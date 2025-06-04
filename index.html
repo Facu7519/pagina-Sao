@@ -487,6 +487,14 @@
             box-shadow: none;
             border-bottom: none;
         }
+        /* Estilos para botones pequeños en el panel de admin */
+        .action-btn.small-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            min-width: auto;
+            margin-left: 5px;
+            margin-top: 5px; /* Espacio superior para botones en admin */
+        }
 
 
         /* Modal General */
@@ -971,9 +979,69 @@
             to { opacity: 0; transform: translateX(100%); }
         }
 
+        /* Estilos para el Panel de Administrador */
+        .admin-section input[type="number"], 
+        .admin-section input[type="text"], 
+        .admin-section select {
+            background-color: #2a2d3a;
+            color: #e0e0e0;
+            border: 1px solid #4a4f66;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-right: 5px;
+            margin-bottom: 10px; /* Espacio inferior para inputs */
+        }
+        .admin-section label { 
+            margin-right: 5px; 
+            display: inline-block; /* Para alinear mejor con inputs */
+            margin-bottom: 5px; /* Espacio inferior para labels */
+        }
+        .admin-section h3, .admin-section h4 {
+            color: #a1d8ff;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .admin-section h4 { font-size: 1.1rem; }
+        .admin-sections-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .admin-section {
+            flex: 1 1 300px; /* Permite que las secciones crezcan y se envuelvan */
+            background: rgba(25, 28, 40, 0.8); /* Ligeramente más oscuro que el modal */
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(70, 130, 180, 0.3);
+        }
+        #adminItemDetailsPreview, #adminUnlockedFloorsList {
+            font-size: 0.9em; 
+            margin-top: 8px; 
+            color: #ccc;
+            padding: 8px;
+            background: rgba(10,10,18,0.4);
+            border-radius: 5px;
+            min-height: 30px;
+        }
+        #adminUnlockedFloorsList {
+            max-height:120px; 
+            overflow-y:auto;
+        }
+        #adminPanelMessage {
+            color: #87CEEB; 
+            text-align: center; 
+            margin-top: 20px; 
+            padding: 10px;
+            background-color: rgba(10,10,18,0.5);
+            border-radius: 5px;
+            border: 1px solid #87CEEB;
+            display: none; /* Inicialmente oculto */
+        }
+
+
         /* Responsive */
         @media (max-width: 992px) {
-            .inventory-sections, .shop-sections, .blacksmith-sections, .training-sections { /* Added .training-sections */
+            .inventory-sections, .shop-sections, .blacksmith-sections, .training-sections, .admin-sections-container { /* Added .training-sections */
                 flex-direction: column;
             }
             .combat-arena { flex-direction: column; align-items: center; }
@@ -1085,7 +1153,8 @@
                 <button class="action-btn shop-btn" id="shop-btn">🛒 Tienda</button>
                 <button class="action-btn blacksmith-btn" id="blacksmith-btn">🛠️ Herrería</button>
                 <button class="action-btn" id="player-stats-btn">📊 Mis Stats</button>
-                <button class="action-btn" id="floor-navigate-btn">🗺️ Desplazarse entre Pisos</button> <!-- New button -->
+                <button class="action-btn" id="floor-navigate-btn">🗺️ Desplazarse entre Pisos</button>
+                <button class="action-btn" id="admin-access-btn">🔑 Admin</button> <!-- Nuevo Botón Admin -->
                 <button class="action-btn" onclick="saveGame()">💾 Guardar</button>
                 <button class="action-btn" onclick="loadGame()">📂 Cargar</button>
                 <button class="action-btn" onclick="confirmResetProgress()">🔄 Nuevo Juego</button>
@@ -1141,6 +1210,7 @@
         </section>
     </main>
 
+    <!-- Modal de Información General -->
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <span class="close-modal-btn" onclick="closeModal('infoModal')">&times;</span>
@@ -1148,6 +1218,7 @@
         </div>
     </div>
 
+    <!-- Modal de Inventario -->
     <div id="inventoryModal" class="modal">
         <div class="modal-content large inventory-content">
             <span class="close-modal-btn" onclick="closeModal('inventoryModal')">&times;</span>
@@ -1172,6 +1243,7 @@
         </div>
     </div>
 
+    <!-- Modal de Tienda -->
     <div id="shopModal" class="modal">
         <div class="modal-content large shop-content">
             <span class="close-modal-btn" onclick="closeModal('shopModal')">&times;</span>
@@ -1184,6 +1256,7 @@
         </div>
     </div>
 
+    <!-- Modal de Herrería -->
     <div id="blacksmithModal" class="modal">
         <div class="modal-content large blacksmith-content">
             <span class="close-modal-btn" onclick="closeModal('blacksmithModal')">&times;</span>
@@ -1203,6 +1276,7 @@
         </div>
     </div>
 
+    <!-- Modal de Estadísticas del Jugador -->
     <div id="playerStatsModal" class="modal">
         <div class="modal-content">
             <span class="close-modal-btn" onclick="closeModal('playerStatsModal')">&times;</span>
@@ -1241,6 +1315,7 @@
         </div>
     </div>
 
+    <!-- Modal de Combate -->
     <div id="combatModal" class="modal">
         <div class="modal-content xlarge">
             <span class="close-modal-btn" onclick="closeModal('combatModal')">&times;</span>
@@ -1249,7 +1324,7 @@
                 <div class="combatant-display" id="combat-player-display">
                     <h3 id="combat-player-name">Jugador</h3>
                     <div class="combatant-icon">
-                        <img src="https://static.wikia.nocookie.net/cardfight/images/4/4a/Sao_sword_art_online_kirito_dual_wield_by_miizu_kun-d5dvytb.jpg/revision/latest?cb=20150408235136text=Kirito" alt="">
+                        <img src="https://static.wikia.nocookie.net/cardfight/images/4/4a/Sao_sword_art_online_kirito_dual_wield_by_miizu_kun-d5dvytb.jpg/revision/latest?cb=20150408235136" alt="Imagen de Kirito en combate">
                     </div>
                     <div class="combat-hp-bar-container">
                         <div class="combat-hp-bar-fill" id="combat-player-hp-bar">100/100</div>
@@ -1284,6 +1359,7 @@
         </div>
     </div>
 
+    <!-- Modal de Entrada de Nombre -->
     <div id="nameEntryModal" class="modal">
         <div class="modal-content">
             <h2>Elige el Nombre de tu Personaje</h2>
@@ -1293,7 +1369,7 @@
         </div>
     </div>
 
-    <!-- New Floor Navigation Modal -->
+    <!-- Modal de Navegación entre Pisos -->
     <div id="floorNavigationModal" class="modal">
         <div class="modal-content">
             <span class="close-modal-btn" onclick="closeModal('floorNavigationModal')">&times;</span>
@@ -1305,7 +1381,7 @@
         </div>
     </div>
 
-    <!-- New Training Modal -->
+    <!-- Modal de Entrenamiento -->
     <div id="trainingModal" class="modal">
         <div class="modal-content large training-content">
             <span class="close-modal-btn" onclick="closeModal('trainingModal')">&times;</span>
@@ -1322,7 +1398,7 @@
                     <h3>📈 Ganancias Estimadas</h3>
                     <ul id="training-stats-preview">
                         <li>Ataque: +1</li>
-                        <li>Defensa: +0-1</li>
+                        <li>Defensa: +0-2</li>
                         <li>HP Máx: +5</li>
                         <li>MP Máx: +2</li>
                     </ul>
@@ -1332,13 +1408,118 @@
         </div>
     </div>
 
+    <!-- Modal de Clave de Administrador -->
+    <div id="adminKeyModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-modal-btn" onclick="closeModal('adminKeyModal')">&times;</span>
+            <h2>Acceso de Administrador</h2>
+            <p>Ingresa la clave de administrador:</p>
+            <input type="password" id="adminKeyValue" placeholder="Clave Secreta" style="width: calc(100% - 20px); padding: 10px; margin: 10px auto; display:block; border-radius: 5px; border: 1px solid #555; background-color: #222; color: #fff;">
+            <button class="action-btn" id="submitAdminKeyBtn" style="display:block; margin: 10px auto;">Entrar</button>
+            <p id="adminKeyErrorMsg" style="color: #ff6b6b; text-align: center; margin-top: 10px; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- Modal del Panel de Administrador -->
+    <div id="adminPanelModal" class="modal">
+        <div class="modal-content xlarge"> <!-- Usar xlarge para más espacio -->
+            <span class="close-modal-btn" onclick="closeModal('adminPanelModal')">&times;</span>
+            <h2>Panel de Administrador</h2>
+
+            <div class="admin-sections-container">
+
+                <!-- Sección: Jugador -->
+                <div class="admin-section">
+                    <h3>Jugador</h3>
+                    <div>
+                        <label for="adminSetLevelValue">Nivel:</label>
+                        <input type="number" id="adminSetLevelValue" min="1" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setLevel()">Establecer Nivel</button>
+                    </div>
+                    <div>
+                        <label for="adminGiveExpValue">Dar EXP:</label>
+                        <input type="number" id="adminGiveExpValue" min="0" style="width: 100px;">
+                        <button class="action-btn small-btn" onclick="adminActions.giveExp()">Dar EXP</button>
+                    </div>
+                    <div>
+                        <label for="adminGiveColValue">Dar Col:</label>
+                        <input type="number" id="adminGiveColValue" min="0" style="width: 100px;">
+                        <button class="action-btn small-btn" onclick="adminActions.giveCol()">Dar Col</button>
+                    </div>
+
+                    <h4>Estadísticas Base:</h4>
+                    <div>
+                        <label for="adminSetBaseAtkValue">Ataque Base:</label>
+                        <input type="number" id="adminSetBaseAtkValue" min="0" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseAttack', 'adminSetBaseAtkValue')">Establecer</button>
+                    </div>
+                    <div>
+                        <label for="adminSetBaseDefValue">Defensa Base:</label>
+                        <input type="number" id="adminSetBaseDefValue" min="0" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseDefense', 'adminSetBaseDefValue')">Establecer</button>
+                    </div>
+                    <div>
+                        <label for="adminSetBaseMaxHpValue">HP Máx. Base:</label>
+                        <input type="number" id="adminSetBaseMaxHpValue" min="1" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseMaxHp', 'adminSetBaseMaxHpValue')">Establecer</button>
+                    </div>
+                    <div>
+                        <label for="adminSetBaseMaxMpValue">MP Máx. Base:</label>
+                        <input type="number" id="adminSetBaseMaxMpValue" min="0" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseMaxMp', 'adminSetBaseMaxMpValue')">Establecer</button>
+                    </div>
+                </div>
+
+                <!-- Sección: Items -->
+                <div class="admin-section">
+                    <h3>Items</h3>
+                    <div>
+                        <label for="adminItemIdValue">ID del Item:</label>
+                        <input type="text" id="adminItemIdValue" placeholder="ej: healing_potion_s" style="width: 180px;">
+                        <button class="action-btn small-btn" onclick="adminActions.showItemDetails()">Ver Detalles</button>
+                    </div>
+                    <div id="adminItemDetailsPreview">Detalles del item aparecerán aquí...</div>
+                    
+                    <div>
+                        <label for="adminItemQuantityValue">Cantidad:</label>
+                        <input type="number" id="adminItemQuantityValue" min="1" value="1" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.giveItem()">Dar Item</button>
+                    </div>
+                    
+                    <h4>Lista de Items (Referencia):</h4>
+                    <select id="adminItemQuickSelect" size="6" style="width: 100%; background: #222; color: #fff; border-radius: 5px; padding: 5px; margin-top:5px;">
+                        <!-- Opciones se llenarán con JS -->
+                    </select>
+                    <button class="action-btn small-btn" onclick="adminActions.selectItemFromList()" style="margin-top: 5px;">Usar ID Seleccionado</button>
+                </div>
+
+                <!-- Sección: Pisos -->
+                <div class="admin-section">
+                    <h3>Acceso a Pisos</h3>
+                    <div>
+                        <label for="adminFloorNumberValue">Número de Piso:</label>
+                        <input type="number" id="adminFloorNumberValue" min="1" max="100" style="width: 80px;"> 
+                        <button class="action-btn small-btn" onclick="adminActions.grantFloorAccess()">Dar Acceso</button>
+                        <button class="action-btn small-btn" onclick="adminActions.revokeFloorAccess()">Quitar Acceso</button>
+                    </div>
+                    
+                    <h4>Pisos Desbloqueados:</h4>
+                    <div id="adminUnlockedFloorsList">Cargando...</div>
+                </div>
+            </div>
+            <p id="adminPanelMessage" style="display: none;"></p> <!-- Mensaje de feedback -->
+        </div>
+    </div>
+
 
     <script>
         // ===============================================
         //           CONFIGURACIÓN INICIAL Y DATOS
         // ===============================================
+        const ADMIN_SECRET_KEY = "SAO_ADMIN_2025"; // Clave secreta para el panel de admin
+
         let player = {
-            name: "", // Nombre se definirá al inicio
+            name: "", 
             level: 1,
             currentExp: 0,
             neededExp: 100,
@@ -1350,7 +1531,7 @@
             baseDefense: 2,
             col: 1000,
             currentFloor: 1,
-            unlockedFloors: [1], // Track unlocked floors
+            unlockedFloors: [1], 
             inventory: [
                 { id: 'healing_potion_s', name: 'Poción Vida (P)', icon: '🧪', type: 'consumable', effect: { hp: 50 }, count: 5, description: "Restaura 50 HP." },
                 { id: 'mana_potion_s', name: 'Poción Maná (P)', icon: '💧', type: 'consumable', effect: { mp: 30 }, count: 3, description: "Restaura 30 MP." },
@@ -1371,14 +1552,15 @@
             skills: [ 
                 { id: 'quick_slash', name: 'Corte Rápido', mpCost: 5, damageMultiplier: 1.2, description: "Un ataque veloz. Coste: 5 MP." },
             ],
-            passiveSkills: [], // New: Passive skills
+            passiveSkills: [], 
             materials: { 
                 'raw_hide': 10, 'iron_ore': 5, 'kobold_fang': 0, 'silver_ingot': 0,
                 'blue_crystal': 0, 'obsidian_shard': 0, 'dragon_scale': 0, 'divine_fragment': 0,
             },
-            activeStatusEffects: [], // New: Array to hold active status effects
-            lastCombatAction: null, // For combo system: 'attack', 'skill'
-            attackComboCount: 0, // For combo system: counts consecutive normal attacks
+            activeStatusEffects: [], 
+            lastCombatAction: null, 
+            attackComboCount: 0, 
+            isAdmin: false, // Nueva propiedad para el acceso de admin
         };
         
         // Datos de Items Base (sin cambios)
@@ -1432,7 +1614,7 @@
         
         // Habilidades del Jugador (Actualizado con nuevas habilidades)
         const skillData = {
-            'quick_slash': { name: 'Corte Rápido', icon: '⚡', mpCost: 5, damageMultiplier: 1.2, type: 'attack', description: "Un ataque veloz que consume 5 MP." },
+            'quick_slash': { name: 'Corte Rápido', icon: '⚡', mpCost: 5, damageMultiplier: 1.3, type: 'attack', description: "Un ataque veloz que consume 5 MP." },
             'power_strike': { name: 'Golpe Poderoso', icon: '💥', mpCost: 15, damageMultiplier: 2.0, type: 'attack', levelReq: 5, description: "Un golpe devastador. Coste: 15 MP. Req LV: 5." },
             'heal_light': { name: 'Curación Ligera', icon: '➕', mpCost: 20, healAmount: 50, type: 'heal', levelReq: 3, description: "Restaura 50 HP. Coste: 20 MP. Req LV: 3." },
             'shield_bash': { name: 'Golpe de Escudo', icon: '🛡️', mpCost: 10, damageMultiplier: 0.8, stunChance: 0.3, type: 'utility', levelReq: 8, description: "Aturde al enemigo con el escudo. Coste: 10 MP. Req LV: 8." },
@@ -1452,7 +1634,7 @@
         const passiveSkillData = {
             'hp_regen_s': { name: 'Regeneración HP (P)', icon: '💚', effect: { hpRegen: 5 }, levelReq: 5, description: "Recupera 5 HP al final de cada turno de combate." },
             'mp_efficiency_s': { name: 'Eficiencia MP (P)', icon: '💙', effect: { mpCostReduction: 0.1 }, levelReq: 8, description: "Reduce el costo de MP de las habilidades en un 10%." },
-            'crit_chance_s': { name: 'Golpe Crítico (P)', icon: '�', effect: { critChance: 0.05 }, levelReq: 15, description: "Aumenta la probabilidad de golpe crítico en un 5%." },
+            'crit_chance_s': { name: 'Golpe Crítico (P)', icon: '🎯', effect: { critChance: 0.05 }, levelReq: 15, description: "Aumenta la probabilidad de golpe crítico en un 5%." },
         };
 
         // Status Effects Data (New)
@@ -1471,11 +1653,12 @@
         const floorData = {
             1: { name: "Bosque del Inicio", monsters: [{ name: "Lobo Frenético", hp: 40, attack: 7, defense: 2, exp: 12, col: 8, icon: '🐺', drops: {'raw_hide': 0.5} }, { name: "Jabalí Agresivo", hp: 60, attack: 10, defense: 3, exp: 18, col: 12, icon: '🐗', drops: {'raw_hide': 0.7} }], boss: { name: "Illfang el Señor Kóbold", hp: 250, attack: 18, defense: 6, exp: 120, col: 70, icon: '👹', drops: {'kobold_fang': 1.0, 'iron_ore': 0.3}, skills: [{ id: 'boss_slam', name: 'Golpe de Jefe', damageMultiplier: 1.5, statusEffect: { type: 'stunned', duration: 1, chance: 0.3 } }] }, shopItems: [{ id: 'healing_potion_s', price: 20 }, { id: 'mana_potion_s', price: 25 }, { id: 'short_sword', price: 75 }, { id: 'leather_jerkin', price: 60 }, { id: 'wooden_buckler', price: 50 }], blacksmithRecipes: [], unlocked: true },
             2: { name: "Praderas de Urbus", monsters: [{ name: "Avispa Gigante", hp: 70, attack: 15, defense: 4, exp: 28, col: 18, icon: '🐝', drops: {'raw_hide': 0.2, 'iron_ore': 0.1} }, { name: "Planta Carnívora", hp: 90, attack: 12, defense: 6, exp: 35, col: 22, icon: '🌿', drops: {'healing_potion_s': 0.1, 'iron_ore': 0.2} }], boss: { name: "Asterios el Tauro Plateado", hp: 550, attack: 28, defense: 10, exp: 280, col: 150, icon: '🐂', drops: {'silver_ingot': 0.5, 'iron_sword': 0.1}, skills: [{ id: 'boss_charge', name: 'Carga Bestial', damageMultiplier: 1.8, statusEffect: { type: 'bleeding', duration: 2, value: 0.1 } }] }, shopItems: [{ id: 'healing_potion_s', price: 20 }, { id: 'healing_potion_m', price: 50 }, { id: 'mana_potion_s', price: 25 }, { id: 'iron_sword', price: 200 }, { id: 'chainmail_vest', price: 180 }, { id: 'iron_kite_shield', price: 150 }, { id: 'ring_of_strength', price: 120 }], blacksmithRecipes: [], unlocked: false },
-            3: { name: "Bosque Serpenteante", monsters: [{ name: "Serpiente Arbórea", hp: 120, attack: 20, defense: 7, exp: 50, col: 30, icon: '🐍', drops: {'raw_hide': 0.4, 'antidote_herb': 0.3} }, { name: "Araña de Cueva", hp: 100, attack: 25, defense: 5, exp: 60, col: 35, icon: '🕷️', drops: {'iron_ore': 0.3, 'kobold_fang': 0.1} }], boss: { name: "Nerius la Reina Arácnida", hp: 900, attack: 35, defense: 12, exp: 500, col: 250, icon: '👑🕷️', drops: {'blue_crystal': 0.2, 'steel_longsword': 0.05, 'poison_spit': { name: 'Saliva Venenosa', damageMultiplier: 0.5, statusEffect: { type: 'poisoned', duration: 3, value: 0.08 } } } }, shopItems: [{ id: 'healing_potion_m', price: 48 }, { id: 'mana_potion_m', price: 60 }, { id: 'antidote_herb', price: 30 }, { id: 'steel_longsword', price: 450 }, { id: 'iron_plate_armor', price: 400 }, { id: 'amulet_of_vitality', price: 250 }], blacksmithRecipes: [], unlocked: false },
+            3: { name: "Bosque Serpenteante", monsters: [{ name: "Serpiente Arbórea", hp: 120, attack: 20, defense: 7, exp: 50, col: 30, icon: '🐍', drops: {'raw_hide': 0.4, 'antidote_herb': 0.3} }, { name: "Araña de Cueva", hp: 100, attack: 25, defense: 5, exp: 60, col: 35, icon: '🕷️', drops: {'iron_ore': 0.3, 'kobold_fang': 0.1} }], boss: { name: "Nerius la Reina Arácnida", hp: 900, attack: 35, defense: 12, exp: 500, col: 250, icon: '👑🕷️', drops: {'blue_crystal': 0.2, 'steel_longsword': 0.05}, skills: [{ id: 'poison_spit', name: 'Saliva Venenosa', damageMultiplier: 0.5, statusEffect: { type: 'poisoned', duration: 3, value: 0.08 } }] }, shopItems: [{ id: 'healing_potion_m', price: 48 }, { id: 'mana_potion_m', price: 60 }, { id: 'antidote_herb', price: 30 }, { id: 'steel_longsword', price: 450 }, { id: 'iron_plate_armor', price: 400 }, { id: 'amulet_of_vitality', price: 250 }], blacksmithRecipes: [], unlocked: false },
             4: { name: "Montañas Nevadas", monsters: [{ name: "Yeti Menor", hp: 180, attack: 30, defense: 10, exp: 90, col: 50, icon: '🦍', drops: {'raw_hide': 0.6, 'silver_ingot': 0.15} }, { name: "Lobo de Hielo", hp: 150, attack: 35, defense: 8, exp: 100, col: 55, icon: '🐺❄️', drops: {'kobold_fang': 0.2, 'blue_crystal': 0.05} }], boss: { name: "Krampus el Rey Helado", hp: 1500, attack: 45, defense: 18, exp: 800, col: 400, icon: '👹❄️', drops: {'blue_crystal': 0.4, 'obsidian_shard': 0.1}, skills: [{ id: 'boss_blizzard', name: 'Ventisca Congelante', damageMultiplier: 1.2, statusEffect: { type: 'weakened', duration: 3, value: 0.2 } }] }, shopItems: [{ id: 'healing_potion_l', price: 100 }, { id: 'mana_potion_m', price: 55 }, { id: 'steel_tower_shield', price: 380 }, { id: 'mage_pendant', price: 300 }], blacksmithRecipes: [], unlocked: false },
-            5: { name: "Mazmorra Olvidada", monsters: [{ name: "Esqueleto Guerrero", hp: 220, attack: 40, defense: 15, exp: 150, col: 70, icon: '💀', drops: {'iron_ore': 0.5, 'obsidian_shard': 0.05} }, { name: "Fantasma Llorón", hp: 180, attack: 38, defense: 12, exp: 140, col: 65, icon: '👻', drops: {'blue_crystal': 0.1, 'mana_potion_s': 0.2} }], boss: { name: "Lich Archimago", hp: 2200, attack: 55, defense: 22, exp: 1200, col: 600, icon: '💀🧙', drops: {'obsidian_shard': 0.3, 'knight_armor': 0.03, 'divine_fragment': 0.01}, skills: [{ id: 'boss_curse', name: 'Maldición Oscura', damageMultiplier: 0.8, statusEffect: { type: 'poisoned', duration: 5, value: 0.1 } }] }, shopItems: [{ id: 'healing_potion_l', price: 95 }, { id: 'knight_sword', price: 800 }, { id: 'knight_armor', price: 750 }], blacksmithRecipes: [], unlocked: false },
+            5: { name: "Mazmorra Olvidada", monsters: [{ name: "Esqueleto Guerrero", hp: 220, attack: 40, defense: 15, exp: 150, col: 70, icon: '�', drops: {'iron_ore': 0.5, 'obsidian_shard': 0.05} }, { name: "Fantasma Llorón", hp: 180, attack: 38, defense: 12, exp: 140, col: 65, icon: '👻', drops: {'blue_crystal': 0.1, 'mana_potion_s': 0.2} }], boss: { name: "Lich Archimago", hp: 2200, attack: 55, defense: 22, exp: 1200, col: 600, icon: '💀🧙', drops: {'obsidian_shard': 0.3, 'knight_armor': 0.03, 'divine_fragment': 0.01}, skills: [{ id: 'boss_curse', name: 'Maldición Oscura', damageMultiplier: 0.8, statusEffect: { type: 'poisoned', duration: 5, value: 0.1 } }] }, shopItems: [{ id: 'healing_potion_l', price: 95 }, { id: 'knight_sword', price: 800 }, { id: 'knight_armor', price: 750 }], blacksmithRecipes: [], unlocked: false },
             6: { name: "Ciudad Flotante: Lyusula", monsters: [{ name: "Guardia Autómata Defectuoso", hp: 300, attack: 50, defense: 25, exp: 250, col: 100, icon: '🤖', drops: {'silver_ingot': 0.3, 'blue_crystal': 0.15} }, { name: "Quimera Escapada", hp: 350, attack: 55, defense: 20, exp: 280, col: 120, icon: '🦁🦅🐍', drops: {'raw_hide': 0.3, 'dragon_scale': 0.02} }], boss: { name: "General Geocíclope", hp: 3500, attack: 70, defense: 30, exp: 2000, col: 1000, icon: '👁️‍🗨️🗿', drops: {'dragon_scale': 0.1, 'divine_fragment': 0.02, 'elucidator_prototype': 0.01}, skills: [{ id: 'boss_tremor', name: 'Temblor de Tierra', damageMultiplier: 1.6, statusEffect: { type: 'stunned', duration: 1, chance: 0.5 } }] }, shopItems: [{ id: 'healing_potion_l', price: 90 }, { id: 'mana_potion_m', price: 50 }, { id: 'obsidian_shard', price: 1500, type: 'material'}, { id: 'blue_crystal', price: 2500, type: 'material'}], blacksmithRecipes: [], unlocked: false },
             7: { name: "Corazón del Laberinto (Piso 74)", monsters: [{ name: "Demonio Menor", hp: 400, attack: 60, defense: 28, exp: 350, col: 150, icon: '👿', drops: {'obsidian_shard': 0.2, 'dragon_scale': 0.05} }, { name: "Guardián de Ébano", hp: 500, attack: 65, defense: 35, exp: 400, col: 180, icon: '💂⚫', drops: {'divine_fragment': 0.01, 'silver_ingot': 0.4} }], boss: { name: "The Gleam Eyes (Réplica)", hp: 5000, attack: 85, defense: 40, exp: 3000, col: 1500, icon: '🐐👹', drops: {'divine_fragment': 0.05, 'dragon_scale': 0.2, 'elucidator': 0.005}, skills: [{ id: 'boss_cleave', name: 'Tajo Brutal', damageMultiplier: 2.0, statusEffect: { type: 'bleeding', duration: 3, value: 0.12 } }] }, shopItems: [ ], blacksmithRecipes: [], unlocked: false }
+            // ... hasta el piso 100 (simplificado para el ejemplo)
         };
         
         // ===============================================
@@ -1497,7 +1680,7 @@
         const playerColElement = document.getElementById('player-col');
         const currentFloorElement = document.getElementById('current-floor');
         const floorNameElement = document.getElementById('floor-name');
-        const trainCostDisplay = document.getElementById('train-cost-display'); // New
+        const trainCostDisplay = document.getElementById('train-cost-display'); 
 
         // Modales y Grids
         const infoModalElement = document.getElementById('infoModal');
@@ -1544,9 +1727,9 @@
         // Combat Modal Selectors
         const combatModalElement = document.getElementById('combatModal');
         const combatTitleElement = document.getElementById('combat-title');
-        const combatPlayerDisplay = document.getElementById('combat-player-display'); // New for turn indicator
+        const combatPlayerDisplay = document.getElementById('combat-player-display'); 
         const combatPlayerNameElement = document.getElementById('combat-player-name');
-        const combatPlayerAvatarImg = document.getElementById('combat-player-avatar-img'); 
+        const combatPlayerAvatarImg = document.querySelector('#combat-player-display .combatant-icon img'); 
         const combatPlayerHpBarElement = document.getElementById('combat-player-hp-bar');
         const combatPlayerHpCurrentElement = document.getElementById('combat-player-hp-current');
         const combatPlayerHpMaxElement = document.getElementById('combat-player-hp-max');
@@ -1556,10 +1739,9 @@
         const combatPlayerDefElement = document.getElementById('combat-player-def');
         const combatPlayerStatusEffectsDisplay = document.getElementById('combat-player-status-effects-display'); 
 
-        const combatEnemyDisplay = document.getElementById('combat-enemy-display'); // New for turn indicator
+        const combatEnemyDisplay = document.getElementById('combat-enemy-display'); 
         const combatEnemyNameElement = document.getElementById('combat-enemy-name');
         const combatEnemyIconElement = document.getElementById('combat-enemy-icon');
-        // Updated to target the fill element directly
         const combatEnemyHpBarFillElement = document.getElementById('combat-enemy-hp-bar-fill'); 
         const combatEnemyHpCurrentElement = document.getElementById('combat-enemy-hp-current');
         const combatEnemyHpMaxElement = document.getElementById('combat-enemy-hp-max');
@@ -1584,16 +1766,40 @@
         const blacksmithBtn = document.getElementById('blacksmith-btn');
         const playerStatsBtn = document.getElementById('player-stats-btn');
         const floorNavigateBtn = document.getElementById('floor-navigate-btn'); 
+        const adminAccessBtn = document.getElementById('admin-access-btn'); // Botón Admin
 
         // Floor Navigation Modal Selectors
         const floorNavigationModal = document.getElementById('floorNavigationModal');
         const floorSelectGrid = document.getElementById('floor-select-grid');
 
         // Training Modal Selectors
-        const trainingModal = document.getElementById('trainingModal'); // New
-        const trainingGridDisplay = document.getElementById('training-grid-display'); // New
-        const trainingPlayerCol = document.getElementById('training-player-col'); // New
-        const trainingStatsPreview = document.getElementById('training-stats-preview'); // New
+        const trainingModal = document.getElementById('trainingModal'); 
+        const trainingGridDisplay = document.getElementById('training-grid-display'); 
+        const trainingPlayerCol = document.getElementById('training-player-col'); 
+        const trainingStatsPreview = document.getElementById('training-stats-preview'); 
+
+        // Admin Panel Selectors
+        const adminKeyModal = document.getElementById('adminKeyModal');
+        const adminKeyValueInput = document.getElementById('adminKeyValue');
+        const submitAdminKeyBtn = document.getElementById('submitAdminKeyBtn');
+        const adminKeyErrorMsg = document.getElementById('adminKeyErrorMsg');
+        const adminPanelModal = document.getElementById('adminPanelModal');
+        const adminPanelMessage = document.getElementById('adminPanelMessage');
+        // Inputs del panel de admin
+        const adminSetLevelValueInput = document.getElementById('adminSetLevelValue');
+        const adminGiveExpValueInput = document.getElementById('adminGiveExpValue');
+        const adminGiveColValueInput = document.getElementById('adminGiveColValue');
+        const adminSetBaseAtkValueInput = document.getElementById('adminSetBaseAtkValue');
+        const adminSetBaseDefValueInput = document.getElementById('adminSetBaseDefValue');
+        const adminSetBaseMaxHpValueInput = document.getElementById('adminSetBaseMaxHpValue');
+        const adminSetBaseMaxMpValueInput = document.getElementById('adminSetBaseMaxMpValue');
+        const adminItemIdValueInput = document.getElementById('adminItemIdValue');
+        const adminItemDetailsPreviewDiv = document.getElementById('adminItemDetailsPreview');
+        const adminItemQuantityValueInput = document.getElementById('adminItemQuantityValue');
+        const adminItemQuickSelect = document.getElementById('adminItemQuickSelect');
+        const adminFloorNumberValueInput = document.getElementById('adminFloorNumberValue');
+        const adminUnlockedFloorsListDiv = document.getElementById('adminUnlockedFloorsList');
+
 
         // Para la Wiki (sin cambios)
         const charactersGridDisplay = document.getElementById('characters-grid-display');
@@ -1613,17 +1819,15 @@
         const backgroundMusic = document.getElementById('background-music');
         const musicToggleBtn = document.getElementById('music-toggle-btn'); 
 
-        // Opcional: Ajustar el volumen (0.5 es 50% de volumen)
         backgroundMusic.volume = 0.3;
 
         function toggleMusic() {
             if (backgroundMusic.paused) {
-                backgroundMusic.play();
+                backgroundMusic.play().catch(e => console.warn("Error al reproducir música:", e)); // Añadir catch
                 musicToggleBtn.textContent = "🔇 Silenciar";
                 showNotification("Música iniciada.", "default", 1500);
             } else {
                 backgroundMusic.pause();
-                // Esto cumple tu requisito de que al reactivar, inicie desde cero.
                 backgroundMusic.currentTime = 0; 
                 musicToggleBtn.textContent = "🔊 Música";
                 showNotification("Música detenida.", "default", 1500);
@@ -1651,12 +1855,14 @@
             }
             player.effectiveAttack = player.baseAttack + equippedAttack;
             player.effectiveDefense = player.baseDefense + equippedDefense;
+            
             const oldMaxHp = player.maxHp;
             player.maxHp = player.baseMaxHp + equippedMaxHp;
             if (player.hp > player.maxHp) player.hp = player.maxHp;
-            else if (player.maxHp > oldMaxHp) {
+            else if (player.maxHp > oldMaxHp && player.hp > 0) { // Solo curar si no está muerto
                  player.hp = Math.min(player.hp + (player.maxHp - oldMaxHp), player.maxHp);
             }
+            
             const oldMaxMp = player.maxMp;
             player.maxMp = player.baseMaxMp + equippedMaxMp;
             if (player.mp > player.maxMp) player.mp = player.maxMp;
@@ -1664,13 +1870,10 @@
                  player.mp = Math.min(player.mp + (player.maxMp - oldMaxMp), player.maxMp);
             }
 
-            // Apply passive skill effects
             calculatePassiveEffects();
         }
 
-        // New: Apply passive skill effects
         function calculatePassiveEffects() {
-            // Reset temporary passive bonuses before recalculating
             player.tempAttackBonus = 0;
             player.tempDefenseBonus = 0;
             player.tempCritChanceBonus = 0;
@@ -1683,7 +1886,6 @@
                     if (passive.effect.hpRegen) player.tempHpRegen += passive.effect.hpRegen;
                     if (passive.effect.mpCostReduction) player.tempMpCostReduction += passive.effect.mpCostReduction;
                     if (passive.effect.critChance) player.tempCritChanceBonus += passive.effect.critChance;
-                    // Add more passive effects here as needed
                 }
             });
         }
@@ -1691,9 +1893,9 @@
         function updatePlayerHUD() {
             calculateEffectiveStats(); 
 
-            saoPlayerNameDisplay.textContent = player.name || "Jugador"; // Mostrar nombre del jugador
-            statsPlayerName.textContent = player.name || "Jugador"; // También en modal de stats
-            combatPlayerNameElement.textContent = player.name || "Jugador"; // También en modal de combate
+            saoPlayerNameDisplay.textContent = player.name || "Jugador"; 
+            statsPlayerName.textContent = player.name || "Jugador"; 
+            combatPlayerNameElement.textContent = player.name || "Jugador"; 
 
             const hpPercentage = (player.hp / player.maxHp) * 100;
             saoHpBar.style.width = `${hpPercentage}%`;
@@ -1717,17 +1919,24 @@
             currentFloorElement.textContent = player.currentFloor;
             floorNameElement.textContent = floorData[player.currentFloor]?.name || "Desconocido";
 
-            trainCostDisplay.textContent = 50 * player.level; // Update train cost display
+            trainCostDisplay.textContent = 50 * player.level; 
 
             displayStatusEffects(playerStatusEffectsDisplay, player.activeStatusEffects);
         }
 
+        function calculateNeededExpForLevel(level) {
+            let exp = 100;
+            for (let i = 1; i < level; i++) {
+                exp = Math.floor(exp * 1.35 + 80);
+            }
+            return exp;
+        }
 
         function gainExp(amount) {
             if (player.hp <= 0) return; 
             player.currentExp += amount;
             showNotification(`¡Has ganado ${amount} EXP!`, "success");
-            if (player.currentExp >= player.neededExp) {
+            while (player.currentExp >= player.neededExp) { // Usar while para múltiples level ups
                 levelUp();
             }
             updatePlayerHUD();
@@ -1736,7 +1945,7 @@
         function levelUp() {
             player.level++;
             player.currentExp = Math.max(0, player.currentExp - player.neededExp); 
-            player.neededExp = Math.floor(player.neededExp * 1.35 + 80); 
+            player.neededExp = calculateNeededExpForLevel(player.level); 
             player.baseMaxHp += Math.floor(20 + player.level * 1.5);
             player.baseMaxMp += Math.floor(8 + player.level * 0.8);
             calculateEffectiveStats(); 
@@ -1745,63 +1954,67 @@
             player.baseAttack += Math.floor(2 + player.level * 0.2);
             player.baseDefense += Math.floor(1 + player.level * 0.15);
             showNotification(`¡LEVEL UP! Has alcanzado el Nivel ${player.level}! Tus stats han mejorado.`, "success", 6000);
-            // Check for new active skills
+            
             Object.entries(skillData).forEach(([skillId, data]) => {
                 if (data.levelReq === player.level && !player.skills.find(s => s.id === skillId)) {
                     player.skills.push({ id: skillId, ...data });
                     showNotification(`¡Nueva habilidad aprendida: ${data.name}!`, "success");
                 }
             });
-            // Check for new passive skills
             Object.entries(passiveSkillData).forEach(([pSkillId, data]) => {
                 if (data.levelReq === player.level && !player.passiveSkills.find(s => s.id === pSkillId)) {
                     player.passiveSkills.push({ id: pSkillId, ...data });
                     showNotification(`¡Nueva habilidad pasiva: ${data.name}!`, "success");
                 }
             });
-            updatePlayerHUD();
+            // No llamar a updatePlayerHUD() aquí, gainExp lo hará después del bucle.
         }
         
         function takeDamage(amount, target, sourceName = "Algo") {
             let damageTaken = Math.max(0, amount - (target.effectiveDefense || target.defense || 0));
 
-            // Process 'protected' status effect
             const protectedEffect = target.activeStatusEffects.find(eff => eff.type === 'protected');
             if (protectedEffect) {
-                damageTaken *= (1 - protectedEffect.value); // Reduce damage by value (e.g., 0.5 for 50%)
+                damageTaken *= (1 - protectedEffect.value); 
                 addCombatLog(`${target.name} está protegido, daño reducido.`, 'status-message');
             }
 
-            // Process 'counter' status effect
             const counterEffect = target.activeStatusEffects.find(eff => eff.type === 'counter');
-            if (counterEffect) {
-                damageTaken *= (1 - counterEffect.damageReduction); // Reduce damage for counter
-                const reflectedDamage = Math.floor(damageTaken * counterEffect.value);
-                currentCombat.enemy.currentHp -= reflectedDamage; // Reflect damage back to enemy
+            if (counterEffect && target === player && currentCombat.enemy) { // Solo el jugador puede contraatacar al enemigo
+                const damageReductionFromCounter = damageTaken * counterEffect.damageReduction;
+                damageTaken -= damageReductionFromCounter;
+                const reflectedDamage = Math.floor(damageTaken * counterEffect.value); // Refleja sobre el daño ya reducido
+                
+                currentCombat.enemy.currentHp -= reflectedDamage; 
                 addCombatLog(`${target.name} contraataca, ${currentCombat.enemy.name} recibe ${reflectedDamage} de daño reflejado.`, 'player-action');
                 updateCombatEnemyDisplay();
+                if (currentCombat.enemy.currentHp <= 0) {
+                    endCombat(true); // El enemigo puede morir por el contraataque
+                    return; // Termina la función si el enemigo muere
+                }
             }
+            
+            damageTaken = Math.floor(damageTaken); // Redondear daño final
 
-            // MODIFICACIÓN CLAVE: Usar target.currentHp para el enemigo
             if (target === player) {
                 target.hp -= damageTaken;
                 if (target.hp < 0) target.hp = 0;
             } else if (target === currentCombat.enemy) {
-                target.currentHp -= damageTaken; // <-- CORRECCIÓN AQUÍ
-                if (target.currentHp < 0) target.currentHp = 0; // <-- CORRECCIÓN AQUÍ
+                target.currentHp -= damageTaken; 
+                if (target.currentHp < 0) target.currentHp = 0; 
             }
 
 
             if (target === player) {
                 combatPlayerDisplay.classList.add('damage-flash');
-                setTimeout(() => combatPlayerDisplay.classList.remove('damage-flash'), 200); // Remove flash after 200ms
+                setTimeout(() => combatPlayerDisplay.classList.remove('damage-flash'), 200); 
 
                 updatePlayerHUD();
                 if (currentCombat.active) {
                     updateCombatPlayerDisplay();
-                    addCombatLog(`${sourceName} te inflige ${Math.floor(damageTaken)} de daño.`, 'enemy-action');
+                    addCombatLog(`${sourceName} te inflige ${damageTaken} de daño.`, 'enemy-action');
                 } else {
-                     showNotification(`${sourceName} te ha infligido ${Math.floor(damageTaken)} de daño.`, "error");
+                     showNotification(`${sourceName} te ha infligido ${damageTaken} de daño.`, "error");
                 }
                 if (player.hp === 0) {
                     if(currentCombat.active) {
@@ -1812,11 +2025,11 @@
                 }
             } else if (target === currentCombat.enemy) {
                 combatEnemyDisplay.classList.add('damage-flash');
-                setTimeout(() => combatEnemyDisplay.classList.remove('damage-flash'), 200); // Remove flash after 200ms
+                setTimeout(() => combatEnemyDisplay.classList.remove('damage-flash'), 200); 
 
                 updateCombatEnemyDisplay();
-                addCombatLog(`Infliges ${Math.floor(damageTaken)} de daño a ${target.name}.`, 'player-action');
-                if (target.currentHp === 0) { // <-- CORRECCIÓN AQUÍ
+                addCombatLog(`Infliges ${damageTaken} de daño a ${target.name}.`, 'player-action');
+                if (target.currentHp === 0) { 
                     endCombat(true);
                 }
             }
@@ -1831,7 +2044,7 @@
             combatBtn.disabled = disable;
             bossCombatBtn.disabled = disable;
             trainSkillBtn.disabled = disable;
-            floorNavigateBtn.disabled = disable; // Disable floor navigation too
+            floorNavigateBtn.disabled = disable; 
         }
 
         function restoreResource(type, amount, target = player) {
@@ -1844,18 +2057,16 @@
             if (currentCombat.active) updateCombatPlayerDisplay();
         }
         
-        // This function is now just a wrapper to open the modal
         function openTrainingModal() {
             const cost = 50 * player.level;
-            trainingPlayerCol.textContent = player.col; // Update Col display in modal
+            trainingPlayerCol.textContent = player.col; 
             trainingStatsPreview.innerHTML = `
                 <li>Ataque: +1</li>
-                <li>Defensa: +0-1</li>
+                <li>Defensa: +0-2</li>
                 <li>HP Máx: +5</li>
                 <li>MP Máx: +2</li>
                 <li>Costo: ${cost} Col</li>
             `;
-            // Render the single training option
             trainingGridDisplay.innerHTML = `
                 <div class="training-option" onclick="performTraining()">
                     <span class="item-icon">💪</span>
@@ -1875,10 +2086,8 @@
                 trainingOptionDiv.title = "";
             }
 
-            // Directly open the training modal
             trainingModal.style.display = 'block';
 
-            // Close other modals if they are open, excluding infoModal and nameEntryModal
             const allModals = document.querySelectorAll('.modal');
             allModals.forEach(m => {
                 if (m.id !== 'trainingModal' && m.id !== 'infoModal' && m.id !== 'nameEntryModal' && !(m.id === 'combatModal' && currentCombat.active)) {
@@ -1887,20 +2096,20 @@
             });
         }
 
-        // This function performs the actual training logic
         function performTraining() {
             const cost = 50 * player.level;
             if (player.col >= cost) {
                 player.col -= cost;
                 player.baseAttack += 1;
-                player.baseDefense += Math.random() < 0.4 ? 1 : 0;
+                player.baseDefense += Math.random() < 0.4 ? 2 : (Math.random() < 0.7 ? 1 : 0) ; // Ajustado para que 0-2 sea más probable
                 player.baseMaxHp += 5;
                 player.baseMaxMp += 2;
                 calculateEffectiveStats();
-                player.hp = Math.min(player.hp + 5, player.maxHp);
+                player.hp = Math.min(player.hp + 5, player.maxHp); // Curar un poco al entrenar
+                player.mp = Math.min(player.mp + 2, player.maxMp);
                 showNotification("¡Entrenamiento completado! Stats mejorados.", "success");
                 updatePlayerHUD();
-                openTrainingModal(); // Re-render the training modal to update cost/stats
+                openTrainingModal(); 
                 saveGame();
             } else {
                 showNotification(`Necesitas ${cost} Col para entrenar.`, "error");
@@ -1925,12 +2134,12 @@
             currentCombat.isBoss = isBossFight;
             currentCombat.enemy = JSON.parse(JSON.stringify(enemyTemplate)); 
             currentCombat.enemy.currentHp = currentCombat.enemy.hp; 
-            currentCombat.enemy.activeStatusEffects = []; // Initialize enemy status effects
+            currentCombat.enemy.activeStatusEffects = []; 
             currentCombat.playerTurn = true; 
-            currentCombat.turnCount = 0; // Reset turn count
-            player.activeStatusEffects = []; // Clear player status effects at start of combat
-            player.attackComboCount = 0; // Reset combo counter
-            player.lastCombatAction = null; // Reset last action
+            currentCombat.turnCount = 0; 
+            player.activeStatusEffects = []; 
+            player.attackComboCount = 0; 
+            player.lastCombatAction = null; 
 
             combatTitleElement.textContent = `¡Combate contra ${currentCombat.enemy.name}!`;
             updateCombatPlayerDisplay();
@@ -1940,13 +2149,13 @@
             combatSkillsListContainer.style.display = 'none'; 
             combatPotionsListContainer.style.display = 'none';
             enableCombatActions(true);
-            updateTurnIndicator(); // Set initial turn indicator
+            updateTurnIndicator(); 
             openModal('combatModal');
         }
 
         function updateCombatPlayerDisplay() {
             calculateEffectiveStats(); 
-            combatPlayerNameElement.textContent = player.name || "Jugador"; // Nombre actualizado
+            combatPlayerNameElement.textContent = player.name || "Jugador"; 
             const playerHpPercent = (player.hp / player.maxHp) * 100;
             combatPlayerHpBarElement.style.width = `${playerHpPercent}%`;
             combatPlayerHpBarElement.textContent = `${player.hp}/${player.maxHp}`;
@@ -1968,11 +2177,10 @@
             combatEnemyNameElement.textContent = currentCombat.enemy.name;
             combatEnemyIconElement.textContent = currentCombat.enemy.icon;
             const enemyHpPercent = (currentCombat.enemy.currentHp / currentCombat.enemy.hp) * 100;
-            combatEnemyHpBarFillElement.style.width = `${enemyHpPercent}%`; // Target the fill element
-            combatEnemyHpBarFillElement.textContent = `${currentCombat.enemy.currentHp}/${currentCombat.enemy.hp}`; // Set text on the fill element
+            combatEnemyHpBarFillElement.style.width = `${enemyHpPercent}%`; 
+            combatEnemyHpBarFillElement.textContent = `${currentCombat.enemy.currentHp}/${currentCombat.enemy.hp}`; 
             
-            // Apply color classes based on HP percentage
-            combatEnemyHpBarFillElement.classList.remove('low', 'critical'); // Remove from fill element
+            combatEnemyHpBarFillElement.classList.remove('low', 'critical'); 
             if (enemyHpPercent < 50 && enemyHpPercent >= 25) {
                 combatEnemyHpBarFillElement.classList.add('low');
             } else if (enemyHpPercent < 25) {
@@ -1998,35 +2206,31 @@
             combatLogDisplayElement.innerHTML = '';
         }
 
-        // New: Apply a status effect to a target
         function applyStatusEffect(target, effectType, duration, value, chance = 1.0) {
-            if (Math.random() > chance) return; // Chance to apply
+            if (Math.random() > chance) return; 
             const existingEffectIndex = target.activeStatusEffects.findIndex(eff => eff.type === effectType);
             if (existingEffectIndex !== -1) {
-                // If effect already exists, refresh duration and update value if applicable
                 target.activeStatusEffects[existingEffectIndex].duration = duration;
                 if (value !== undefined) target.activeStatusEffects[existingEffectIndex].value = value;
-                addCombatLog(`${target.name} ya está ${statusEffects[effectType].name.toLowerCase()}, se refresca la duración.`, 'status-message');
+                addCombatLog(`${target.name || 'Objetivo'} ya está ${statusEffects[effectType].name.toLowerCase()}, se refresca la duración.`, 'status-message');
             } else {
                 target.activeStatusEffects.push({ type: effectType, duration: duration, value: value });
-                addCombatLog(`${target.name} está ${statusEffects[effectType].name.toLowerCase()}!`, 'status-message');
+                addCombatLog(`${target.name || 'Objetivo'} está ${statusEffects[effectType].name.toLowerCase()}!`, 'status-message');
             }
             if (target === player) updateCombatPlayerDisplay();
             else if (target === currentCombat.enemy) updateCombatEnemyDisplay();
         }
 
-        // New: Remove a status effect from a target
         function removeStatusEffect(target, effectType) {
             const initialLength = target.activeStatusEffects.length;
             target.activeStatusEffects = target.activeStatusEffects.filter(eff => eff.type !== effectType);
             if (target.activeStatusEffects.length < initialLength) {
-                addCombatLog(`${target.name} ya no está ${statusEffects[effectType].name.toLowerCase()}.`, 'status-message');
+                addCombatLog(`${target.name || 'Objetivo'} ya no está ${statusEffects[effectType].name.toLowerCase()}.`, 'status-message');
             }
             if (target === player) updateCombatPlayerDisplay();
             else if (target === currentCombat.enemy) updateCombatEnemyDisplay();
         }
 
-        // New: Process status effects at the start/end of a turn
         function processStatusEffects(target) {
             const effectsToRemove = [];
             target.activeStatusEffects.forEach(effect => {
@@ -2036,23 +2240,21 @@
                         case 'poisoned':
                         case 'bleeding':
                             const damage = Math.floor((target === player ? player.maxHp : currentCombat.enemy.hp) * effect.value);
-                            // MODIFICACIÓN CLAVE: Usar target.currentHp para el enemigo
                             if (target === player) {
                                 target.hp -= damage;
                                 if (target.hp < 0) target.hp = 0;
                             } else if (target === currentCombat.enemy) {
-                                target.currentHp -= damage; // <-- CORRECCIÓN AQUÍ
-                                if (target.currentHp < 0) target.currentHp = 0; // <-- CORRECCIÓN AQUÍ
+                                target.currentHp -= damage; 
+                                if (target.currentHp < 0) target.currentHp = 0; 
                             }
-                            addCombatLog(`${target.name} pierde ${damage} HP por ${statusEffects[effect.type].name.toLowerCase()}.`, 'status-message');
+                            addCombatLog(`${target.name || 'Objetivo'} pierde ${damage} HP por ${statusEffects[effect.type].name.toLowerCase()}.`, 'status-message');
                             break;
-                        case 'hp_regen_s': // Passive effect applied per turn
+                        case 'hp_regen_s': 
                             if (target === player) {
                                 restoreResource('hp', effect.value, player);
                                 addCombatLog(`${target.name} recupera ${effect.value} HP por regeneración.`, 'status-message');
                             }
                             break;
-                        // Add other turn-based effects here
                     }
                 }
                 if (effect.duration === 0) {
@@ -2066,7 +2268,6 @@
             else if (target === currentCombat.enemy) updateCombatEnemyDisplay();
         }
 
-        // New: Display status effect icons on HUD
         function displayStatusEffects(displayElement, effectsArray) {
             displayElement.innerHTML = '';
             effectsArray.forEach(effect => {
@@ -2082,7 +2283,6 @@
             });
         }
 
-        // New: Update turn indicator
         function updateTurnIndicator() {
             if (currentCombat.playerTurn) {
                 combatPlayerDisplay.classList.add('active-turn');
@@ -2097,10 +2297,9 @@
         function playerAttack() {
             if (!currentCombat.active || !currentCombat.playerTurn) return;
 
-            // Check for stunned status
             if (player.activeStatusEffects.some(eff => eff.type === 'stunned')) {
                 addCombatLog("Estás aturdido y no puedes atacar.", 'system-message');
-                removeStatusEffect(player, 'stunned'); // Consume stun
+                removeStatusEffect(player, 'stunned'); 
                 currentCombat.playerTurn = false;
                 updateTurnIndicator();
                 setTimeout(enemyTurn, 1000);
@@ -2110,37 +2309,34 @@
             const enemy = currentCombat.enemy;
             let damageDealt = Math.max(1, player.effectiveAttack - (enemy.defense || 0) + Math.floor(Math.random() * (player.effectiveAttack * 0.2))); 
             
-            // Combo System Logic
             if (player.lastCombatAction === 'attack') {
                 player.attackComboCount++;
-                if (player.attackComboCount >= 2) { // After 2 consecutive attacks, the 3rd becomes a combo
-                    damageDealt *= 1.5; // Combo bonus damage
+                if (player.attackComboCount >= 2) { 
+                    damageDealt *= 1.5; 
                     addCombatLog(`¡COMBO! Tu ataque es más poderoso.`, 'combo-message');
-                    player.attackComboCount = 0; // Reset combo after successful combo
+                    player.attackComboCount = 0; 
                 }
             } else {
-                player.attackComboCount = 1; // Start new combo chain
+                player.attackComboCount = 1; 
             }
             player.lastCombatAction = 'attack';
 
-            takeDamage(damageDealt, enemy, player.name); // Use the updated takeDamage function
+            takeDamage(damageDealt, enemy, player.name); 
 
-            if (enemy.currentHp === 0) {
-                endCombat(true); 
-            } else {
+            if (enemy.currentHp > 0) { // Solo ceder turno si el enemigo sigue vivo
                 currentCombat.playerTurn = false;
                 updateTurnIndicator();
                 setTimeout(enemyTurn, 1000); 
             }
+            // Si el enemigo muere, endCombat ya se encarga de todo.
         }
         
         function usePlayerSkill(skillId) {
             if (!currentCombat.active || !currentCombat.playerTurn) return;
 
-            // Check for stunned status
             if (player.activeStatusEffects.some(eff => eff.type === 'stunned')) {
                 addCombatLog("Estás aturdido y no puedes usar habilidades.", 'system-message');
-                removeStatusEffect(player, 'stunned'); // Consume stun
+                removeStatusEffect(player, 'stunned'); 
                 currentCombat.playerTurn = false;
                 updateTurnIndicator();
                 setTimeout(enemyTurn, 1000);
@@ -2151,39 +2347,37 @@
             if (!skill) return addCombatLog("Habilidad desconocida.", "system-message");
 
             let mpCost = skill.mpCost;
-            // Apply MP cost reduction from passive skills
-            mpCost = Math.max(0, mpCost * (1 - player.tempMpCostReduction));
+            mpCost = Math.max(0, Math.floor(mpCost * (1 - player.tempMpCostReduction))); // Redondear hacia abajo
 
             if (player.mp < mpCost) return addCombatLog(`No tienes suficiente MP para ${skill.name}.`, "system-message");
-            if (skill.requiresCombo && player.attackComboCount < 2) { // Example: requires 2 consecutive attacks
+            if (skill.requiresCombo && player.attackComboCount < 2) { 
                 return addCombatLog(`Necesitas un combo activo para usar ${skill.name}.`, "system-message");
             }
 
             player.mp -= mpCost;
             addCombatLog(`Usas ${skill.name}.`, "player-action");
-            player.lastCombatAction = 'skill'; // Reset combo counter if skill is used
+            player.lastCombatAction = 'skill'; 
             player.attackComboCount = 0;
 
             if (skill.type === 'attack') {
                 const enemy = currentCombat.enemy;
                 let damageDealt = Math.floor(player.effectiveAttack * skill.damageMultiplier);
                 if (skill.ignoreDefPercent) {
-                    damageDealt = Math.max(1, damageDealt - (enemy.defense * (1 - skill.ignoreDefPercent) || 0));
+                    damageDealt = Math.max(1, damageDealt - Math.floor(enemy.defense * (1 - skill.ignoreDefPercent) || 0));
                 } else {
                     damageDealt = Math.max(1, damageDealt - (enemy.defense || 0));
                 }
 
-                // Apply critical chance bonus from passive skills
-                let critChance = 0.1; // Base crit chance
+                let critChance = 0.1; 
                 if (skill.critChanceBonus) critChance += skill.critChanceBonus;
                 critChance += player.tempCritChanceBonus;
 
                 if (Math.random() < critChance) {
-                    damageDealt *= 2; // Critical hit!
+                    damageDealt = Math.floor(damageDealt * 2); // Redondear daño crítico
                     addCombatLog(`¡Golpe Crítico!`, 'combo-message');
                 }
 
-                takeDamage(damageDealt, enemy, player.name); // Use updated takeDamage
+                takeDamage(damageDealt, enemy, player.name); 
 
                 if (skill.statusEffect) {
                     applyStatusEffect(enemy, skill.statusEffect.type, skill.statusEffect.duration, skill.statusEffect.value, skill.statusEffect.chance);
@@ -2195,13 +2389,13 @@
                 if (player.equipment.shield) {
                     const enemy = currentCombat.enemy;
                     const damageDealt = Math.max(1, Math.floor(player.effectiveAttack * skill.damageMultiplier) - (enemy.defense || 0));
-                    takeDamage(damageDealt, enemy, player.name); // Use updated takeDamage
+                    takeDamage(damageDealt, enemy, player.name); 
                     if (Math.random() < (skill.stunChance || 0)) {
-                        applyStatusEffect(enemy, 'stunned', 1); // Stun for 1 turn
+                        applyStatusEffect(enemy, 'stunned', 1); 
                     }
                 } else {
                      addCombatLog(`Necesitas un escudo equipado para ${skill.name}.`, "system-message");
-                     player.mp += mpCost; // Refund MP if skill cannot be used
+                     player.mp += mpCost; 
                 }
             } else if (skill.type === 'defensive') {
                 if (skill.statusEffect) {
@@ -2210,9 +2404,7 @@
             }
 
             updateCombatPlayerDisplay(); 
-            if (currentCombat.enemy.currentHp === 0) {
-                endCombat(true); 
-            } else {
+            if (currentCombat.enemy.currentHp > 0) { // Solo ceder turno si el enemigo sigue vivo
                 currentCombat.playerTurn = false;
                 updateTurnIndicator();
                 setTimeout(enemyTurn, 1000);
@@ -2223,10 +2415,9 @@
         function useCombatPotion(itemIndexInInventory) {
             if (!currentCombat.active || !currentCombat.playerTurn) return;
 
-            // Check for stunned status
             if (player.activeStatusEffects.some(eff => eff.type === 'stunned')) {
                 addCombatLog("Estás aturdido y no puedes usar pociones.", 'system-message');
-                removeStatusEffect(player, 'stunned'); // Consume stun
+                removeStatusEffect(player, 'stunned'); 
                 currentCombat.playerTurn = false;
                 updateTurnIndicator();
                 setTimeout(enemyTurn, 1000);
@@ -2236,11 +2427,11 @@
             const item = player.inventory[itemIndexInInventory];
             if (!item || item.type !== 'consumable') return addCombatLog("No es una poción válida.", "system-message");
 
-            player.lastCombatAction = 'potion'; // Reset combo counter
+            player.lastCombatAction = 'potion'; 
             player.attackComboCount = 0;
 
-            if (item.effect.hp) restoreResource('hp', item.effect.effect.hp); // Corrected property access
-            if (item.effect.mp) restoreResource('mp', item.effect.effect.mp); // Corrected property access
+            if (item.effect.hp) restoreResource('hp', item.effect.hp); 
+            if (item.effect.mp) restoreResource('mp', item.effect.mp); 
             if (item.effect.cure) {
                 removeStatusEffect(player, item.effect.cure);
             }
@@ -2259,39 +2450,35 @@
 
 
         function enemyTurn() {
-            if (!currentCombat.active || currentCombat.playerTurn || player.hp === 0) return;
+            if (!currentCombat.active || currentCombat.playerTurn || player.hp === 0 || (currentCombat.enemy && currentCombat.enemy.currentHp === 0)) return; // Añadida verificación de HP enemigo
 
-            currentCombat.turnCount++; // Increment turn count
+            currentCombat.turnCount++; 
 
-            // Process status effects at the start of enemy's turn
             processStatusEffects(player);
-            processStatusEffects(currentCombat.enemy);
-
-            // Check if player or enemy is defeated by status effects
-            if (player.hp === 0) {
+             if (player.hp === 0) { // Verificar si el jugador murió por efectos de estado
                 endCombat(false);
                 return;
             }
-            if (currentCombat.enemy.currentHp === 0) {
+            processStatusEffects(currentCombat.enemy);
+            if (currentCombat.enemy.currentHp === 0) { // Verificar si el enemigo murió por efectos de estado
                 endCombat(true);
                 return;
             }
 
+
             const enemy = currentCombat.enemy;
 
-            // Check for stunned status on enemy
             if (enemy.activeStatusEffects.some(eff => eff.type === 'stunned')) {
                 addCombatLog(`${enemy.name} está aturdido y no puede actuar.`, 'enemy-action');
-                removeStatusEffect(enemy, 'stunned'); // Consume stun
+                removeStatusEffect(enemy, 'stunned'); 
                 currentCombat.playerTurn = true;
                 updateTurnIndicator();
                 enableCombatActions(true);
                 return;
             }
 
-            // Enemy AI: Simple decision making
             let actionTaken = false;
-            if (enemy.skills && enemy.skills.length > 0 && Math.random() < 0.3) { // 30% chance to use a skill
+            if (enemy.skills && enemy.skills.length > 0 && Math.random() < 0.3) { 
                 const skillToUse = enemy.skills[Math.floor(Math.random() * enemy.skills.length)];
                 if (skillToUse) {
                     addCombatLog(`${enemy.name} usa ${skillToUse.name}!`, 'enemy-action');
@@ -2305,7 +2492,7 @@
                 }
             }
 
-            if (!actionTaken) { // If no skill was used, perform a normal attack
+            if (!actionTaken) { 
                 const damageDealt = Math.max(1, enemy.attack - player.effectiveDefense + Math.floor(Math.random() * (enemy.attack * 0.15)));
                 takeDamage(damageDealt, player, enemy.name); 
             }
@@ -2325,7 +2512,7 @@
                 showNotification("Lograste huir del combate.", "default");
                 currentCombat.active = false;
                 closeModal('combatModal');
-                player.activeStatusEffects = []; // Clear status effects on flee
+                player.activeStatusEffects = []; 
                 updatePlayerHUD();
             } else {
                 addCombatLog("¡Fallaste al intentar huir!", "system-message");
@@ -2346,12 +2533,12 @@
         function endCombat(playerWon) {
             currentCombat.active = false;
             enableCombatActions(false); 
-            player.activeStatusEffects = []; // Clear all status effects at end of combat
-            currentCombat.enemy.activeStatusEffects = []; // Clear enemy status effects
-            updatePlayerHUD(); // Update HUD to reflect cleared effects
-            updateCombatEnemyDisplay(); // Update enemy HUD to reflect cleared effects
-            combatPlayerDisplay.classList.remove('active-turn'); // Remove turn indicator
-            combatEnemyDisplay.classList.remove('active-turn'); // Remove turn indicator
+            player.activeStatusEffects = []; 
+            if(currentCombat.enemy) currentCombat.enemy.activeStatusEffects = []; 
+            updatePlayerHUD(); 
+            if(currentCombat.enemy) updateCombatEnemyDisplay(); 
+            combatPlayerDisplay.classList.remove('active-turn'); 
+            combatEnemyDisplay.classList.remove('active-turn'); 
 
 
             if (playerWon) {
@@ -2373,14 +2560,13 @@
                 }
                 if (currentCombat.isBoss) {
                     const nextFloor = player.currentFloor + 1;
-                    if (floorData[nextFloor]) { // Check if the next floor exists
+                    if (floorData[nextFloor]) { 
                         if (!player.unlockedFloors.includes(nextFloor)) {
-                            player.unlockedFloors.push(nextFloor); // Unlock the new floor
-                            floorData[nextFloor].unlocked = true; // Mark as unlocked in data
-                            showNotification(`¡Has desbloqueado el Piso ${nextFloor}: ${floorData[nextFloor].name}!`, "success", 10000); // Show notification
-                            // Automatically advance to the next floor if it's a new unlock
+                            player.unlockedFloors.push(nextFloor); 
+                            floorData[nextFloor].unlocked = true; 
+                            showNotification(`¡Has desbloqueado el Piso ${nextFloor}: ${floorData[nextFloor].name}!`, "success", 10000); 
                             player.currentFloor = nextFloor;
-                            updatePlayerHUD(); // Update HUD to show new floor
+                            updatePlayerHUD(); 
                         } else {
                             showNotification(`Ya habías desbloqueado el Piso ${nextFloor}.`, "default", 8000);
                         }
@@ -2391,7 +2577,7 @@
                     }
                     setTimeout(() => { 
                         if (!currentCombat.active) closeModal('combatModal'); 
-                    }, 3000); // Close combat modal after notification
+                    }, 3000); 
                 } else {
                     setTimeout(() => { 
                         if (!currentCombat.active) closeModal('combatModal'); 
@@ -2408,6 +2594,7 @@
                 }, 4000); 
             }
             updatePlayerHUD();
+            saveGame(); // Guardar después de cada combate
         }
 
         combatActionAttackBtn.onclick = playerAttack;
@@ -2421,10 +2608,10 @@
             } else {
                 availableSkills.forEach(skill => {
                     const skillBtn = document.createElement('button');
-                    skillBtn.className = 'action-btn tooltip'; // Add tooltip class
+                    skillBtn.className = 'action-btn tooltip'; 
                     let mpCost = skill.mpCost;
-                    mpCost = Math.max(0, mpCost * (1 - player.tempMpCostReduction)); // Apply MP cost reduction
-                    skillBtn.innerHTML = `${skill.icon || '✨'} ${skill.name} (${mpCost} MP) <span class="tooltiptext">${skill.description}</span>`; // Add icon and tooltip
+                    mpCost = Math.max(0, Math.floor(mpCost * (1 - player.tempMpCostReduction))); 
+                    skillBtn.innerHTML = `${skill.icon || '✨'} ${skill.name} (${mpCost} MP) <span class="tooltiptext">${skill.description}</span>`; 
                     skillBtn.onclick = () => usePlayerSkill(skill.id);
                     skillBtn.disabled = player.mp < mpCost || (skill.requiresCombo && player.attackComboCount < 2);
                     combatSkillsListContainer.appendChild(skillBtn);
@@ -2439,11 +2626,11 @@
             if (potions.length === 0) {
                 combatPotionsListContainer.innerHTML = '<p>No tienes pociones.</p>';
             } else {
-                potions.forEach((potion, indexInFullInventory) => {
+                potions.forEach((potion) => { // No necesitamos el segundo argumento indexInFullInventory aquí
                     const originalIndex = player.inventory.findIndex(invItem => invItem.id === potion.id && invItem.count === potion.count); 
                     const potionBtn = document.createElement('button');
-                    potionBtn.className = 'action-btn tooltip'; // Add tooltip class
-                    potionBtn.innerHTML = `${potion.icon || '🧪'} ${potion.name} (x${potion.count}) <span class="tooltiptext">${potion.description}</span>`; // Add icon and tooltip
+                    potionBtn.className = 'action-btn tooltip'; 
+                    potionBtn.innerHTML = `${potion.icon || '🧪'} ${potion.name} (x${potion.count}) <span class="tooltiptext">${potion.description}</span>`; 
                     potionBtn.onclick = () => useCombatPotion(originalIndex);
                     combatPotionsListContainer.appendChild(potionBtn);
                 });
@@ -2451,17 +2638,17 @@
              combatPotionsListContainer.style.display = combatPotionsListContainer.style.display === 'none' ? 'flex' : 'none';
         };
 
-        // New: Floor Navigation Button Handler
         floorNavigateBtn.onclick = () => {
             renderFloorSelection();
             openModal('floorNavigationModal');
         };
 
-        // New: Render floor selection buttons
         function renderFloorSelection() {
             floorSelectGrid.innerHTML = '';
-            for (let i = 1; i <= Object.keys(floorData).length; i++) {
+            const totalFloors = Object.keys(floorData).length; // Asumiendo que floorData tiene entradas para todos los pisos hasta el máximo
+            for (let i = 1; i <= totalFloors; i++) {
                 const floor = floorData[i];
+                if (!floor) continue; // Saltar si no hay datos para este piso
                 const floorBtn = document.createElement('button');
                 floorBtn.className = 'action-btn';
                 floorBtn.textContent = `Piso ${i}: ${floor.name}`;
@@ -2478,21 +2665,20 @@
             }
         }
 
-        // New: Change player's current floor
         function changeFloor(newFloor) {
-            if (player.unlockedFloors.includes(newFloor)) {
+            if (player.unlockedFloors.includes(newFloor) && floorData[newFloor]) {
                 player.currentFloor = newFloor;
                 updatePlayerHUD();
                 showNotification(`Has viajado al Piso ${newFloor}: ${floorData[newFloor].name}.`, 'default');
                 saveGame();
             } else {
-                showNotification(`El Piso ${newFloor} aún no está desbloqueado.`, 'error');
+                showNotification(`El Piso ${newFloor} aún no está desbloqueado o no existe.`, 'error');
             }
         }
 
 
         // ===============================================
-        //           INVENTARIO Y EQUIPO (Sin cambios funcionales)
+        //           INVENTARIO Y EQUIPO 
         // ===============================================
         function renderInventory() { 
             inventoryGridDisplay.innerHTML = '';
@@ -2504,7 +2690,7 @@
                 if (itemData.stats) {
                     detailsHtml += `<span class="item-details">ATK:${itemData.stats.attack || 0} DEF:${itemData.stats.defense || 0} HP:${itemData.stats.hp || 0} MP:${itemData.stats.mp || 0}</span>`;
                 }
-                if (itemData.effect) {
+                if (itemData.effect) { // Asegurarse que itemData.effect existe
                      detailsHtml += `<span class="item-details">Efecto: ${Object.entries(itemData.effect).map(([key, val]) => `${key.toUpperCase()}: ${val}`).join(', ')}</span>`;
                 }
                 itemDiv.innerHTML = `
@@ -2563,7 +2749,7 @@
             if (itemBase.effect.hp) restoreResource('hp', itemBase.effect.hp);
             if (itemBase.effect.mp) restoreResource('mp', itemBase.effect.mp);
             if (itemBase.effect.cure) {
-                removeStatusEffect(player, itemBase.effect.cure); // Cure status effect
+                removeStatusEffect(player, itemBase.effect.cure); 
             }
             showNotification(`Has usado ${itemBase.name}.`, "success");
             itemInstance.count = (itemInstance.count || 1) - 1;
@@ -2601,15 +2787,18 @@
             renderEquipment();
             saveGame();
         }
-        function addItemToInventory(itemData) { 
+        function addItemToInventory(itemData, quantity = 1) { // Modificado para aceptar cantidad
             const itemBase = baseItems[itemData.id] || itemData;
-            const existingItem = player.inventory.find(invItem => invItem.id === itemData.id && itemBase.type !== 'weapon' && itemBase.type !== 'armor' && itemBase.type !== 'shield' && itemBase.type !== 'accessory'); 
-            if (existingItem && itemBase.type !== 'weapon' && itemBase.type !== 'armor' && itemBase.type !== 'shield' && itemBase.type !== 'accessory') {
-                existingItem.count = (existingItem.count || 1) + (itemData.count || 1);
+            // Los items de equipo no se apilan, los consumibles y materiales sí.
+            const stackable = itemBase.type === 'consumable' || itemBase.type === 'material';
+            const existingItem = player.inventory.find(invItem => invItem.id === itemData.id && stackable); 
+            
+            if (existingItem && stackable) {
+                existingItem.count = (existingItem.count || 0) + quantity;
             } else {
                 const newItemInstance = JSON.parse(JSON.stringify(itemBase)); 
                 newItemInstance.id = itemData.id; 
-                newItemInstance.count = itemData.count || 1;
+                newItemInstance.count = quantity; // Usar la cantidad pasada
                 delete newItemInstance.price; 
                 delete newItemInstance.stock;
                 player.inventory.push(newItemInstance);
@@ -2617,7 +2806,7 @@
         }
 
         // ===============================================
-        //           TIENDA (Sin cambios)
+        //           TIENDA 
         // ===============================================
         function renderShop() { 
             const currentFloorShopData = floorData[player.currentFloor]?.shopItems;
@@ -2656,11 +2845,11 @@
                     return;
                 }
                 player.col -= itemDataFromShop.price;
-                const itemToAdd = { id: itemDataFromShop.id, count: 1 }; 
+                const itemToAdd = { id: itemDataFromShop.id }; 
                 if (baseItems[itemDataFromShop.id]?.type === 'material') { 
                     addMaterial(itemDataFromShop.id, 1);
                 } else {
-                    addItemToInventory(itemToAdd); 
+                    addItemToInventory(itemToAdd, 1); 
                 }
                 showNotification(`Has comprado ${itemDataFromShop.name} por ${itemDataFromShop.price} Col.`, "success");
                 updatePlayerHUD();
@@ -2673,7 +2862,7 @@
         }
         
         // ===============================================
-        //           HERRERÍA (Blacksmith) (Sin cambios)
+        //           HERRERÍA (Blacksmith) 
         // ===============================================
         function addMaterial(materialId, quantity) { 
             if (!player.materials[materialId]) {
@@ -2773,7 +2962,7 @@
             player.col -= recipe.cost;
             showNotification(`Materiales y ${recipe.cost} Col gastados intentando forjar ${itemToCraftBase.name}...`, "default");
             if (Math.random() < recipe.chance) {
-                addItemToInventory({ id: recipe.itemId, count: 1 });
+                addItemToInventory({ id: recipe.itemId }, 1); // Usar cantidad 1
                 showNotification(`¡FORJA EXITOSA! Has creado ${itemToCraftBase.name} ${itemToCraftBase.icon}!`, "success", 7000);
             } else {
                 showNotification(`FORJA FALLIDA... ${itemToCraftBase.name} se ha roto en el proceso.`, "error", 7000);
@@ -2786,7 +2975,7 @@
 
 
         // ===============================================
-        //           PANTALLA DE ESTADÍSTICAS DEL JUGADOR (Actualizado para nombre y pasivas)
+        //           PANTALLA DE ESTADÍSTICAS DEL JUGADOR 
         // ===============================================
         function renderPlayerStats() {
             calculateEffectiveStats(); 
@@ -2820,20 +3009,19 @@
                 player.skills.forEach(skillRef => {
                     const skill = skillData[skillRef.id] || skillRef; 
                     const li = document.createElement('li');
-                    li.textContent = `${skill.icon || '❖'} ${skill.name} - ${skill.description || `Coste MP: ${skill.mpCost}`}`; // Add icon
+                    li.textContent = `${skill.icon || '❖'} ${skill.name} - ${skill.description || `Coste MP: ${skill.mpCost}`}`; 
                     statsSkillsList.appendChild(li);
                 });
             } else {
                 statsSkillsList.innerHTML = '<li>No has aprendido ninguna habilidad activa.</li>';
             }
 
-            // Display passive skills
             statsPassiveSkillsList.innerHTML = '';
             if (player.passiveSkills.length > 0) {
                 player.passiveSkills.forEach(pSkillRef => {
                     const pSkill = passiveSkillData[pSkillRef.id] || pSkillRef;
                     const li = document.createElement('li');
-                    li.textContent = `${pSkill.icon || '🌟'} ${pSkill.name} - ${pSkill.description}`; // Add icon
+                    li.textContent = `${pSkill.icon || '🌟'} ${pSkill.name} - ${pSkill.description}`; 
                     statsPassiveSkillsList.appendChild(li);
                 });
             } else {
@@ -2843,16 +3031,14 @@
 
 
         // ===============================================
-        //           MODALES Y NOTIFICACIONES (Actualizado para modal de nombre y nuevos modales)
+        //           MODALES Y NOTIFICACIONES 
         // ===============================================
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
                 const allModals = document.querySelectorAll('.modal');
                 allModals.forEach(m => { 
-                    // No cerrar el modal de nombre si el nombre aún no se ha establecido
-                    // No cerrar el modal de combate si está activo (para evitar cerrar por click fuera)
-                    if (m.id !== modalId && m.id !== 'infoModal' && m.id !== 'nameEntryModal' && !(m.id === 'combatModal' && currentCombat.active)) {
+                    if (m.id !== modalId && m.id !== 'infoModal' && m.id !== 'nameEntryModal' && !(m.id === 'combatModal' && currentCombat.active) && m.id !== 'adminKeyModal' && m.id !== 'adminPanelModal') {
                         m.style.display = 'none'; 
                     }
                 });
@@ -2862,21 +3048,25 @@
             if (modalId === 'shopModal') renderShop();
             if (modalId === 'blacksmithModal') renderBlacksmithRecipes();
             if (modalId === 'playerStatsModal') renderPlayerStats();
-            if (modalId === 'nameEntryModal') { // Enfocar input al abrir modal de nombre
+            if (modalId === 'nameEntryModal') { 
                 playerNameInputElement.focus();
             }
-            // Removed the recursive call for trainingModal here.
-            // openTrainingModal() is now responsible for opening itself.
+            if (modalId === 'adminKeyModal') {
+                adminKeyValueInput.value = '';
+                adminKeyErrorMsg.style.display = 'none';
+                adminKeyValueInput.focus();
+            }
+            if (modalId === 'adminPanelModal') {
+                populateAdminPanel(); // Llenar el panel de admin con datos actuales
+            }
         }
 
         function closeModal(modalId) {
-            // No permitir cerrar el modal de nombre si el nombre aún no se ha establecido
             if (modalId === 'nameEntryModal' && !player.name) {
                 showNotification("Debes ingresar un nombre para tu personaje.", "error");
                 playerNameInputElement.focus();
                 return;
             }
-            // No permitir cerrar el modal de combate si está activo
             if (modalId === 'combatModal' && currentCombat.active) {
                 showNotification("No puedes cerrar el combate mientras está activo. Usa el botón 'Huir'.", "error");
                 return;
@@ -2886,25 +3076,27 @@
             if (modal) modal.style.display = 'none';
             if (modalId === 'infoModal') modalBodyContentElement.innerHTML = ''; 
             if (modalId === 'combatModal' && currentCombat.active) { 
-                // Esto se ejecuta si el combate se cierra por una razón que no sea victoria/derrota/huida explícita
-                // Aunque el if de arriba ya previene el cierre manual, esto es un fallback.
                 if (player.hp > 0) { 
                     addCombatLog("Combate interrumpido.", "system-message");
                 }
                  currentCombat.active = false; 
-                 player.activeStatusEffects = []; // Clear status effects if combat interrupted
-                 currentCombat.enemy.activeStatusEffects = []; // Clear enemy status effects
+                 player.activeStatusEffects = []; 
+                 if(currentCombat.enemy) currentCombat.enemy.activeStatusEffects = []; 
                  updatePlayerHUD();
-                 updateCombatEnemyDisplay();
+                 if(currentCombat.enemy) updateCombatEnemyDisplay();
+            }
+            if (modalId === 'adminPanelModal') { // Limpiar mensaje de feedback del panel admin al cerrar
+                adminPanelMessage.style.display = 'none';
+                adminPanelMessage.textContent = '';
             }
         }
         
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
-                // Prevenir cierre del modal de combate si se clickea fuera y está activo
                 if (event.target.id === 'combatModal' && currentCombat.active) return;
-                // Prevenir cierre del modal de nombre si se clickea fuera y no hay nombre
                 if (event.target.id === 'nameEntryModal' && !player.name) return;
+                if (event.target.id === 'adminKeyModal' && adminKeyModal.style.display === 'block') return; // No cerrar si se clickea fuera del contenido del modal de admin key
+                if (event.target.id === 'adminPanelModal' && adminPanelModal.style.display === 'block') return; // Idem para el panel
                 closeModal(event.target.id);
             }
         }
@@ -2913,10 +3105,11 @@
                 const openModals = document.querySelectorAll('.modal[style*="display: block"]');
                 if (openModals.length > 0) {
                     const topModal = openModals[openModals.length - 1];
-                    // Prevenir cierre del modal de combate con Esc si está activo
                     if (topModal.id === 'combatModal' && currentCombat.active) return;
-                    // Prevenir cierre del modal de nombre con Esc si no hay nombre
                     if (topModal.id === 'nameEntryModal' && !player.name) return;
+                    // No cerrar adminKeyModal o adminPanelModal con ESC si están abiertos y son el topModal
+                    // para evitar cierres accidentales mientras se interactúa. El botón X sigue funcionando.
+                    // if (topModal.id === 'adminKeyModal' || topModal.id === 'adminPanelModal') return; 
                     closeModal(topModal.id);
                 }
             }
@@ -2927,12 +3120,15 @@
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.textContent = message;
+            
+            // Forzar reflow para reiniciar la animación si ya existe una con el mismo nombre
             notification.style.animation = 'none';
-            notification.offsetHeight; 
+            notification.offsetHeight; // trigger reflow
             notification.style.animation = `slideInNotification 0.4s ease-out, fadeOutNotification 0.4s ease-in ${duration/1000 - 0.4}s forwards`;
+            
             notificationArea.appendChild(notification);
             setTimeout(() => {
-                if (notification.parentNode === notificationArea) {
+                if (notification.parentNode === notificationArea) { // Verificar si aún existe
                     notificationArea.removeChild(notification);
                 }
             }, duration);
@@ -2940,7 +3136,7 @@
 
 
         // ===============================================
-        //           CONTENIDO DE LA WIKI (DINÁMICO) - Sin cambios
+        //           CONTENIDO DE LA WIKI (DINÁMICO) 
         // ===============================================
         const wikiCharacterData = { 
             kirito: { name: 'Kirito (黒の剣士)', role: 'Espadachín Solitario / Beater', icon: '⚫', description: 'Kazuto Kirigaya, conocido como Kirito, es el protagonista principal. Es un jugador solitario que prefiere luchar en la vanguardia. Posee la habilidad única de "Doble Empuñadura". Su determinación y habilidad lo convierten en una figura clave para completar Aincrad.', fullInfo: 'Más detalles sobre sus batallas, relaciones y crecimiento como personaje...'},
@@ -2970,7 +3166,7 @@
             kob: {name: "Caballeros de la Sangre (KoB)", icon: '🛡️✝️', description: "El gremio más poderoso y líder en la limpieza de pisos, comandado por Heathcliff. Asuna era su subcomandante. Su objetivo era completar el juego lo más rápido posible, imponiendo un orden estricto.", details: "Vestidos de blanco y rojo, eran la fuerza de vanguardia principal. Unirse requería habilidad excepcional."},
             lc: {name: "Ataúd Risueño (Laughing Coffin)", icon: '💀😈', description: "Un infame gremio de jugadores asesinos (PKers) que disfrutaban matando a otros jugadores. Eran temidos por su crueldad y tácticas sádicas. Liderados por PoH.", details: "Se especializaban en emboscadas y tortura, marcando a sus víctimas con el símbolo de un ataúd sonriente. Fueron el principal antagonista interno para muchos jugadores."},
             fuurinkazan: {name: "Fuurinkazan", icon: '🔥🌲⛰️', description: "Un gremio amigable y de tamaño mediano liderado por Klein. Se enfocaban en apoyarse mutuamente, sobrevivir y disfrutar del juego dentro de lo posible. Su nombre proviene del estandarte de Takeda Shingen.", details: "Conocidos por su camaradería y por ayudar a otros jugadores siempre que podían. Un ejemplo de gremio positivo."},
-            als: {name: "Armada de Liberación de Aincrad (ALA)", icon: ' armies', description: "Originalmente llamado Ejército de Aincrad. Un gran gremio que intentó imponer su propia ley y orden, pero a menudo eran vistos como ineficientes o corruptos. Liderados por Kibaou y luego por Thinker.", details: "Su objetivo era controlar los recursos y la información, pero sus métodos y liderazgo a menudo causaban conflictos con otros jugadores y gremios."}
+            als: {name: "Armada de Liberación de Aincrad (ALA)", icon: '🎖️', description: "Originalmente llamado Ejército de Aincrad. Un gran gremio que intentó imponer su propia ley y orden, pero a menudo eran vistos como ineficientes o corruptos. Liderados por Kibaou y luego por Thinker.", details: "Su objetivo era controlar los recursos y la información, pero sus métodos y liderazgo a menudo causaban conflictos con otros jugadores y gremios."}
         };
 
         function loadWikiContent() { 
@@ -3030,7 +3226,7 @@
 
 
         // ===============================================
-        //           GUARDAR/CARGAR/REINICIAR (Actualizado para nombre y pisos desbloqueados)
+        //           GUARDAR/CARGAR/REINICIAR 
         // ===============================================
         function saveGame() {
             try {
@@ -3044,9 +3240,10 @@
                     inventory: player.inventory, equipment: player.equipment,
                     skills: player.skills.map(s => ({id: s.id})),
                     passiveSkills: player.passiveSkills.map(s => ({id: s.id})), 
-                    materials: player.materials
+                    materials: player.materials,
+                    isAdmin: player.isAdmin // Guardar estado de admin
                 };
-                localStorage.setItem('saoAincradChroniclesSave_v3', JSON.stringify(playerSaveData));
+                localStorage.setItem('saoAincradChroniclesSave_v4', JSON.stringify(playerSaveData)); // v4 por el isAdmin
                 showNotification('¡Progreso guardado!', 'success', 2000);
             } catch (e) {
                 showNotification('Error al guardar: ' + e.message, 'error');
@@ -3056,14 +3253,14 @@
 
         function loadGame() {
             try {
-                const savedState = localStorage.getItem('saoAincradChroniclesSave_v3'); 
+                const savedState = localStorage.getItem('saoAincradChroniclesSave_v4'); 
                 if (savedState) {
                     const loadedData = JSON.parse(savedState);
                     
                     player.name = loadedData.name || ""; 
                     player.level = loadedData.level || 1;
                     player.currentExp = loadedData.currentExp || 0;
-                    player.neededExp = loadedData.neededExp || 100;
+                    player.neededExp = loadedData.neededExp || calculateNeededExpForLevel(player.level); // Recalcular si no está
                     player.baseMaxHp = loadedData.baseMaxHp || 100;
                     player.baseMaxMp = loadedData.baseMaxMp || 50;
                     player.hp = loadedData.hp !== undefined ? loadedData.hp : player.baseMaxHp;
@@ -3076,6 +3273,7 @@
                     player.inventory = loadedData.inventory || [];
                     player.equipment = loadedData.equipment || { weapon: null, shield: null, armor: null, accessory: null };
                     player.materials = loadedData.materials || {};
+                    player.isAdmin = loadedData.isAdmin || false; // Cargar estado de admin
                     
                     player.skills = []; 
                     if (loadedData.skills && Array.isArray(loadedData.skills)) {
@@ -3085,7 +3283,6 @@
                             }
                         });
                     }
-                    // Ensure starting skill is present if none loaded or if it's a fresh start for skills
                     if (player.skills.length === 0 && skillData['quick_slash']) {
                          player.skills.push({ id: 'quick_slash', ...skillData['quick_slash'] });
                     }
@@ -3099,10 +3296,13 @@
                         });
                     }
 
-                    // Update floorData based on unlockedFloors
-                    Object.keys(floorData).forEach(floorNum => {
-                        floorData[floorNum].unlocked = player.unlockedFloors.includes(parseInt(floorNum));
+                    Object.keys(floorData).forEach(floorNumStr => {
+                        const floorNum = parseInt(floorNumStr);
+                        if (floorData[floorNum]) { // Asegurarse que el piso existe en floorData
+                           floorData[floorNum].unlocked = player.unlockedFloors.includes(floorNum);
+                        }
                     });
+
 
                     if (!player.name) { 
                         promptForPlayerName();
@@ -3120,7 +3320,7 @@
             } catch (e) {
                 showNotification('Error al cargar el progreso: ' + e.message + '. Se iniciará una nueva partida.', 'error');
                 console.error("Error al cargar:", e);
-                localStorage.removeItem('saoAincradChroniclesSave_v3'); 
+                localStorage.removeItem('saoAincradChroniclesSave_v4'); 
                 initializeNewPlayer(true);
             }
         }
@@ -3143,11 +3343,14 @@
                 activeStatusEffects: [],
                 lastCombatAction: null,
                 attackComboCount: 0,
+                isAdmin: false // Reiniciar estado de admin
             };
             
-            // Set floor 1 as unlocked in floorData
-            Object.keys(floorData).forEach(floorNum => {
-                floorData[floorNum].unlocked = (parseInt(floorNum) === 1);
+            Object.keys(floorData).forEach(floorNumStr => {
+                const floorNum = parseInt(floorNumStr);
+                 if (floorData[floorNum]) {
+                    floorData[floorNum].unlocked = (floorNum === 1);
+                 }
             });
 
             if (promptName) {
@@ -3167,17 +3370,14 @@
 
         submitPlayerNameBtn.onclick = () => {
             const name = playerNameInputElement.value.trim();
-            // Validación simple: no vacío, longitud, caracteres permitidos
             if (name && name.length > 0 && name.length <= 15 && /^[a-zA-Z0-9\s]+$/.test(name)) {
                 player.name = name;
                 closeModal('nameEntryModal');
                 showNotification(`¡Nombre establecido como ${player.name}!`, "success");
                 
-                // Si la espada básica está en el inventario y no hay arma equipada, equiparla ahora
                 if (!player.equipment.weapon) {
                     const basicSwordIndex = player.inventory.findIndex(i => i.id === 'basic_sword');
                     if (basicSwordIndex !== -1) {
-                         // Crear una copia para equipar y reducir del inventario
                         const swordToEquip = JSON.parse(JSON.stringify(player.inventory[basicSwordIndex]));
                         equipItem(swordToEquip, basicSwordIndex);
                     }
@@ -3207,16 +3407,247 @@
         }
 
         function executeReset() {
-            localStorage.removeItem('saoAincradChroniclesSave_v3'); 
+            localStorage.removeItem('saoAincradChroniclesSave_v4'); 
             initializeNewPlayer(true); 
             closeModal('infoModal');
             showNotification('¡Nuevo personaje creado! Tu aventura comienza.', 'success', 6000);
             disableGameActions(false); 
         }
 
+        // ===============================================
+        //           PANEL DE ADMINISTRADOR
+        // ===============================================
+        function openAdminLoginModal() {
+            if (player.isAdmin) {
+                openAdminPanel();
+            } else {
+                openModal('adminKeyModal');
+            }
+        }
+
+        function checkAdminKey() {
+            const enteredKey = adminKeyValueInput.value;
+            if (enteredKey === ADMIN_SECRET_KEY) {
+                player.isAdmin = true;
+                saveGame();
+                closeModal('adminKeyModal');
+                openAdminPanel();
+                showAdminPanelMessage("Acceso de administrador concedido.", "success");
+            } else {
+                adminKeyErrorMsg.textContent = "Clave incorrecta.";
+                adminKeyErrorMsg.style.display = 'block';
+                adminKeyValueInput.value = ''; // Limpiar input
+            }
+        }
+
+        function populateAdminPanel() {
+            // Llenar campos con datos actuales del jugador
+            adminSetLevelValueInput.value = player.level;
+            adminGiveExpValueInput.value = 0;
+            adminGiveColValueInput.value = 0;
+            adminSetBaseAtkValueInput.value = player.baseAttack;
+            adminSetBaseDefValueInput.value = player.baseDefense;
+            adminSetBaseMaxHpValueInput.value = player.baseMaxHp;
+            adminSetBaseMaxMpValueInput.value = player.baseMaxMp;
+            adminItemIdValueInput.value = '';
+            adminItemQuantityValueInput.value = 1;
+            adminFloorNumberValueInput.value = player.currentFloor;
+            adminItemDetailsPreviewDiv.textContent = 'Detalles del item aparecerán aquí...';
+
+            // Llenar select de items
+            adminItemQuickSelect.innerHTML = '';
+            Object.keys(baseItems).sort().forEach(itemId => {
+                const option = document.createElement('option');
+                option.value = itemId;
+                option.textContent = `${baseItems[itemId].name} (${itemId})`;
+                adminItemQuickSelect.appendChild(option);
+            });
+
+            // Llenar lista de pisos desbloqueados
+            updateAdminUnlockedFloorsList();
+        }
+        
+        function updateAdminUnlockedFloorsList() {
+            adminUnlockedFloorsListDiv.innerHTML = player.unlockedFloors.sort((a, b) => a - b).join(', ') || "Ninguno (excepto Piso 1)";
+        }
+
+        function openAdminPanel() {
+            if (!player.isAdmin) {
+                showNotification("No tienes acceso de administrador.", "error");
+                return;
+            }
+            openModal('adminPanelModal'); // populateAdminPanel se llama desde openModal
+        }
+
+        function showAdminPanelMessage(message, type = "default") {
+            adminPanelMessage.textContent = message;
+            adminPanelMessage.style.color = type === "success" ? "#5cb85c" : (type === "error" ? "#d9534f" : "#87CEEB");
+            adminPanelMessage.style.display = 'block';
+            setTimeout(() => {
+                adminPanelMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        const adminActions = {
+            giveItem: () => {
+                const itemId = adminItemIdValueInput.value.trim();
+                const quantity = parseInt(adminItemQuantityValueInput.value) || 1;
+                if (!baseItems[itemId]) {
+                    showAdminPanelMessage(`Error: Item ID '${itemId}' no encontrado.`, "error");
+                    return;
+                }
+                if (quantity < 1) {
+                     showAdminPanelMessage(`Error: La cantidad debe ser al menos 1.`, "error");
+                    return;
+                }
+
+                const itemBase = baseItems[itemId];
+                if (itemBase.type === 'material') {
+                    addMaterial(itemId, quantity);
+                } else {
+                    addItemToInventory({ id: itemId }, quantity); // addItemToInventory maneja la lógica de apilamiento
+                }
+                
+                showAdminPanelMessage(`${quantity} x ${itemBase.name} (${itemId}) añadido(s) al inventario.`, "success");
+                if (inventoryModalElement.style.display === 'block') renderInventory();
+                saveGame();
+            },
+            showItemDetails: () => {
+                const itemId = adminItemIdValueInput.value.trim();
+                const itemBase = baseItems[itemId];
+                if (itemBase) {
+                    let details = `Nombre: ${itemBase.name} ${itemBase.icon}\nTipo: ${itemBase.type}\nDescripción: ${itemBase.description}`;
+                    if(itemBase.stats) {
+                        details += `\nStats: ATK:${itemBase.stats.attack || 0}, DEF:${itemBase.stats.defense || 0}, HP:${itemBase.stats.hp || 0}, MP:${itemBase.stats.mp || 0}`;
+                    }
+                    if(itemBase.effect) {
+                        details += `\nEfecto: ${JSON.stringify(itemBase.effect)}`;
+                    }
+                     if(itemBase.levelReq) {
+                        details += `\nReq. LV: ${itemBase.levelReq}`;
+                    }
+                    adminItemDetailsPreviewDiv.textContent = details.replace(/\n/g, '<br>'); // Usar <br> para saltos de línea en HTML
+                } else {
+                    adminItemDetailsPreviewDiv.textContent = `Item ID '${itemId}' no encontrado.`;
+                }
+            },
+            selectItemFromList: () => {
+                const selectedItemId = adminItemQuickSelect.value;
+                if (selectedItemId) {
+                    adminItemIdValueInput.value = selectedItemId;
+                    adminActions.showItemDetails();
+                }
+            },
+            giveCol: () => {
+                const amount = parseInt(adminGiveColValueInput.value);
+                if (isNaN(amount) || amount < 0) {
+                    showAdminPanelMessage("Cantidad de Col inválida.", "error");
+                    return;
+                }
+                player.col += amount;
+                updatePlayerHUD();
+                saveGame();
+                showAdminPanelMessage(`${amount} Col añadidos. Total: ${player.col}.`, "success");
+            },
+            giveExp: () => {
+                const amount = parseInt(adminGiveExpValueInput.value);
+                 if (isNaN(amount) || amount < 0) {
+                    showAdminPanelMessage("Cantidad de EXP inválida.", "error");
+                    return;
+                }
+                gainExp(amount); // gainExp maneja level ups y HUD
+                saveGame();
+                showAdminPanelMessage(`${amount} EXP añadidos.`, "success");
+            },
+            setLevel: () => {
+                const newLevel = parseInt(adminSetLevelValueInput.value);
+                if (isNaN(newLevel) || newLevel < 1) {
+                    showAdminPanelMessage("Nivel inválido.", "error");
+                    return;
+                }
+                player.level = newLevel;
+                player.currentExp = 0;
+                player.neededExp = calculateNeededExpForLevel(newLevel);
+                // Opcional: ajustar stats base aquí o dejar que el admin lo haga manualmente
+                updatePlayerHUD();
+                saveGame();
+                showAdminPanelMessage(`Nivel establecido a ${newLevel}.`, "success");
+            },
+            setStat: (statName, inputId) => {
+                const value = parseInt(document.getElementById(inputId).value);
+                 if (isNaN(value) || value < (statName.includes('MaxHp') ? 1 : 0) ) { // HP Máx no puede ser 0
+                    showAdminPanelMessage(`Valor inválido para ${statName}.`, "error");
+                    return;
+                }
+                player[statName] = value;
+
+                if (statName === 'baseMaxHp') {
+                    const oldMaxHp = player.maxHp; // Guardar maxHp antes de recalcular
+                    calculateEffectiveStats(); // Actualiza player.maxHp
+                    if (player.hp > player.maxHp) player.hp = player.maxHp;
+                    // Opcional: curar la diferencia si el nuevo maxHp es mayor
+                    // else if (player.maxHp > oldMaxHp) player.hp = Math.min(player.hp + (player.maxHp - oldMaxHp), player.maxHp);
+                } else if (statName === 'baseMaxMp') {
+                    const oldMaxMp = player.maxMp;
+                    calculateEffectiveStats(); // Actualiza player.maxMp
+                    if (player.mp > player.maxMp) player.mp = player.maxMp;
+                    // else if (player.maxMp > oldMaxMp) player.mp = Math.min(player.mp + (player.maxMp - oldMaxMp), player.maxMp);
+                } else {
+                    calculateEffectiveStats();
+                }
+                
+                updatePlayerHUD();
+                saveGame();
+                showAdminPanelMessage(`${statName} establecido a ${value}.`, "success");
+            },
+            grantFloorAccess: () => {
+                const floorNumber = parseInt(adminFloorNumberValueInput.value);
+                if (isNaN(floorNumber) || floorNumber < 1 || !floorData[floorNumber]) {
+                    showAdminPanelMessage("Número de piso inválido o no existente.", "error");
+                    return;
+                }
+                if (!player.unlockedFloors.includes(floorNumber)) {
+                    player.unlockedFloors.push(floorNumber);
+                    floorData[floorNumber].unlocked = true;
+                    updateAdminUnlockedFloorsList();
+                    saveGame();
+                    showAdminPanelMessage(`Acceso concedido al Piso ${floorNumber}.`, "success");
+                } else {
+                    showAdminPanelMessage(`El Piso ${floorNumber} ya estaba desbloqueado.`, "default");
+                }
+            },
+            revokeFloorAccess: () => {
+                const floorNumber = parseInt(adminFloorNumberValueInput.value);
+                 if (isNaN(floorNumber) || floorNumber < 1 || !floorData[floorNumber]) {
+                    showAdminPanelMessage("Número de piso inválido o no existente.", "error");
+                    return;
+                }
+                if (floorNumber === 1) {
+                    showAdminPanelMessage("No se puede revocar el acceso al Piso 1.", "error");
+                    return;
+                }
+                const index = player.unlockedFloors.indexOf(floorNumber);
+                if (index > -1) {
+                    player.unlockedFloors.splice(index, 1);
+                    if (floorData[floorNumber]) floorData[floorNumber].unlocked = false;
+                    updateAdminUnlockedFloorsList();
+                    if (player.currentFloor === floorNumber) { // Si el jugador estaba en ese piso, moverlo al piso 1
+                        player.currentFloor = 1;
+                        updatePlayerHUD();
+                        showAdminPanelMessage(`Acceso revocado al Piso ${floorNumber}. Has sido movido al Piso 1.`, "success");
+                    } else {
+                        showAdminPanelMessage(`Acceso revocado al Piso ${floorNumber}.`, "success");
+                    }
+                    saveGame();
+                } else {
+                    showAdminPanelMessage(`El Piso ${floorNumber} no estaba desbloqueado.`, "default");
+                }
+            }
+        };
+
 
         // ===============================================
-        //           PARTÍCULAS FLOTANTES (Estético) - Sin cambios
+        //           PARTÍCULAS FLOTANTES (Estético) 
         // ===============================================
         const particleStyle = document.createElement('style');
         particleStyle.textContent = `
@@ -3259,12 +3690,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             combatBtn.onclick = () => initCombat(false);
             bossCombatBtn.onclick = () => initCombat(true);
-            trainSkillBtn.onclick = () => openTrainingModal(); // Open the new training modal
+            trainSkillBtn.onclick = () => openTrainingModal(); 
             inventoryBtn.onclick = () => openModal('inventoryModal');
             shopBtn.onclick = () => openModal('shopModal');
             blacksmithBtn.onclick = () => openModal('blacksmithModal');
             playerStatsBtn.onclick = () => openModal('playerStatsModal');
-            musicToggleBtn.onclick = toggleMusic; // Listener for music toggle
+            musicToggleBtn.onclick = toggleMusic; 
+            adminAccessBtn.onclick = openAdminLoginModal; // Listener para el botón de admin
+            submitAdminKeyBtn.onclick = checkAdminKey; // Listener para el botón de enviar clave admin
 
             loadGame(); 
             loadWikiContent();
