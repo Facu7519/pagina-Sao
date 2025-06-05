@@ -2,60 +2,60 @@
 
 // --- Configuración e Importaciones de Módulos ---
 // Se importan las variables de config.js como están exportadas allí
-import { VERSION, ADMIN_SECRET_KEY, NUM_BOSS_HP_BARS, SAVE_KEY } from './config.js';
-import { domElements, getEl } from './dom.js';
+import { VERSION, ADMIN_SECRET_KEY, NUM_BOSS_HP_BARS, SAVE_KEY } from '../config.js'; // Corregido a ../config.js
+import { domElements, getEl } from '../dom.js'; // Corregido a ../dom.js
 import {
     showNotification,
     openModal,
     closeModal,
     renderGridItems,
-    setActiveLink, // Asumiendo que esta es la correcta según tu utils.js
+    setActiveLink,
     calculateNeededExpForLevel,
     initializeGlobalModalClosers // Corregido según tu utils.js
-} from './utils.js';
+} from '../utils.js'; // Corregido a ../utils.js
 
 // Importaciones del estado del juego y datos
-import { player, currentCombat, initializeDefaultPlayerItemsAndSkills } from './game/game_state.js';
-import { baseItems } from './data/items_db.js';
-import { skillData, passiveSkillData } from './data/skills_db.js';
-import { floorData } from './data/floor_data_db.js';
-import { questDefinitions, initializeQuestDefinitions } from './data/quests_db.js';
-import { blacksmithRecipes } from './data/recipes_db.js'; // Asumiendo que lo tienes
-import { statusEffects } from './data/status_effects_db.js'; // Asumiendo que lo tienes
+import { player, currentCombat, initializeDefaultPlayerItemsAndSkills } from './game_state.js';
+import { baseItems } from '../data/items_db.js';
+import { skillData, passiveSkillData } from '../data/skills_db.js';
+import { floorData } from '../data/floor_data_db.js';
+import { questDefinitions, initializeQuestDefinitions } from '../data/quests_db.js';
+import { blacksmithRecipes } from '../data/recipes_db.js';
+import { statusEffects } from '../data/status_effects_db.js';
 import {
     wikiCharacterData,
     wikiWeaponData,
     wikiFloorsData,
     wikiGuildsData,
-    loadWikiContent, // Esta es la función que tu script.js llama
-    showWikiInfo // Esta es la función que tu script.js llama
-} from './wiki/wiki_content.js';
+    loadWikiContent,
+    showWikiInfo
+} from '../wiki/wiki_content.js'; // Corregido a ../wiki/wiki_content.js
 
 
 // Importaciones de lógica de juego
-import { calculateEffectiveStats, levelUp, gainExp, takeDamage, restoreResource } from './game/player_logic.js';
-import { updatePlayerHUD } from './game/hud_logic.js'; // getHpColor y updateResourceBar son usados internamente o en utils.js
+import { calculateEffectiveStats, levelUp, gainExp, takeDamage, restoreResource } from './player_logic.js';
+import { updatePlayerHUD } from './hud_logic.js';
 
 import {
-    loadGame, // Renombrado para claridad, desde persistence_logic
-    saveGame, // Renombrado para claridad, desde persistence_logic
-    initializeNewPlayer, // Renombrado para claridad, desde persistence_logic
-    promptForPlayerName, // Renombrado para claridad, desde persistence_logic
-    confirmAndSavePlayerName, // Renombrado para claridad, desde persistence_logic
-    confirmResetProgress, // Renombrado para claridad, desde persistence_logic
-    executeReset // Renombrado para claridad, desde persistence_logic
-} from './game/persistence_logic.js';
+    loadGame,
+    saveGame,
+    initializeNewPlayer,
+    promptForPlayerName,
+    confirmAndSavePlayerName,
+    confirmResetProgress,
+    executeReset
+} from './persistence_logic.js';
 
 import {
     initCombat,
-    playerAttack, // Esta es la que se usa en el script.js original
-    usePlayerSkill, // Esta es la que se usa en el script.js original
-    useCombatPotion, // Esta es la que se usa en el script.js original
-    fleeCombat, // Esta es la que se usa en el script.js original
-    // setupCombatActionListeners, // No se llama directamente en script.js, los listeners se asignan en DOMContentLoaded
-    // showCombatSkills, // Lógica para mostrar skills se maneja en DOMContentLoaded
-    // showCombatPotions // Lógica para mostrar pociones se maneja en DOMContentLoaded
-} from './game/combat_logic.js';
+    playerAttack,
+    usePlayerSkill,
+    useCombatPotion,
+    fleeCombat,
+    // setupCombatActionListeners, // Se llama en DOMContentLoaded
+    // showCombatSkills, // La lógica está en DOMContentLoaded
+    // showCombatPotions // La lógica está en DOMContentLoaded
+} from './combat_logic.js';
 
 import {
     renderInventory,
@@ -65,64 +65,53 @@ import {
     unequipItem,
     addItemToInventory,
     useConsumable
-} from './game/inventory_logic.js';
+} from './inventory_logic.js';
 
-import { renderShop, buyItem } from './game/shop_logic.js';
-import { renderBlacksmithRecipes, attemptForge, addMaterial, renderPlayerMaterials } from './game/blacksmith_logic.js';
-import { renderPlayerStats, renderSkillListInStats } from './game/stats_modal_logic.js';
-import { renderFloorSelection, changeFloor } from './game/floor_nav_logic.js';
-import { openTrainingModal, performTraining } from './game/training_logic.js';
+import { renderShop, buyItem } from './shop_logic.js';
+import { renderBlacksmithRecipes, attemptForge, addMaterial, renderPlayerMaterials } from './blacksmith_logic.js';
+import { renderPlayerStats, renderSkillListInStats } from './stats_modal_logic.js';
+import { renderFloorSelection, changeFloor } from './floor_nav_logic.js';
+import { openTrainingModal, performTraining } from './training_logic.js';
 
 import {
-    openQuestsModal, // Esta es la que se usa en el script.js original
+    openQuestsModal,
     renderAllQuestLists,
-    showQuestDetails, // Esta es la que se usa en el script.js original
+    showQuestDetails,
     acceptQuest,
     updateQuestProgress,
     claimQuestReward
-} from './game/quests_logic.js';
+} from './quests_logic.js';
 
 import {
-    adminActions, // Objeto con todas las acciones de admin
-    openAdminLoginModal, // Función para abrir el modal de login/panel
-    checkAdminKey, // Función para verificar la clave
-    // populateAdminPanel, // Llamada internamente por openAdminPanel
-    openAdminPanel // Función para abrir el panel directamente si ya es admin
-} from './game/admin_logic.js';
+    adminActions,
+    openAdminLoginModal,
+    checkAdminKey,
+    openAdminPanel
+} from './admin_logic.js';
 
 import { toggleMusic, createParticles, SAO_PARTICLES } from './audiovisual_logic.js';
 
 
 // --- Exposición de Funciones a `window` (para llamadas desde HTML onclick) ---
-// Basado en los onclicks directos en index1.html y script.js original
-
-// Funciones de persistencia
+// Esto permite que los `onclick="nombreFuncion()"` en index1.html funcionen.
 window.saveGame = saveGame;
 window.loadGame = loadGame;
 window.confirmResetProgress = confirmResetProgress;
-window.executeReset = executeReset; // Para el botón en el modal de confirmación
+window.executeReset = executeReset; // Usado en el modal de confirmación (infoModal)
+window.setActiveLink = setActiveLink;
+window.showWikiInfo = showWikiInfo;
+window.closeModal = closeModal; // Para los botones de cierre en los modales
+window.openModal = openModal;   // Por si algún HTML lo usa directamente
+window.toggleMusic = toggleMusic; // Para el botón de música
+window.openAdminLoginModal = openAdminLoginModal; // Para el botón de admin
+window.checkAdminKey = checkAdminKey; // Para el modal de clave de admin
+window.adminActions = adminActions; // Para los botones dentro del panel de admin
+window.submitPlayerName = confirmAndSavePlayerName; // Para el modal de nombre de jugador
 
-// Funciones de UI/Generales
-window.toggleMusic = toggleMusic;
-window.setActiveLink = setActiveLink; // De utils.js
-window.showWikiInfo = showWikiInfo; // De wiki_content.js
-window.closeModal = closeModal; // De utils.js, si algún HTML lo llama directamente
-window.openModal = openModal;   // De utils.js, si algún HTML lo llama directamente
-
-// Funciones de Admin
-window.openAdminLoginModal = openAdminLoginModal;
-window.checkAdminKey = checkAdminKey;
-window.adminActions = adminActions; // Expone el objeto completo
-
-// Funciones del Jugador
-window.submitPlayerName = confirmAndSavePlayerName; // De persistence_logic.js
-
-
-// Las funciones de combate como playerAttack, fleeCombat, etc.,
-// son asignadas a los onclick de los botones en DOMContentLoaded más abajo.
-// No es necesario exponerlas a window si los listeners se asignan en JS.
-// Sin embargo, si alguna parte del HTML insertado dinámicamente las necesita,
-// podrían tener que exponerse. Por ahora, se asume que los listeners de abajo son suficientes.
+// Las funciones de combate como playerAttack, fleeCombat, etc., se asignan
+// a los botones específicos en DOMContentLoaded más abajo.
+// Si el HTML generara dinámicamente botones con onclick="playerAttack()",
+// entonces también necesitaríamos window.playerAttack = playerAttack;
 
 
 // --- Lógica Principal de Inicialización del Juego ---
@@ -130,42 +119,43 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(`Sword Art Online: Aincrad Chronicles - Initializing (Version ${VERSION || 'N/A'})`);
     console.log(`Save Key: ${SAVE_KEY}, Admin Key Hint: First 3 chars: ${ADMIN_SECRET_KEY.substring(0,3)}`);
 
-    initializeQuestDefinitions(); // De data/quests_db.js
-    initializeGlobalModalClosers(); // De utils.js
+    initializeQuestDefinitions();
+    initializeGlobalModalClosers(); // Configura listeners para cerrar modales (Esc, click fuera)
 
-    loadGame(); // De persistence_logic.js. Esto también llama a updatePlayerHUD, etc.
-    loadWikiContent(); // De wiki/wiki_content.js
+    loadGame(); // Carga el juego o inicializa uno nuevo. Actualiza HUD, etc.
+    loadWikiContent(); // Carga el contenido de la wiki.
 
     if (typeof createParticles === 'function' && SAO_PARTICLES && domElements.particlesContainer) {
-        createParticles(SAO_PARTICLES, domElements.particlesContainer); // De audiovisual_logic.js
+        createParticles(SAO_PARTICLES, domElements.particlesContainer);
     } else {
-        console.warn('createParticles o SAO_PARTICLES o domElements.particlesContainer no están disponibles.');
+        console.warn('createParticles, SAO_PARTICLES o domElements.particlesContainer no están disponibles. Audiovisual_logic.js podría necesitar revisión.');
     }
 
     // --- Asignación de Event Listeners para Botones Principales del HUD ---
-    // Basado en las asignaciones en el script.js original
+    // (Usando los IDs de los botones definidos en domElements)
     if (domElements.combatBtn) domElements.combatBtn.onclick = () => initCombat(false);
     if (domElements.bossCombatBtn) domElements.bossCombatBtn.onclick = () => initCombat(true);
+    if (domElements.questsBtn) domElements.questsBtn.onclick = () => openModal('questsModal'); // openModal se encarga de llamar a openQuestsModal de quests_logic
     if (domElements.trainSkillBtn) domElements.trainSkillBtn.onclick = openTrainingModal;
-    if (domElements.inventoryBtn) domElements.inventoryBtn.onclick = () => openModal('inventoryModal'); // openModal de utils.js se encarga de llamar a renderInventory, etc.
+    
+    if (domElements.inventoryBtn) domElements.inventoryBtn.onclick = () => openModal('inventoryModal');
     if (domElements.shopBtn) domElements.shopBtn.onclick = () => openModal('shopModal');
     if (domElements.blacksmithBtn) domElements.blacksmithBtn.onclick = () => openModal('blacksmithModal');
     if (domElements.playerStatsBtn) domElements.playerStatsBtn.onclick = () => openModal('playerStatsModal');
     if (domElements.floorNavigateBtn) domElements.floorNavigateBtn.onclick = () => {
-        renderFloorSelection(); // de floor_nav_logic.js
+        renderFloorSelection(); 
         openModal('floorNavigationModal');
     };
-    if (domElements.questsBtn) domElements.questsBtn.onclick = () => openModal('questsModal'); // openModal de utils.js llama a openQuestsModal de quests_logic
 
-    // Botones ya expuestos a window o que sus modales manejan sus propios botones internos
+    // Botones cuyos onclick ya llaman a funciones en window (definidas arriba)
     if (domElements.musicToggleBtn) domElements.musicToggleBtn.onclick = window.toggleMusic;
-    if (domElements.adminAccessBtn) domElements.adminAccessBtn.onclick = window.openAdminLoginModal;
-    // submitAdminKeyBtn y submitPlayerNameBtn tienen onclicks en el HTML que llaman a funciones en window.
-
+    if (domElements.adminAccessBtn) domElements.adminAccessBtn.onclick = window.openAdminLoginModal; // Llama a la función en window
+    if (domElements.submitAdminKeyBtn) domElements.submitAdminKeyBtn.onclick = window.checkAdminKey; // Llama a la función en window
+    if (domElements.submitPlayerNameBtn) domElements.submitPlayerNameBtn.onclick = window.submitPlayerName; // Llama a la función en window
+    
     // --- Asignación de Event Listeners para el Modal de Combate ---
-    // Replicando la lógica del script.js original para los botones de acción de combate
-    if (domElements.combatActionAttackBtn) domElements.combatActionAttackBtn.onclick = playerAttack; // de combat_logic.js
-    if (domElements.combatActionFleeBtn) domElements.combatActionFleeBtn.onclick = fleeCombat; // de combat_logic.js
+    if (domElements.combatActionAttackBtn) domElements.combatActionAttackBtn.onclick = playerAttack;
+    if (domElements.combatActionFleeBtn) domElements.combatActionFleeBtn.onclick = fleeCombat;
 
     if (domElements.combatActionSkillsBtn) {
         domElements.combatActionSkillsBtn.onclick = () => {
@@ -173,23 +163,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const skillContainer = domElements.combatSkillsListContainer;
             if (!skillContainer) return;
             skillContainer.innerHTML = '';
-            const availableSkills = player.skills.filter(skillDef => player.level >= (skillDef.levelReq || 0));
+            // Asegúrate que player.skills y skillData estén disponibles y correctos.
+            const availableSkills = player.skills.filter(skillRef => {
+                const skillDef = skillData[skillRef.id] || skillRef; // Usar skillRef si ya tiene todos los datos
+                return player.level >= (skillDef.levelReq || 0);
+            });
 
             if (availableSkills.length === 0) {
                 skillContainer.innerHTML = '<p>No has aprendido habilidades.</p>';
             } else {
-                availableSkills.forEach(skill => {
-                    const skillFullData = skillData[skill.id] || skill; // Asegurar que tenemos todos los datos
+                availableSkills.forEach(skillRef => {
+                    const skillFullData = skillData[skillRef.id] || skillRef;
                     const skillBtn = document.createElement('button');
                     skillBtn.className = 'action-btn tooltip';
                     let mpCost = Math.max(0, Math.floor(skillFullData.mpCost * (1 - (player.tempMpCostReduction || 0))));
-                    skillBtn.innerHTML = `${skillFullData.icon || '✨'} ${skillFullData.name} (${mpCost} MP) <span class="tooltiptext">${skillFullData.description}</span>`;
-                    skillBtn.onclick = () => usePlayerSkill(skillFullData.id); // usePlayerSkill de combat_logic.js
+                    skillBtn.innerHTML = `${skillFullData.icon || '✨'} ${skillFullData.name} (${mpCost} MP) <span class="tooltiptext">${skillFullData.description || 'Sin descripción'}</span>`;
+                    skillBtn.onclick = () => usePlayerSkill(skillFullData.id);
                     skillBtn.disabled = player.mp < mpCost || (skillFullData.requiresCombo && player.attackComboCount < 2);
                     skillContainer.appendChild(skillBtn);
                 });
             }
-            skillContainer.style.display = skillContainer.style.display === 'none' ? 'flex' : 'none';
+            skillContainer.style.display = skillContainer.style.display === 'none' || !skillContainer.style.display ? 'flex' : 'none';
         };
     }
 
@@ -199,33 +193,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const potionContainer = domElements.combatPotionsListContainer;
             if (!potionContainer) return;
             potionContainer.innerHTML = '';
-            const potions = player.inventory.filter(item => item.type === 'consumable' && (baseItems[item.id]?.effect?.hp || baseItems[item.id]?.effect?.mp || baseItems[item.id]?.effect?.cure));
+            const potions = player.inventory.filter(item => {
+                const itemBase = baseItems[item.id];
+                return itemBase && itemBase.type === 'consumable' && (itemBase.effect?.hp || itemBase.effect?.mp || itemBase.effect?.cure);
+            });
 
             if (potions.length === 0) {
                 potionContainer.innerHTML = '<p>No tienes pociones.</p>';
             } else {
-                potions.forEach((potion) => {
-                    // Encontrar el índice original del item en el inventario principal es crucial si se va a modificar/eliminar.
-                    const originalIndex = player.inventory.findIndex(invItem => invItem.id === potion.id && invItem.count === potion.count); // Esto puede ser frágil si hay duplicados exactos.
-                                                                                                                                        // Sería mejor si 'potion' fuera el objeto original del inventario.
-                                                                                                                                        // O si useCombatPotion recibe el ID y busca.
-                    const itemBase = baseItems[potion.id];
+                potions.forEach((potionInstance) => { 
+                    const itemBase = baseItems[potionInstance.id];
+                    const originalIndex = player.inventory.findIndex(invItem => invItem.id === potionInstance.id); // Busca por ID, puede ser frágil si hay items idénticos no apilados. Idealmente el objeto potionInstance sería la referencia directa.
+                    
                     const potionBtn = document.createElement('button');
                     potionBtn.className = 'action-btn tooltip';
-                    potionBtn.innerHTML = `${itemBase.icon || '🧪'} ${itemBase.name} (x${potion.count}) <span class="tooltiptext">${itemBase.description}</span>`;
-                    potionBtn.onclick = () => useCombatPotion(originalIndex); // useCombatPotion de combat_logic.js
+                    potionBtn.innerHTML = `${itemBase.icon || '🧪'} ${itemBase.name} (x${potionInstance.count}) <span class="tooltiptext">${itemBase.description || 'Sin descripción'}</span>`;
+                    potionBtn.onclick = () => useCombatPotion(originalIndex); // `useCombatPotion` debe estar preparado para manejar el índice o el ID.
                     potionContainer.appendChild(potionBtn);
                 });
             }
-            potionContainer.style.display = potionContainer.style.display === 'none' ? 'flex' : 'none';
+            potionContainer.style.display = potionContainer.style.display === 'none' || !potionContainer.style.display ? 'flex' : 'none';
         };
     }
 
     // Activar enlace "Juego" por defecto en la navegación
     const gamePanelLink = document.querySelector('.nav-links a[href="#game-panel"]');
-    if (gamePanelLink && typeof setActiveLink === 'function') { // setActiveLink de utils.js
+    if (gamePanelLink && typeof setActiveLink === 'function') {
         setActiveLink(gamePanelLink);
     }
 
-    console.log("Game initialized and ready.");
+    console.log("Game initialized and ready. If you see errors, ensure you are using a local web server.");
 });
