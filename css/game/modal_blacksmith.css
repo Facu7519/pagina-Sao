@@ -1,0 +1,25 @@
+/* css/game/modal_blacksmith.css */
+/* Styles specific to the Blacksmith Modal. */
+
+#blacksmithModal .modal-content.large.blacksmith-content {
+    /* Max width is already in general, can be overridden if needed */
+}
+
+/* Specific styles for the blacksmith materials section */
+/* .blacksmith-materials-info and its children (h3, ul, li) are already styled in modals_general.css */
+/* Add overrides or more specific styles here if needed. */
+/*
+#blacksmithModal .blacksmith-materials-info {
+    background-color: rgba(0,0,0,0.1);
+    padding: 10px;
+    border-radius: 5px;
+}
+*/
+
+/* Specific styles for .blacksmith-recipes-container or .blacksmith-grid if they differ */
+/* from general modal column/grid layouts. */
+/*
+#blacksmithModal .blacksmith-grid .blacksmith-item .item-materials {
+    font-size: 0.65em; // Even smaller material text if needed
+}
+*/

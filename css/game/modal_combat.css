@@ -1,0 +1,177 @@
+/* css/game/modal_combat.css */
+/* Styles specific to the Combat Modal. */
+
+#combatModal .modal-content.xlarge { 
+    max-width: 850px; /* Specific max-width for combat modal */
+}
+
+.combat-arena {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start; /* Align items to the top */
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+.combatant-display {
+    background: rgba(20,20,35,0.5);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(70,130,180,0.3);
+    width: 45%;
+    text-align: center;
+    position: relative; /* For status effects positioning */
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.combatant-display.active-turn {
+    border-color: #ffd700; /* Gold border for active turn */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+.combatant-display.damage-flash {
+    animation: damageFlash 0.2s ease-out;
+}
+@keyframes damageFlash {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.8; filter: brightness(1.5); }
+    100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+
+.combatant-display h3 { /* Name of combatant */
+    color: #a1d8ff;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+.combatant-icon { 
+    font-size: 4rem; /* For emoji/text icons */
+    margin-bottom: 0.5rem; 
+}
+.combatant-icon img { /* For image icons */
+    max-width: 100%; 
+    max-height: 150px; 
+    height: auto;
+    border-radius: 8px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+}
+
+.combat-hp-bar-container {
+    width: 100%;
+    height: 25px;
+    background-color: #1e1f26;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    border: 1px solid #4a4f66;
+}
+/* Estilo para el contenedor de múltiples barras del jefe */
+.combat-hp-multibar-container.boss-hp-bars { /* Ensure .boss-hp-bars is used to show */
+    display: flex; /* Default to flex, JS will show/hide this container */
+    flex-direction: column;
+    gap: 3px; /* Espacio entre las barras de segmento */
+}
+.combat-hp-multibar-container .combat-hp-bar-container.segment-container {
+    height: 10px; /* Altura más pequeña para cada segmento */
+    margin-bottom: 0; /* Sin margen inferior para que estén juntas */
+}
+
+.combat-hp-bar-fill { /* Controlled by JS for color dinámico */
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease-out, background-color 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.combat-hp-text { 
+    font-size: 0.9rem; 
+    color: #c0d0e0; 
+}
+.combat-stats-preview { 
+    font-size: 0.85rem; 
+    color: #b0c4de; 
+    margin-top: 0.5rem; 
+}
+
+/* Status Effects Display in Combat */
+.status-effects-display { /* Shared between player and enemy */
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10; /* Ensure they are above other elements in the card */
+}
+.status-effect-icon {
+    font-size: 1.2rem;
+    cursor: help; /* To indicate it's hoverable for a title/tooltip */
+    filter: grayscale(0.5); /* Slightly desaturated by default */
+    transition: filter 0.2s ease;
+}
+.status-effect-icon:hover { 
+    filter: grayscale(0); /* Full color on hover */
+}
+
+.combat-actions { 
+    text-align: center; 
+    margin-bottom: 1.5rem; 
+}
+.combat-actions .action-btn { 
+    margin: 0.5rem; /* Uses .action-btn styles from game_base.css */
+}
+
+.combat-log {
+    background: rgba(10,10,18,0.4);
+    border-radius: 8px;
+    padding: 1rem;
+    height: 150px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+    color: #c0d0e0;
+    border: 1px solid rgba(70,130,180,0.2);
+}
+.combat-log p { 
+    margin-bottom: 0.5rem; 
+    line-height: 1.4; 
+}
+.combat-log .player-action { color: #87CEEB; }
+.combat-log .enemy-action { color: #FF7F7F; } /* Reddish for enemy actions */
+.combat-log .system-message { color: #FFD700; font-style: italic; } /* Yellow for system messages */
+.combat-log .combo-message { color: #ff69b4; font-weight: bold; } /* Pink for combo */
+.combat-log .status-message { color: #98fb98; font-style: italic; } /* Light green for status effects */
+
+/* Skills and Potions Lists in Combat */
+.skills-list, .potions-list { /* Shared container style for skills/potions */
+    display: flex; /* Will be toggled by JS */
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(10,10,18,0.2);
+    border-radius: 5px;
+}
+.skills-list button, .potions-list button { /* Styling for individual skill/potion buttons */
+    font-size: 0.85rem; 
+    padding: 6px 10px;
+    /* Inherits .action-btn styles if also applied in JS */
+}
+
+
+/* Responsive Combat Modal */
+@media (max-width: 992px) {
+    .combat-arena { 
+        flex-direction: column; 
+        align-items: center; 
+    }
+    .combatant-display { 
+        width: 80%; /* Combatant displays take more width when stacked */
+        margin-bottom: 1rem;
+    }
+}
+@media (max-width: 480px) {
+    .combatant-display { width: 95%; }
+    .combatant-icon img { max-height: 120px; }
+}
