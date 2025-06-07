@@ -1,0 +1,25 @@
+/* css/game/modal_training.css */
+/* Styles specific to the Training Modal. */
+
+#trainingModal .modal-content.large.training-content {
+    /* Max width is already in general, can be overridden */
+}
+
+/* .training-sections, .training-info-container, .training-details-container, 
+   .training-grid, .training-option are styled in modals_general.css */
+
+/* Specific styles for the training stats preview, if needed beyond general ul/li */
+#trainingModal #training-stats-preview li {
+    color: #90EE90; /* Light green for positive stat gains */
+    margin-bottom: 0.5rem;
+}
+
+#trainingModal #training-stats-preview li:last-child { /* Cost display, if part of this list */
+    color: #FFD700; /* Gold for cost */
+}
+
+/* Example of a specific override if .training-option needed unique styling:
+#trainingModal .training-option {
+    border-color: #FFA500; // Orange border for training options
+}
+*/

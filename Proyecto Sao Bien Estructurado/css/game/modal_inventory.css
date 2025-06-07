@@ -1,0 +1,58 @@
+/* css/game/modal_inventory.css */
+/* Styles specific to the Inventory Modal, like the equipment section */
+
+/* Ensure .inventory-modal .modal-content or #inventoryModal .modal-content is used if these are overrides */
+#inventoryModal .modal-content.large.inventory-content {
+    /* Max width is already in general, but can be overridden if needed */
+}
+
+/* Player Equipment Section within Inventory Modal */
+.player-equipment h3 { /* For Inventory Modal's equipment section title */
+    color: #a1d8ff;
+    margin-bottom: 1.2rem;
+    text-align: center;
+    font-size: 1.6rem;
+}
+.equipment-slots {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column for equipment slots */
+    gap: 15px;
+}
+.equipment-slot {
+    background: rgba(20, 22, 38, 0.5);
+    border: 2px dashed rgba(70, 130, 180, 0.5);
+    border-radius: 10px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.85em;
+    color: rgba(180, 190, 210, 0.7);
+    transition: all 0.2s ease;
+    cursor: pointer; /* To indicate it's clickable for unequipping */
+}
+.equipment-slot.has-item {
+    border: 2px solid #87CEEB;
+    background: rgba(30, 35, 55, 0.7);
+}
+.equipment-slot .item-icon { /* Icon of the equipped item */
+    font-size: 2.8rem; 
+    color: #E0FFFF; /* A light cyan for equipped item icons */
+    margin-bottom: 5px;
+}
+.equipment-slot .item-name { /* Name of the equipped item */
+    font-size: 0.95em; 
+    font-weight: bold; 
+    color: #a1d8ff;
+}
+.equipment-slot-label { /* Text like "Weapon", "Shield" */
+    font-size: 0.8em;
+    color: #8090b0; /* A dimmer color for the slot type label */
+    margin-bottom: 5px;
+}
+
+/* Specific styles for .inventory-grid-container or .player-equipment-container if they differ from general modal column layout */
+/* For example, if #inventoryModal .inventory-grid-container needed a different flex-basis */

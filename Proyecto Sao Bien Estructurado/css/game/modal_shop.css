@@ -1,0 +1,22 @@
+/* css/game/modal_shop.css */
+/* Styles specific to the Shop Modal, if any beyond general modal styles. */
+
+#shopModal .modal-content.large.shop-content {
+    /* Max width is already in general, can be overridden if needed */
+}
+
+/* If .shop-items-container or .shop-grid within #shopModal need specific styling not covered by: */
+/* .shop-items-container (general modal column layout from modals_general.css) */
+/* .shop-grid (general modal grid layout from modals_general.css) */
+/* .shop-item (general modal item style from modals_general.css) */
+/* Then add those specific styles here. */
+
+/* Example:
+#shopModal .shop-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); // Slightly larger items in shop
+}
+
+#shopModal .item-price {
+    font-size: 0.85em; // Larger price display in shop
+}
+*/

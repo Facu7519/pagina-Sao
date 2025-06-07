@@ -1,0 +1,58 @@
+/* css/game/modal_player_stats.css */
+/* Styles specific to the Player Stats Modal. */
+
+#playerStatsModal .modal-content { 
+    max-width: 600px; /* Specific max-width for this modal */
+}
+
+.stats-category { 
+    margin-bottom: 1.5rem; 
+}
+.stats-category h3 {
+    color: #87CEEB;
+    font-size: 1.4rem;
+    border-bottom: 1px solid rgba(70, 130, 180, 0.3);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    font-size: 1rem;
+}
+.stat-line .stat-label { /* Already styled in .modal-content p, li by default */
+    color: #b0c4de; 
+} 
+.stat-line .stat-value { /* Already styled in .modal-content p, li by default */
+    color: #e0e0e0; 
+    font-weight: bold; 
+}
+.stats-divider { 
+    border: none; /* Remove default hr border */
+    height: 1px;
+    background-color: rgba(70,130,180,0.3); 
+    margin: 0.5rem 0; 
+}
+
+/* Specific styling for skill lists in player stats modal */
+.modal-content ul.skills-list-display { /* Used for general skill list structure if defined in HTML */
+    list-style-type: '❖ '; 
+    padding-left: 20px; 
+    margin-top: 0.5rem;
+}
+.modal-content ul#stats-skills-list li, /* Styling specific list items */
+.modal-content ul#stats-passive-skills-list li {
+    font-size: 0.95rem; /* Slightly smaller font for skill list items */
+    margin-bottom: 0.4rem;
+    color: #c0d0e0;
+}
+
+/* If #stats-skills-list or #stats-passive-skills-list need more distinct styling */
+/*
+#stats-skills-list {
+    background-color: rgba(0,0,0,0.1);
+    padding: 10px;
+    border-radius: 4px;
+}
+*/
