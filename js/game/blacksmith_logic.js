@@ -1,13 +1,14 @@
 // js/game/blacksmith_logic.js
 
-import { player, gameState, uiStates, updatePlayerHUD } from './game_state.js';
+import { player } from './game_state.js'; // 'gameState' y 'uiStates' removidos de la importación
 import { domElements } from '../dom.js';
 import { showNotification, renderGridItems } from '../utils.js';
 import { baseItems } from '../data/items_db.js';
-import { blacksmithRecipes } from '../data/recipes_db.js'; // Asumiendo que blacksmithRecipes está aquí
+import { blacksmithRecipes } from '../data/recipes_db.js';
 import { floorData } from '../data/floor_data_db.js';
-import { addItemToInventory, addMaterial, renderInventory as renderFullInventory } from './inventory_logic.js'; // addMaterial ya es de inventory_logic
+import { addItemToInventory, addMaterial, renderInventory as renderFullInventory } from './inventory_logic.js';
 import { saveGame } from './persistence_logic.js';
+import { updatePlayerHUD } from './hud_logic.js'; // Importar updatePlayerHUD desde hud_logic.js
 
 /**
  * Renderiza los materiales de forja que posee el jugador en el modal de herrería.
@@ -153,8 +154,32 @@ export function attemptForge(recipeKey) {
 
     updatePlayerHUD();
     renderBlacksmithRecipes(); // Re-renderizar para actualizar UI de herrería
-    if (uiStates.isInventoryModalOpen) { // Si el inventario está abierto, re-renderizarlo
+    // Acceder a uiStates a través del objeto player
+    if (player.uiStates.isInventoryModalOpen) { // Si el inventario está abierto, re-renderizarlo
          renderFullInventory();
     }
     saveGame();
+}
+
+/**
+ * Abre el modal de herrería y renderiza su contenido.
+ */
+export function openBlacksmithModal() {
+    if (!domElements.blacksmithModal) {
+        console.error("Modal de herrería no encontrado en el DOM.");
+        return;
+    }
+    renderBlacksmithRecipes(); // Asegura que las recetas estén actualizadas
+    renderPlayerMaterialsList(); // Asegura que los materiales del jugador estén actualizados
+    player.uiStates.isBlacksmithModalOpen = true; // Acceder a uiStates a través del objeto player
+    domElements.blacksmithModal.style.display = 'block';
+}
+
+/**
+ * Cierra el modal de herrería.
+ */
+export function closeBlacksmithModal() {
+    if (!domElements.blacksmithModal) return;
+    player.uiStates.isBlacksmithModalOpen = false; // Acceder a uiStates a través del objeto player
+    domElements.blacksmithModal.style.display = 'none';
 }

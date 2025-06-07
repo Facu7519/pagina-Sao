@@ -30,40 +30,38 @@ export let player = {
         armor: null, 
         accessory: null 
     },
-    // Estadísticas efectivas calculadas (con equipo y pasivas)
+    skills: [], // Habilidades activas aprendidas por el jugador
+    passiveSkills: [], // Habilidades pasivas aprendidas por el jugador
+    activeStatusEffects: [], // Efectos de estado activos en el jugador {type: 'poisoned', duration: 3}
+    activeQuests: [], // Misiones que el jugador ha aceptado
+    completedQuests: [], // IDs de misiones completadas (para no aceptarlas de nuevo)
+    isAdmin: false, // Modo administrador
+    
+    // Estadísticas efectivas calculadas (se actualizarán en player_logic.js)
     effectiveAttack: 0,
     effectiveDefense: 0,
-    maxHp: 0, // HP máximo total (base + equipo)
-    maxMp: 0, // MP máximo total (base + equipo)
-    
-    skills: [ // Habilidades activas aprendidas por el jugador
-        // { id: 'quick_slash', ...skillData['quick_slash'] } // Ejemplo
-    ],
-    passiveSkills: [ // Habilidades pasivas aprendidas
-        // { id: 'hp_regen_s', ...passiveSkillData['hp_regen_s'] } // Ejemplo
-    ],
-    materials: { // Cantidad de cada material de crafteo
-        'raw_hide': 0, 
-        'iron_ore': 0, 
-        'kobold_fang': 0, 
-        'silver_ingot': 0,
-        'blue_crystal': 0, 
-        'obsidian_shard': 0, 
-        'dragon_scale': 0, 
-        'divine_fragment': 0,
-    },
-    activeStatusEffects: [], // Efectos de estado activos en el jugador durante el combate
-    lastCombatAction: null, // Para mecánicas de combo ('attack', 'skill', 'potion')
-    attackComboCount: 0,   // Contador para combos de ataque
-    isAdmin: false,        // Flag para acceso al panel de administrador
-    
-    activeQuests: [], // Array de objetos: { questId: 'id_mision', progress: { current: 0, target: N } }
-    completedQuests: [], // Array de IDs de misiones completadas: ['id_mision1', 'id_mision2']
+    maxHp: 0,
+    maxMp: 0,
 
-    // Bonificaciones temporales por pasivas (se recalculan)
+    // Variables temporales para efectos de pasivas o buffs
     tempHpRegen: 0,
     tempMpCostReduction: 0,
     tempCritChanceBonus: 0,
+
+    // Estados de UI para persistencia de modales abiertos
+    uiStates: {
+        isInventoryModalOpen: false,
+        isShopModalOpen: false,
+        isBlacksmithModalOpen: false,
+        isPlayerStatsModalOpen: false,
+        isTrainingModalOpen: false,
+        isQuestsModalOpen: false,
+        isFloorNavigationModalOpen: false,
+        isAdminKeyModalOpen: false,
+        isAdminPanelModalOpen: false,
+        isInfoModalOpen: false,
+        // isCombatModalOpen se maneja por currentCombat.active
+    }
 };
 
 /**
@@ -79,6 +77,46 @@ export let currentCombat = {
 };
 
 /**
+ * Función para inicializar el estado del jugador a sus valores por defecto.
+ * Utilizado para iniciar una nueva partida.
+ */
+export function initializeNewPlayerState() {
+    player.name = "";
+    player.level = 1;
+    player.currentExp = 0;
+    player.neededExp = 100;
+    player.hp = 100;
+    player.baseMaxHp = 100;
+    player.mp = 50;
+    player.baseMaxMp = 50;
+    player.baseAttack = 5;
+    player.baseDefense = 2;
+    player.col = 1000;
+    player.currentFloor = 1;
+    player.unlockedFloors = [1];
+    player.materials = {};
+    player.activeStatusEffects = [];
+    player.activeQuests = [];
+    player.completedQuests = [];
+    player.isAdmin = false;
+    player.uiStates = {
+        isInventoryModalOpen: false,
+        isShopModalOpen: false,
+        isBlacksmithModalOpen: false,
+        isPlayerStatsModalOpen: false,
+        isTrainingModalOpen: false,
+        isQuestsModalOpen: false,
+        isFloorNavigationModalOpen: false,
+        isAdminKeyModalOpen: false,
+        isAdminPanelModalOpen: false,
+        isInfoModalOpen: false,
+    }; // Reiniciar estados de UI
+
+    // Reinicializar inventario y habilidades por defecto
+    initializeDefaultPlayerItemsAndSkills();
+}
+
+/**
  * Función para inicializar el inventario y habilidades del jugador por defecto.
  * Se llama cuando se crea un nuevo jugador.
  */
@@ -92,10 +130,13 @@ export function initializeDefaultPlayerItemsAndSkills() {
         return base ? { ...base, ...itemRef, id: itemRef.id } : null;
     }).filter(item => item); // Filtra nulos si algún ID no existe
 
-    player.skills = skillData['quick_slash'] ? [{ id: 'quick_slash', ...skillData['quick_slash'] }] : [];
-    
-    // Reiniciar materiales
-    Object.keys(player.materials).forEach(matId => player.materials[matId] = 0);
-    player.materials['raw_hide'] = 10; // Ejemplo de materiales iniciales
-    player.materials['iron_ore'] = 5;
+    player.equipment = { // Asegurar que el equipo también se reinicia
+        weapon: null, 
+        shield: null, 
+        armor: null, 
+        accessory: null 
+    };
+
+    player.skills = skillData['quick_slash'] ? [{ id: 'quick_slash' }] : [];
+    player.passiveSkills = []; // Las pasivas se aprenden con LEVEL UP, no se dan por defecto
 }

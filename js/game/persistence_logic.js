@@ -1,14 +1,17 @@
 // js/game/persistence_logic.js
 
-import { player, initializeNewPlayerState, calculateEffectiveStats, updatePlayerHUD, gainExp } from './game_state.js';
-import { domElements } from '../dom.js'; // Para NameEntryModal principalmente
-import { showNotification } from '../utils.js';
+import { player, initializeNewPlayerState } from './game_state.js'; // initializeNewPlayerState sí está en game_state.js
+import { domElements, getEl } from '../dom.js'; // Para NameEntryModal principalmente
+import { showNotification, calculateNeededExpForLevel, openModal, closeModal } from '../utils.js'; // calculateNeededExpForLevel se movió a utils
 import { floorData } from '../data/floor_data_db.js';
 import { skillData, passiveSkillData } from '../data/skills_db.js';
 import { questDefinitions } from '../data/quests_db.js';
 // inventory_logic para renderEquipment y equipar item inicial si es necesario.
 import { renderEquipment, equipItem } from './inventory_logic.js';
-// admin_logic para isAdmin (aunque isAdmin se guarda/carga directamente en el objeto player)
+import { calculateEffectiveStats as playerLogicCalculateEffectiveStats, gainExp } from './player_logic.js'; // Importar correctamente desde player_logic
+import { updatePlayerHUD } from './hud_logic.js'; // Importar updatePlayerHUD correctamente desde hud_logic.js
+import { baseItems } from '../data/items_db.js';
+
 
 const SAVE_KEY = 'saoAincradChroniclesSave_v7'; // Incrementar versión si la estructura de guardado cambia significativamente
 
@@ -32,295 +35,170 @@ export function saveGame() {
             col: player.col,
             currentFloor: player.currentFloor,
             unlockedFloors: player.unlockedFloors,
-            inventory: player.inventory.map(item => ({ id: item.id, count: item.count })), // Guardar solo ID y cantidad
-            equipment: {}, // Guardar solo IDs de items equipados
-            skills: player.skills.map(s => s.id), // Guardar solo IDs de habilidades
-            passiveSkills: player.passiveSkills.map(s => s.id), // Guardar solo IDs de habilidades pasivas
+            inventory: player.inventory.map(item => ({ id: item.id, count: item.count || 1 })), // Simplificar inventario
+            equipment: { // Guardar solo IDs de items equipados
+                weapon: player.equipment.weapon ? { id: player.equipment.weapon.id } : null,
+                shield: player.equipment.shield ? { id: player.equipment.shield.id } : null,
+                armor: player.equipment.armor ? { id: player.equipment.armor.id } : null,
+                accessory: player.equipment.accessory ? { id: player.equipment.accessory.id } : null,
+            },
             materials: player.materials,
-            isAdmin: player.isAdmin,
-            activeQuests: player.activeQuests, // Guardar progreso completo de misiones activas
-            completedQuests: player.completedQuests, // Guardar IDs de misiones completadas
-            // Considerar si `questDefinitions` debe guardarse si es modificable por el admin
+            skills: player.skills.map(s => ({ id: s.id })), // Guardar solo IDs de habilidades
+            passiveSkills: player.passiveSkills.map(s => ({ id: s.id })), // Guardar solo IDs de pasivas
+            activeQuests: player.activeQuests, // Guardar el progreso de misiones
+            completedQuests: player.completedQuests,
+            isAdmin: player.isAdmin, // Guardar estado de admin
+            uiStates: player.uiStates, // Guardar estados de UI para reabrir modales
         };
-
-        // Poblar equipment con IDs
-        for (const slot in player.equipment) {
-            if (player.equipment[slot]) {
-                playerSaveData.equipment[slot] = player.equipment[slot].id;
-            } else {
-                playerSaveData.equipment[slot] = null;
-            }
-        }
-
         localStorage.setItem(SAVE_KEY, JSON.stringify(playerSaveData));
-        // showNotification('¡Progreso guardado!', 'success', 2000); // Evitar spam de notificaciones si se guarda frecuentemente
-        console.log("Game saved successfully.");
+        showNotification("¡Juego guardado!", "success");
     } catch (e) {
-        showNotification('Error al guardar el progreso: ' + e.message, 'error');
-        console.error("Error saving game:", e);
+        console.error("Error al guardar el juego:", e);
+        showNotification("Error al guardar el juego.", "error");
     }
 }
 
 /**
  * Carga el progreso del juego desde localStorage.
- * Si no hay datos guardados o hay un error, inicializa un nuevo jugador.
  */
 export function loadGame() {
     try {
-        const savedState = localStorage.getItem(SAVE_KEY);
-        if (savedState) {
-            const loadedData = JSON.parse(savedState);
+        const savedData = localStorage.getItem(SAVE_KEY);
+        if (savedData) {
+            const data = JSON.parse(savedData);
 
-            // Restaurar datos directos del jugador
-            player.name = loadedData.name || "";
-            player.level = loadedData.level || 1;
-            player.currentExp = loadedData.currentExp || 0;
-            player.neededExp = loadedData.neededExp || calculateNeededExpForLevel(player.level); // Recalcular si no está
-            player.baseMaxHp = loadedData.baseMaxHp || 100;
-            player.mp = loadedData.mp || 50; // Se ajustará después de calcular maxMP
-            player.baseMaxMp = loadedData.baseMaxMp || 50;
-            player.baseAttack = loadedData.baseAttack || 5;
-            player.baseDefense = loadedData.baseDefense || 2;
-            player.col = loadedData.col || 1000;
-            player.currentFloor = loadedData.currentFloor || 1;
-            player.unlockedFloors = loadedData.unlockedFloors || [1];
-            player.materials = loadedData.materials || { 'raw_hide': 0, 'iron_ore': 0 }; // Asegurar valores por defecto
-            player.isAdmin = loadedData.isAdmin || false;
-            player.activeQuests = loadedData.activeQuests || [];
-            player.completedQuests = loadedData.completedQuests || [];
-            
-            // Restaurar inventario
-            player.inventory = (loadedData.inventory || []).map(itemRef => {
-                // La instancia en player.inventory solo necesita id y count.
-                // Las propiedades completas se obtienen de baseItems al renderizar/usar.
-                return { id: itemRef.id, count: itemRef.count };
-            });
+            // Cargar datos básicos del jugador
+            player.name = data.name || "Jugador";
+            player.level = data.level || 1;
+            player.currentExp = data.currentExp || 0;
+            player.neededExp = data.neededExp || calculateNeededExpForLevel(player.level); // Recalcular si no está
 
-            // Restaurar equipo
-            player.equipment = { weapon: null, shield: null, armor: null, accessory: null };
-            if (loadedData.equipment) {
-                for (const slot in loadedData.equipment) {
-                    const itemId = loadedData.equipment[slot];
-                    if (itemId) {
-                        // Encontrar el item correspondiente en el inventario para equiparlo
-                        // Esto es crucial: el objeto equipado debe ser una instancia del inventario.
-                        // O, si el item equipado no está en el inventario (caso raro), crearlo.
-                        // Por simplicidad, asumimos que si estaba equipado, "existe" y lo creamos como instancia para equipar.
-                        // La lógica de equipItem se encarga de moverlo si está en el inventario.
-                         const itemFromInventoryIndex = player.inventory.findIndex(invItem => invItem.id === itemId);
-                         if (itemFromInventoryIndex !== -1) {
-                            // Temporalmente, creamos una instancia para equipar. equipItem lo manejará.
-                            // Esta parte es delicada. equipItem espera un item del inventario.
-                            // Para evitar duplicados o problemas, es mejor limpiar el inventario
-                            // de este item y luego equiparlo.
-                            // O mejor: equipItem debe poder tomar un ID y buscarlo/crearlo.
-                            // Por ahora, asumimos que equipItem puede manejar una instancia simple.
-                            const itemToEquipInstance = JSON.parse(JSON.stringify(player.inventory[itemFromInventoryIndex]));
-                            player.inventory.splice(itemFromInventoryIndex, 1); // Quitar del inventario para equipar
-                            equipItem(itemToEquipInstance, -1); // -1 como índice para indicar que no viene de una posición de inventario visible
-                         } else {
-                             // Si el item equipado no está en el inventario cargado (ej. se borró el save corrupto),
-                             // se podría intentar añadir una instancia base.
-                             if(baseItems[itemId]){
-                                 const baseEquipItem = { ...baseItems[itemId], id: itemId, count:1 }; // Crear instancia
-                                 equipItem(baseEquipItem, -1); // Equiparlo
-                             }
-                         }
+            player.hp = data.hp || player.baseMaxHp;
+            player.baseMaxHp = data.baseMaxHp || 100;
+            player.mp = data.mp || player.baseMaxMp;
+            player.baseMaxMp = data.baseMaxMp || 50;
+            player.baseAttack = data.baseAttack || 5;
+            player.baseDefense = data.baseDefense || 2;
+            player.col = data.col || 0;
+            player.currentFloor = data.currentFloor || 1;
+            player.unlockedFloors = data.unlockedFloors || [1];
+            player.materials = data.materials || {};
+            player.isAdmin = data.isAdmin || false;
+            player.uiStates = data.uiStates || {}; // Cargar estados de UI
+
+            // Cargar inventario, asegurando que los items tengan sus propiedades base
+            player.inventory = (data.inventory || []).map(itemRef => {
+                const base = baseItems[itemRef.id];
+                return base ? { ...base, ...itemRef, id: itemRef.id } : null;
+            }).filter(item => item);
+
+            // Cargar equipo
+            player.equipment = {
+                weapon: null, shield: null, armor: null, accessory: null
+            };
+            if (data.equipment) {
+                for (const slot in data.equipment) {
+                    if (data.equipment[slot] && data.equipment[slot].id) {
+                        const base = baseItems[data.equipment[slot].id];
+                        if (base) {
+                            player.equipment[slot] = { ...base, id: data.equipment[slot].id };
+                        }
                     }
                 }
             }
-            
-            // Restaurar HP después de que maxHP (base y equipo) se haya calculado
-            calculateEffectiveStats(); // Esto calcula maxHp y maxMp con equipo
-            player.hp = Math.min(loadedData.hp || player.maxHp, player.maxHp); // Restaurar HP sin exceder el nuevo máximo
-            player.mp = Math.min(loadedData.mp || player.maxMp, player.maxMp); // Idem para MP
 
-            // Restaurar habilidades
-            player.skills = (loadedData.skills || []).map(skillId => {
-                return skillData[skillId] ? { id: skillId, ...skillData[skillId] } : null;
-            }).filter(s => s);
-             if (player.skills.length === 0 && skillData['quick_slash']) { // Asegurar habilidad inicial
-                player.skills.push({ id: 'quick_slash', ...skillData['quick_slash'] });
-            }
+            // Cargar habilidades
+            player.skills = (data.skills || []).map(skillRef => {
+                const base = skillData[skillRef.id];
+                return base ? { ...base, id: skillRef.id } : null;
+            }).filter(skill => skill);
 
-            player.passiveSkills = (loadedData.passiveSkills || []).map(skillId => {
-                return passiveSkillData[skillId] ? { id: skillId, ...passiveSkillData[skillId] } : null;
-            }).filter(s => s);
+            // Cargar habilidades pasivas
+            player.passiveSkills = (data.passiveSkills || []).map(passiveRef => {
+                const base = passiveSkillData[passiveRef.id];
+                return base ? { ...base, id: passiveRef.id } : null;
+            }).filter(passive => passive);
 
+            // Cargar misiones
+            player.activeQuests = data.activeQuests || [];
+            player.completedQuests = data.completedQuests || [];
 
-            // Actualizar estado de desbloqueo de pisos según datos cargados
-            Object.keys(floorData).forEach(floorNumStr => {
-                const floorNum = parseInt(floorNumStr);
-                if (floorData[floorNum]) {
-                    floorData[floorNum].unlocked = player.unlockedFloors.includes(floorNum);
+            // Recalcular estadísticas efectivas después de cargar todo el equipo y pasivas
+            playerLogicCalculateEffectiveStats(); // Usa la función importada de player_logic
+
+            updatePlayerHUD();
+            renderEquipment(); // Asegurar que el equipo se muestre
+            showNotification("¡Juego cargado!", "success");
+
+            // Reabrir modales si estaban abiertos al guardar
+            Object.keys(player.uiStates).forEach(modalId => {
+                if (player.uiStates[modalId]) {
+                    // Cuidado: No reabrir el nameEntryModal si el nombre ya está puesto.
+                    // No reabrir combatModal si no hay un enemigo activo.
+                    if (modalId === 'nameEntryModal' && player.name) return;
+                    if (modalId === 'combatModal') return; // Combat modal no se reabre en carga
+
+                    // openModal maneja la lógica de renderizado interno para cada modal
+                    openModal(modalId);
                 }
             });
 
-            showNotification('¡Progreso cargado exitosamente!', 'success');
-            if (!player.name) {
-                promptForPlayerName();
-            } else {
-                updatePlayerHUD();
-                renderEquipment(); // Asegurar que el equipo se muestre
-                // Habilitar/deshabilitar acciones según el estado del jugador (ej. si HP es 0)
-                if (domElements.combatBtn) { // Ejemplo, los botones deben estar en domElements
-                    domElements.combatBtn.disabled = player.hp <= 0;
-                    // ...otros botones
-                }
-            }
-
         } else {
-            showNotification('No hay datos guardados. Empezando una nueva aventura.', 'default');
-            initializeNewPlayer(true); // true para solicitar nombre
+            showNotification("No se encontró partida guardada. ¡Comienza una nueva aventura!", "default");
+            initializeNewPlayer(true); // Inicia un nuevo juego y pide nombre
         }
     } catch (e) {
-        showNotification('Error al cargar datos: ' + e.message + '. Se iniciará una nueva partida.', 'error', 7000);
-        console.error("Error loading game:", e);
-        localStorage.removeItem(SAVE_KEY); // Limpiar datos corruptos
-        initializeNewPlayer(true); // true para solicitar nombre
+        console.error("Error al cargar el juego:", e);
+        showNotification("Error al cargar el juego. Se iniciará un nuevo juego.", "error");
+        executeReset(); // Forzar un reseteo si la carga falla gravemente
     }
 }
 
 /**
- * Inicializa un nuevo jugador.
- * @param {boolean} promptName - Si es true, solicitará el nombre del jugador.
+ * Inicializa un nuevo jugador, opcionalmente pidiendo el nombre.
+ * @param {boolean} [askForName=false] - Si se debe mostrar el modal para pedir el nombre.
  */
-export function initializeNewPlayer(promptName = false) {
-    initializeNewPlayerState(); // Llama a la función de game_state.js para resetear el objeto player
-    
-    // Configurar valores iniciales después del reseteo si es necesario
-    player.neededExp = calculateNeededExpForLevel(player.level);
-    player.inventory = [ // Inventario inicial básico
-        { id: 'healing_potion_s', count: 5 },
-        { id: 'mana_potion_s', count: 3 },
-        { id: 'basic_sword', count: 1 }
-    ];
-    player.skills = [{ id: 'quick_slash', ...skillData['quick_slash'] }]; // Habilidad inicial
+export function initializeNewPlayer(askForName = false) {
+    initializeNewPlayerState(); // Resetear el objeto player a su estado por defecto
+    playerLogicCalculateEffectiveStats(); // Calcular stats iniciales
+    player.neededExp = calculateNeededExpForLevel(player.level); // Asegurar neededExp correcto
+    updatePlayerHUD();
+    saveGame(); // Guardar el estado inicial del nuevo juego
 
-    Object.values(floorData).forEach(floor => floor.unlocked = (floor.id === 1 || floor.number === 1)); // Solo piso 1 desbloqueado
-
-    if (promptName) {
-        promptForPlayerName();
-    } else {
-        calculateEffectiveStats();
-        updatePlayerHUD();
-        renderEquipment();
+    if (askForName) {
+        openModal('nameEntryModal');
     }
-    // No se guarda automáticamente al inicializar; se guarda después de poner nombre o primera acción.
-}
-
-/**
- * Solicita el nombre del jugador mediante un modal.
- */
-export function promptForPlayerName() {
-    if (domElements.nameEntryModalElement && domElements.playerNameInputElement) {
-        domElements.nameEntryModalElement.style.display = 'block';
-        domElements.playerNameInputElement.value = player.name || "";
-        domElements.playerNameInputElement.focus();
-    } else {
-        console.error("Elementos del modal de entrada de nombre no encontrados.");
-        // Fallback si el modal no está, aunque no es ideal
-        const name = window.prompt("Ingresa el nombre de tu personaje (máx. 15 caracteres):", "Kirito");
-        if (name && name.trim().length > 0 && name.trim().length <= 15) {
-            player.name = name.trim();
-            confirmAndSavePlayerName(); // Simula la confirmación
-        } else {
-            player.name = "Aventurero"; // Nombre por defecto si falla el prompt
-            confirmAndSavePlayerName();
-        }
-    }
-}
-
-/**
- * Confirma y guarda el nombre del jugador ingresado en el modal.
- * Esta función ahora es parte de persistence_logic ya que se relaciona con el inicio del juego/carga.
- */
-export function confirmAndSavePlayerName() {
-    const nameInput = domElements.playerNameInputElement;
-    const name = nameInput ? nameInput.value.trim() : player.name; // Usa player.name si el input no existe (fallback)
-
-    if (name && name.length > 0 && name.length <= 15 && /^[a-zA-Z0-9\s]+$/.test(name)) {
-        player.name = name;
-        if (domElements.nameEntryModalElement) domElements.nameEntryModalElement.style.display = 'none';
-        showNotification(`Nombre establecido: ${player.name}! Bienvenido a Aincrad.`, "success");
-
-        // Equipar espada básica si no tiene arma y está en el inventario
-        if (!player.equipment.weapon) {
-            const basicSwordIndex = player.inventory.findIndex(i => i.id === 'basic_sword');
-            if (basicSwordIndex !== -1) {
-                // Necesitamos una instancia completa para equipar si la lógica de equipItem la espera así.
-                const swordInstance = { ...baseItems['basic_sword'], id: 'basic_sword', count: player.inventory[basicSwordIndex].count };
-                equipItem(swordInstance, basicSwordIndex); // equipItem debe manejar la reducción de count y remoción del inventario
-            }
-        }
-        
-        calculateEffectiveStats(); // Asegurarse de que las stats se calculan con el equipo inicial
-        updatePlayerHUD();
-        renderEquipment(); // Renderizar equipo después de posible auto-equipamiento
-        saveGame(); // Guardar el juego por primera vez con el nombre
-    } else {
-        showNotification("Nombre inválido. Usa 1-15 letras/números. Intenta de nuevo.", "error");
-        if (nameInput) nameInput.focus();
-    }
+    showNotification("¡Bienvenido a Aincrad! Comienza tu aventura.", "default", 5000);
 }
 
 
 /**
- * Muestra una confirmación para reiniciar el progreso del juego.
+ * Muestra un modal de confirmación antes de reiniciar el progreso.
  */
 export function confirmResetProgress() {
-    if (domElements.infoModalElement && domElements.modalBodyContentElement) {
-        domElements.modalBodyContentElement.innerHTML = `
-            <h2>Confirmar Reinicio Total</h2>
-            <p>¿Estás absolutamente seguro de que quieres borrar todo tu progreso y empezar una nueva partida? Esta acción no se puede deshacer.</p>
-            <div class="action-buttons" style="margin-top:1.5rem; justify-content:center;">
-                <button class="action-btn" onclick="gamePersistence.executeReset()">Sí, Reiniciar Aventura</button>
-                <button class="action-btn" onclick="closeModal('infoModal')" style="background:grey;">No, Cancelar</button>
-            </div>`;
-        // Hacer que gamePersistence.executeReset esté disponible globalmente o pasar closeModal como callback
-        // Por simplicidad, se asume que main.js expondrá gamePersistence.
-        // Si no, se necesitaría un event listener o una forma de llamar a executeReset desde aquí.
-        // window.executeResetGame = executeReset; // Temporalmente global
-        uiStates.isInfoModalOpen = true; // Asumiendo que tienes control sobre el estado del infoModal
-        domElements.infoModalElement.style.display = 'block';
-    } else {
-        // Fallback si el modal no está disponible (poco probable si el juego funciona)
-        if (window.confirm("¿Seguro que quieres reiniciar? Todo progreso se perderá.")) {
-            executeReset();
-        }
-    }
+    // Usar el modal infoModal como modal de confirmación
+    domElements.modalBodyContentElement.innerHTML = `
+        <h3>¿Estás seguro?</h3>
+        <p>Esto borrará todo tu progreso actual y comenzará un nuevo juego.</p>
+        <button class="action-btn success-btn" id="confirmResetBtn" style="margin-right: 10px;">Sí, borrar todo</button>
+        <button class="action-btn cancel-btn" id="cancelResetBtn">Cancelar</button>
+    `;
+    openModal('infoModal');
+
+    // Añadir event listeners a los botones de confirmación
+    getEl('confirmResetBtn').addEventListener('click', executeReset);
+    getEl('cancelResetBtn').addEventListener('click', () => closeModal('infoModal'));
 }
+
 /**
- * Ejecuta el reinicio del progreso del juego.
+ * Ejecuta el reinicio completo del juego.
  */
 export function executeReset() {
     localStorage.removeItem(SAVE_KEY);
     initializeNewPlayer(true); // Inicia nuevo jugador y pide nombre
     if (domElements.infoModalElement) domElements.infoModalElement.style.display = 'none';
-    uiStates.isInfoModalOpen = false;
     showNotification('¡Nueva aventura iniciada! El progreso anterior ha sido borrado.', 'success', 6000);
     // Asegurar que los botones de acción se habiliten
     if (domElements.combatBtn) domElements.combatBtn.disabled = false;
     // ... otros botones
 }
-
-
-// Helper para calcular neededExp, podría estar en game_state o utils también.
-function calculateNeededExpForLevel(level) {
-    if (level <= 1) return 100;
-    // Fórmula de ejemplo: EXP_n = EXP_n-1 * 1.35 + 80 (redondeado)
-    let exp = 100;
-    for (let i = 2; i <= level; i++) {
-        exp = Math.floor(exp * 1.35 + 80);
-    }
-    return exp;
-}
-
-// Para que executeReset sea accesible desde el HTML del modal de confirmación
-// Esto es una forma. Otra sería añadir event listeners directamente en este módulo
-// a botones que SÓLO existen cuando este modal está activo.
-// O mejor, que el onclick en el HTML llame a una función que esté en el scope global
-// y que esa función global llame a la función exportada de este módulo.
-// Ejemplo: en main.js: window.gamePersistence = { executeReset, ... };
-// y el HTML: onclick="window.gamePersistence.executeReset()"
-// Por ahora, lo dejamos así esperando que main.js lo maneje.

@@ -10,8 +10,8 @@ import { showNotification, openModal, closeModal } from '../utils.js'; // Funcio
 import { ADMIN_SECRET_KEY } from '../config.js';
 import { saveGame } from './persistence_logic.js';
 import { updatePlayerHUD } from './hud_logic.js';
-import { gainExp, addMaterial, addItemToInventory, calculateEffectiveStats } from './player_logic.js';
-import { renderInventory } from './inventory_logic.js';
+import { gainExp, calculateEffectiveStats } from './player_logic.js'; // addItemToInventory y addMaterial removidos
+import { addItemToInventory, addMaterial, renderInventory } from './inventory_logic.js'; // Importar correctamente
 import { claimQuestReward, renderAllQuestLists, showQuestDetails } from './quests_logic.js'; // showQuestDetails aquí es la de quests_logic
 
 
@@ -49,7 +49,7 @@ export const adminActions = {
 
         const itemBase = baseItems[itemId];
         if (itemBase.type === 'material') {
-            addMaterial(itemId, quantity); // De player_logic.js o blacksmith_logic.js si allí está
+            addMaterial(itemId, quantity); // De inventory_logic.js
         } else {
             addItemToInventory({ id: itemId }, quantity); // De inventory_logic.js
         }
@@ -366,7 +366,7 @@ export function populateAdminPanel() {
 
     if (domElements.adminSetLevelValueInput) domElements.adminSetLevelValueInput.value = player.level;
     if (domElements.adminGiveExpValueInput) domElements.adminGiveExpValueInput.value = 0; // Default to 0
-    if (domElements.adminGiveColValueInput) domElements.adminGiveColValueInput.value = 0; // Default to 0
+    if (domElements.adminGiveColValueInput) domElements.adminColValueInput.value = 0; // Default to 0
     if (domElements.adminSetBaseAtkValueInput) domElements.adminSetBaseAtkValueInput.value = player.baseAttack;
     if (domElements.adminSetBaseDefValueInput) domElements.adminSetBaseDefValueInput.value = player.baseDefense;
     if (domElements.adminSetBaseMaxHpValueInput) domElements.adminSetBaseMaxHpValueInput.value = player.baseMaxHp;

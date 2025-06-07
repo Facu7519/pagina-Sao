@@ -1,11 +1,13 @@
 // js/game/inventory_logic.js
 
-import { player, gameState, uiStates, updatePlayerHUD, calculateEffectiveStats } from './game_state.js';
+import { player } from './game_state.js'; // 'gameState' removido de la importación
 import { domElements } from '../dom.js';
 import { showNotification, renderGridItems } from '../utils.js';
-import { baseItems } from '../data/items_db.js'; // Asumiendo que baseItems está en items_db.js
+import { baseItems } from '../data/items_db.js';
 import { saveGame } from './persistence_logic.js';
-import { updateQuestProgress } from './quests_logic.js'; // Para misiones de recolección de items/materiales
+import { updateQuestProgress } from './quests_logic.js';
+import { calculateEffectiveStats } from './player_logic.js'; // Importar correctamente desde player_logic.js
+import { updatePlayerHUD } from './hud_logic.js'; // Importar updatePlayerHUD desde hud_logic.js
 
 /**
  * Renderiza el inventario del jugador en el modal.
@@ -223,7 +225,8 @@ export function addItemToInventory(itemData, quantity = 1) {
         updateQuestProgress('collect', itemData.id, quantity);
     }
 
-    if (uiStates.isInventoryModalOpen) { // Solo re-renderizar si el modal está abierto
+    // Acceder a uiStates a través del objeto player
+    if (player.uiStates.isInventoryModalOpen) { // Solo re-renderizar si el modal está abierto
         renderInventory();
     }
 }
@@ -244,7 +247,8 @@ export function addMaterial(materialId, quantity) {
     player.materials[materialId] = (player.materials[materialId] || 0) + quantity;
     showNotification(`${materialBase.name} x${quantity} añadido(s) a materiales.`, "success");
 
-    if (uiStates.isBlacksmithModalOpen) { // Actualizar UI de herrería si está abierta
+    // Acceder a uiStates a través del objeto player
+    if (player.uiStates.isBlacksmithModalOpen) { // Actualizar UI de herrería si está abierta
         // Suponiendo que existe una función renderPlayerMaterials en blacksmith_logic.js
         // import { renderPlayerMaterials } from './blacksmith_logic.js'; -> Cuidado con dependencias circulares
         // Por ahora, asumimos que la actualización se maneja donde se llama addMaterial o que blacksmith_logic se re-renderiza.
@@ -267,8 +271,25 @@ function questTriggersItemCollection(itemId) {
     return false; 
 }
 
-// Inicializar equipo para que los slots se muestren correctamente al inicio si están vacíos.
-// Esto se podría hacer en persistence_logic.js al cargar o inicializar jugador.
-// if (domElements.equipWeaponSlot) { // Solo si el DOM está cargado
-//     renderEquipment();
-// }
+/**
+ * Abre el modal de inventario y renderiza su contenido.
+ */
+export function openInventoryModal() {
+    if (!domElements.inventoryModal) {
+        console.error("Modal de inventario no encontrado en el DOM.");
+        return;
+    }
+    renderInventory(); // Asegura que los items estén actualizados
+    renderEquipment(); // Asegura que el equipo esté actualizado
+    player.uiStates.isInventoryModalOpen = true; // Acceder a uiStates a través del objeto player
+    domElements.inventoryModal.style.display = 'block';
+}
+
+/**
+ * Cierra el modal de inventario.
+ */
+export function closeInventoryModal() {
+    if (!domElements.inventoryModal) return;
+    player.uiStates.isInventoryModalOpen = false; // Acceder a uiStates a través del objeto player
+    domElements.inventoryModal.style.display = 'none';
+}

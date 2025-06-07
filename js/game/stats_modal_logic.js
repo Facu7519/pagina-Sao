@@ -1,8 +1,10 @@
 // js/game/stats_modal_logic.js
 
-import { player, calculateEffectiveStats, uiStates } from './game_state.js'; // Assuming calculateEffectiveStats is also in game_state or player_logic
+import { player } from './game_state.js'; // 'calculateEffectiveStats' y 'uiStates' removidos de la importación
 import { domElements } from '../dom.js';
-import { skillData, passiveSkillData } from '../data/skills_db.js'; // Assuming skill data is here
+import { skillData, passiveSkillData } from '../data/skills_db.js';
+import { calculateEffectiveStats } from './player_logic.js'; // Importar correctamente desde player_logic
+import { openModal } from '../utils.js'; // Necesario para openPlayerStatsModal
 
 /**
  * Renderiza las estadísticas del jugador en el modal correspondiente.
@@ -30,49 +32,45 @@ export function renderPlayerStats() {
 
     let equippedAttack = 0;
     let equippedDefense = 0;
-    let equippedHp = 0;
-    // Calculate bonuses from equipment
+    let equippedMaxHp = 0;
+    let equippedMaxMp = 0;
+
     Object.values(player.equipment).forEach(item => {
         if (item && item.stats) {
             equippedAttack += item.stats.attack || 0;
             equippedDefense += item.stats.defense || 0;
-            equippedHp += item.stats.hp || 0;
-            // Add other stat bonuses from equipment if they exist (e.g., mp)
+            equippedMaxHp += item.stats.hp || 0;
+            equippedMaxMp += item.stats.mp || 0;
         }
     });
 
-    domElements.statsEquipAtk.textContent = equippedAttack;
-    domElements.statsEquipDef.textContent = equippedDefense;
-    domElements.statsEquipHp.textContent = `+${equippedHp}`; // Show as bonus
+    domElements.statsEquippedAtk.textContent = equippedAttack;
+    domElements.statsEquippedDef.textContent = equippedDefense;
+    domElements.statsEquippedHp.textContent = equippedMaxHp;
+    domElements.statsEquippedMp.textContent = equippedMaxMp;
 
-    domElements.statsTotalAtk.textContent = effectiveAttack;
-    domElements.statsTotalDef.textContent = effectiveDefense;
+    domElements.statsEffectiveAtk.textContent = effectiveAttack;
+    domElements.statsEffectiveDef.textContent = effectiveDefense;
 
-    // Render Skills
-    renderSkillList(domElements.statsSkillsList, player.skills, skillData, '❖', 'No has aprendido habilidades activas.');
-    renderSkillList(domElements.statsPassiveSkillsList, player.passiveSkills, passiveSkillData, '🌟', 'No has aprendido habilidades pasivas.');
+    // Skills
+    renderSkillList(domElements.playerActiveSkillsList, player.skills, skillData, '⚡', "No tienes habilidades activas.");
+    renderSkillList(domElements.playerPassiveSkillsList, player.passiveSkills, passiveSkillData, '🌟', "No tienes habilidades pasivas.");
 }
 
 /**
- * Helper para renderizar listas de habilidades (activas o pasivas) en el modal de stats.
- * @param {HTMLElement} ulElement - El elemento UL donde se renderizará la lista.
- * @param {Array<Object>} playerSkillRefs - Array de referencias de habilidades del jugador (ej: [{id: 'skill_id'}, ...]).
- * @param {Object} allSkillData - Objeto que contiene todas las definiciones de habilidades (ej: skillData o passiveSkillData).
- * @param {string} iconPrefix - Prefijo de icono para cada habilidad en la lista.
+ * Función auxiliar para renderizar listas de habilidades (activas o pasivas).
+ * @param {HTMLElement} ulElement - El elemento <ul> donde se renderizarán las habilidades.
+ * @param {Array<Object>} playerSkillsArray - El array de habilidades del jugador (player.skills o player.passiveSkills).
+ * @param {Object} skillDefinitionData - El objeto de definiciones de habilidades (skillData o passiveSkillData).
+ * @param {string} iconPrefix - Un icono predeterminado si la habilidad no tiene uno.
  * @param {string} emptyMessage - Mensaje a mostrar si no hay habilidades.
  */
-function renderSkillList(ulElement, playerSkillRefs, allSkillData, iconPrefix, emptyMessage) {
-    if (!ulElement) {
-        console.error("Elemento UL para lista de skills no encontrado en DOM.");
-        return;
-    }
-    ulElement.innerHTML = ''; // Clear previous list
-    if (playerSkillRefs && playerSkillRefs.length > 0) {
-        playerSkillRefs.forEach(skillRef => {
-            // skillRef podría ser solo {id: 'xxx'} o el objeto completo si se guardó así.
-            // Es más robusto buscar siempre en allSkillData usando el id.
-            const skillId = skillRef.id;
-            const skill = allSkillData[skillId]; 
+function renderSkillList(ulElement, playerSkillsArray, skillDefinitionData, iconPrefix, emptyMessage) {
+    ulElement.innerHTML = '';
+    if (playerSkillsArray && playerSkillsArray.length > 0) {
+        playerSkillsArray.forEach(playerSkill => {
+            const skillId = playerSkill.id;
+            const skill = skillDefinitionData[skillId]; 
             
             if (skill) {
                 const li = document.createElement('li');
@@ -101,7 +99,7 @@ function renderSkillList(ulElement, playerSkillRefs, allSkillData, iconPrefix, e
  */
 export function openPlayerStatsModal() {
     renderPlayerStats(); // Asegura que los datos estén actualizados al abrir
-    uiStates.isPlayerStatsModalOpen = true; // Actualizar el estado global
+    player.uiStates.isPlayerStatsModalOpen = true; // Actualizar el estado global
     domElements.playerStatsModalElement.style.display = 'block';
 }
 
@@ -109,6 +107,6 @@ export function openPlayerStatsModal() {
  * Cierra el modal de estadísticas del jugador.
  */
 export function closePlayerStatsModal() {
-    uiStates.isPlayerStatsModalOpen = false; // Actualizar el estado global
+    player.uiStates.isPlayerStatsModalOpen = false; // Actualizar el estado global
     domElements.playerStatsModalElement.style.display = 'none';
 }

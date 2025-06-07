@@ -28,38 +28,50 @@ export const domElements = {
     playerColElement: getEl('player-col'),
     currentFloorElement: getEl('current-floor'),
     floorNameElement: getEl('floor-name'),
-    trainCostDisplay: getEl('train-cost-display'),
 
-    // Modales y sus contenidos principales
-    infoModalElement: getEl('infoModal'),
-    modalBodyContentElement: getEl('modal-body-content'), // Para wiki y confirmaciones
-    nameEntryModalElement: getEl('nameEntryModal'),
-    playerNameInputElement: getEl('playerNameInput'),
-    submitPlayerNameBtn: getEl('submitPlayerNameBtn'),
+    // Botones de acción del juego (panel principal)
+    combatBtn: getEl('combat-btn'),
+    bossCombatBtn: getEl('boss-combat-btn'),
+    questsBtn: getEl('quests-btn'),
+    trainSkillBtn: getEl('train-skill-btn'),
+    inventoryBtn: getEl('inventory-btn'),
+    shopBtn: getEl('shop-btn'),
+    blacksmithBtn: getEl('blacksmith-btn'),
+    playerStatsBtn: getEl('player-stats-btn'),
+    floorNavigateBtn: getEl('floor-navigate-btn'),
+    adminAccessBtn: getEl('admin-access-btn'),
+    saveGameBtn: getEl('save-game-btn'), // Nuevo ID
+    loadGameBtn: getEl('load-game-btn'), // Nuevo ID
+    newGameBtn: getEl('new-game-btn'),   // Nuevo ID
 
-    // Modal de Inventario
-    inventoryModalElement: getEl('inventoryModal'),
+
+    // Modales y sus elementos internos (nombres estandarizados)
+    infoModal: getEl('infoModal'),
+    modalBodyContentElement: getEl('modal-body-content'),
+    closeInfoModalBtn: getEl('close-info-modal-btn'),
+
+    inventoryModal: getEl('inventoryModal'),
     inventoryGridDisplay: getEl('inventory-grid-display'),
     equipWeaponSlot: getEl('equip-weapon'),
     equipShieldSlot: getEl('equip-shield'),
     equipArmorSlot: getEl('equip-armor'),
     equipAccessorySlot: getEl('equip-accessory'),
+    closeInventoryModalBtn: getEl('close-inventory-modal-btn'),
 
-    // Modal de Tienda
-    shopModalElement: getEl('shopModal'),
-    shopGridDisplay: getEl('shop-grid-display'),
+    shopModal: getEl('shopModal'),
     shopFloorNumberElement: getEl('shop-floor-number'),
     shopPlayerColElement: getEl('shop-player-col'),
+    shopGridDisplay: getEl('shop-grid-display'),
+    closeShopModalBtn: getEl('close-shop-modal-btn'),
 
-    // Modal de Herrería
-    blacksmithModalElement: getEl('blacksmithModal'),
-    blacksmithGridDisplay: getEl('blacksmith-grid-display'),
+    blacksmithModal: getEl('blacksmithModal'),
     blacksmithFloorNumberElement: getEl('blacksmith-floor-number'),
     blacksmithPlayerColElement: getEl('blacksmith-player-col'),
+    blacksmithGridDisplay: getEl('blacksmith-grid-display'),
     playerMaterialsListElement: getEl('player-materials-list'),
+    closeBlacksmithModalBtn: getEl('close-blacksmith-modal-btn'),
 
-    // Modal de Estadísticas del Jugador
-    playerStatsModalElement: getEl('playerStatsModal'),
+    playerStatsModal: getEl('playerStatsModal'),
     statsPlayerName: getEl('stats-player-name'),
     statsLevel: getEl('stats-level'),
     statsHp: getEl('stats-hp'),
@@ -75,63 +87,54 @@ export const domElements = {
     statsTotalDef: getEl('stats-total-def'),
     statsSkillsList: getEl('stats-skills-list'),
     statsPassiveSkillsList: getEl('stats-passive-skills-list'),
+    closePlayerStatsModalBtn: getEl('close-player-stats-modal-btn'),
 
-    // Modal de Combate
-    combatModalElement: getEl('combatModal'),
-    combatTitleElement: getEl('combat-title'),
+    combatModal: getEl('combatModal'),
+    combatTitle: getEl('combat-title'),
     combatPlayerDisplay: getEl('combat-player-display'),
-    combatPlayerNameElement: getEl('combat-player-name'),
-    combatPlayerAvatarImg: document.querySelector('#combat-player-display .combatant-icon img'),
-    combatPlayerHpBarElement: getEl('combat-player-hp-bar'),
-    combatPlayerHpCurrentElement: getEl('combat-player-hp-current'),
-    combatPlayerHpMaxElement: getEl('combat-player-hp-max'),
-    combatPlayerMpCurrentElement: getEl('combat-player-mp-current'),
-    combatPlayerMpMaxElement: getEl('combat-player-mp-max'),
-    combatPlayerAtkElement: getEl('combat-player-atk'),
-    combatPlayerDefElement: getEl('combat-player-def'),
-    combatPlayerStatusEffectsDisplay: getEl('combat-player-status-effects-display'), // En combate
+    combatPlayerName: getEl('combat-player-name'),
+    combatPlayerHpBar: getEl('combat-player-hp-bar'),
+    combatPlayerHpCurrent: getEl('combat-player-hp-current'),
+    combatPlayerHpMax: getEl('combat-player-hp-max'),
+    combatPlayerMpCurrent: getEl('combat-player-mp-current'),
+    combatPlayerMpMax: getEl('combat-player-mp-max'),
+    combatPlayerAtk: getEl('combat-player-atk'),
+    combatPlayerDef: getEl('combat-player-def'),
+    combatPlayerStatusEffectsDisplay: getEl('combat-player-status-effects-display'),
     combatEnemyDisplay: getEl('combat-enemy-display'),
-    combatEnemyNameElement: getEl('combat-enemy-name'),
-    combatEnemyIconElement: getEl('combat-enemy-icon'),
+    combatEnemyName: getEl('combat-enemy-name'),
+    combatEnemyIcon: getEl('combat-enemy-icon'),
     combatEnemyHpBarsContainer: getEl('combat-enemy-hp-bars-container'),
-    combatEnemySingleHpBarFill: getEl('combat-enemy-hp-bar-fill'), // Para barra única
-    // Referencias a barras de HP de segmento de jefe se obtendrán dinámicamente si es necesario
-    combatEnemyHpCurrentElement: getEl('combat-enemy-hp-current'),
-    combatEnemyHpMaxElement: getEl('combat-enemy-hp-max'),
-    combatEnemyAtkElement: getEl('combat-enemy-atk'),
-    combatEnemyDefElement: getEl('combat-enemy-def'),
-    combatEnemyStatusEffectsDisplay: getEl('combat-enemy-status-effects-display'), // En combate
-    combatLogDisplayElement: getEl('combat-log-display'),
+    combatEnemyHpBarFill: getEl('combat-enemy-hp-bar-fill'),
+    combatEnemyHpCurrent: getEl('combat-enemy-hp-current'),
+    combatEnemyHpMax: getEl('combat-enemy-hp-max'),
+    combatEnemyAtk: getEl('combat-enemy-atk'),
+    combatEnemyDef: getEl('combat-enemy-def'),
+    combatEnemyStatusEffectsDisplay: getEl('combat-enemy-status-effects-display'),
     combatActionAttackBtn: getEl('combat-action-attack'),
     combatActionSkillsBtn: getEl('combat-action-skills'),
     combatActionPotionsBtn: getEl('combat-action-potions'),
     combatActionFleeBtn: getEl('combat-action-flee'),
     combatSkillsListContainer: getEl('combat-skills-list-container'),
     combatPotionsListContainer: getEl('combat-potions-list-container'),
+    combatLogDisplay: getEl('combat-log-display'),
+    closeCombatModalBtn: getEl('close-combat-modal-btn'),
 
-    // Botones de Acción Principales (fuera de modales específicos)
-    combatBtn: getEl('combat-btn'),
-    bossCombatBtn: getEl('boss-combat-btn'),
-    trainSkillBtn: getEl('train-skill-btn'),
-    inventoryBtn: getEl('inventory-btn'),
-    shopBtn: getEl('shop-btn'),
-    blacksmithBtn: getEl('blacksmith-btn'),
-    playerStatsBtn: getEl('player-stats-btn'),
-    floorNavigateBtn: getEl('floor-navigate-btn'),
-    adminAccessBtn: getEl('admin-access-btn'), // Para abrir modal de clave de admin
-    questsBtn: getEl('quests-btn'),
+    nameEntryModal: getEl('nameEntryModal'),
+    playerNameInput: getEl('playerNameInput'),
+    submitPlayerNameBtn: getEl('submitPlayerNameBtn'),
+    closeNameEntryModalBtn: getEl('close-name-entry-modal-btn'),
 
-    // Modal de Navegación entre Pisos
     floorNavigationModal: getEl('floorNavigationModal'),
     floorSelectGrid: getEl('floor-select-grid'),
+    closeFloorNavModalBtn: getEl('close-floor-nav-modal-btn'),
 
-    // Modal de Entrenamiento
     trainingModal: getEl('trainingModal'),
-    trainingGridDisplay: getEl('training-grid-display'),
     trainingPlayerCol: getEl('training-player-col'),
     trainingStatsPreview: getEl('training-stats-preview'),
+    trainingGridDisplay: getEl('training-grid-display'),
+    closeTrainingModalBtn: getEl('close-training-modal-btn'),
     
-    // Modal de Misiones
     questsModal: getEl('questsModal'),
     availableQuestsList: getEl('available-quests-list'),
     activeQuestsList: getEl('active-quests-list'),
@@ -139,29 +142,41 @@ export const domElements = {
     questDetailsArea: getEl('quest-details-area'),
     questDetailTitle: getEl('quest-detail-title'),
     questDetailDescription: getEl('quest-detail-description'),
-    questDetailObjectives: getEl('quest-detail-objectives'),
-    questDetailRewards: getEl('quest-detail-rewards'),
-    questActionBtn: getEl('quest-action-btn'),
+    questDetailObjectives: getEl('quest-detail-obj-list'),
+    questDetailRewards: getEl('quest-detail-rewards-list'),
+    questDetailProgressBar: getEl('quest-progress-bar-fill'),
+    claimQuestRewardBtn: getEl('claim-quest-reward-btn'),
+    closeQuestsModalBtn: getEl('close-quests-modal-btn'),
 
-    // Modal de Panel de Administrador y Clave
     adminKeyModal: getEl('adminKeyModal'),
-    adminKeyValueInput: getEl('adminKeyValue'),
+    adminKeyInput: getEl('adminKeyInput'),
     submitAdminKeyBtn: getEl('submitAdminKeyBtn'),
-    adminKeyErrorMsg: getEl('adminKeyErrorMsg'),
+    closeAdminKeyModalBtn: getEl('close-admin-key-modal-btn'),
+
     adminPanelModal: getEl('adminPanelModal'),
-    adminPanelMessage: getEl('adminPanelMessage'),
-    adminSetLevelValueInput: getEl('adminSetLevelValue'),
+    adminLevelValueInput: getEl('adminLevelValue'),
     adminGiveExpValueInput: getEl('adminGiveExpValue'),
     adminGiveColValueInput: getEl('adminGiveColValue'),
     adminSetBaseAtkValueInput: getEl('adminSetBaseAtkValue'),
     adminSetBaseDefValueInput: getEl('adminSetBaseDefValue'),
     adminSetBaseMaxHpValueInput: getEl('adminSetBaseMaxHpValue'),
     adminSetBaseMaxMpValueInput: getEl('adminSetBaseMaxMpValue'),
-    adminItemIdValueInput: getEl('adminItemIdValue'),
-    adminItemDetailsPreviewDiv: getEl('adminItemDetailsPreview'),
-    adminItemQuantityValueInput: getEl('adminItemQuantityValue'),
+    adminSetLevelBtn: getEl('admin-set-level-btn'),
+    adminGiveExpBtn: getEl('admin-give-exp-btn'),
+    adminGiveColBtn: getEl('admin-give-col-btn'),
+    adminSetBaseAtkBtn: getEl('admin-set-base-atk-btn'),
+    adminSetBaseDefBtn: getEl('admin-set-base-def-btn'),
+    adminSetBaseMaxHpBtn: getEl('admin-set-base-max-hp-btn'),
+    adminSetBaseMaxMpBtn: getEl('admin-set-base-max-mp-btn'),
     adminItemQuickSelect: getEl('adminItemQuickSelect'),
+    adminItemIdValueInput: getEl('adminItemIdValue'),
+    adminItemQuantityValueInput: getEl('adminItemQuantityValue'),
+    adminShowItemDetailsBtn: getEl('admin-show-item-details-btn'),
+    adminGiveItemBtn: getEl('admin-give-item-btn'),
+    adminItemDetailsPreviewDiv: getEl('adminItemDetailsPreview'),
     adminFloorNumberValueInput: getEl('adminFloorNumberValue'),
+    adminGrantFloorAccessBtn: getEl('admin-grant-floor-access-btn'),
+    adminRevokeFloorAccessBtn: getEl('admin-revoke-floor-access-btn'),
     adminUnlockedFloorsListDiv: getEl('adminUnlockedFloorsList'),
     adminQuestDefinitionSelect: getEl('adminQuestDefinitionSelect'),
     adminQuestIdInput: getEl('adminQuestId'),
@@ -175,7 +190,15 @@ export const domElements = {
     adminQuestRewardExpInput: getEl('adminQuestRewardExp'),
     adminQuestRewardItemIdInput: getEl('adminQuestRewardItemId'),
     adminQuestRewardItemQtyInput: getEl('adminQuestRewardItemQty'),
+    adminLoadQuestForEditingBtn: getEl('admin-load-quest-for-editing-btn'),
+    adminDeleteQuestDefinitionBtn: getEl('admin-delete-quest-definition-btn'),
+    adminSaveQuestDefinitionBtn: getEl('admin-save-quest-definition-btn'),
+    adminClearQuestDefinitionFormBtn: getEl('admin-clear-quest-definition-form-btn'),
     adminPlayerQuestSelect: getEl('adminPlayerQuestSelect'),
+    adminCompletePlayerQuestBtn: getEl('admin-complete-player-quest-btn'),
+    adminResetPlayerQuestBtn: getEl('admin-reset-player-quest-btn'),
+    adminPanelMessage: getEl('adminPanelMessage'),
+    closeAdminPanelModalBtn: getEl('close-admin-panel-modal-btn'),
 
 
     // Elementos de la Wiki
@@ -184,12 +207,16 @@ export const domElements = {
     floorsInfoContainer: getEl('floors-info-container'),
     guildsInfoContainer: getEl('guilds-info-container'),
     
+    // Enlaces de navegación (para event listeners)
+    navPersonajesLink: getEl('nav-personajes-link'),
+    navArsenalLink: getEl('nav-arsenal-link'),
+    navPisosLink: getEl('nav-pisos-link'),
+    navGremiosLink: getEl('nav-gremios-link'),
+    navGameLink: getEl('nav-game-link'),
+
     // Elementos Audiovisuales y de Notificación
     backgroundMusic: getEl('background-music'),
     musicToggleBtn: getEl('music-toggle-btn'),
     notificationArea: getEl('notification-area'),
     particlesContainer: getEl('particles'),
-
-    // Nav Links (para active state)
-    navLinks: document.querySelectorAll('.nav-links a'),
 };

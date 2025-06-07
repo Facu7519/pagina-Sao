@@ -1,11 +1,12 @@
 // js/game/floor_nav_logic.js
 
-import { player, uiStates, updatePlayerHUD } from './game_state.js';
+import { player } from './game_state.js'; // 'uiStates' removido de la importación
 import { domElements } from '../dom.js';
 import { showNotification } from '../utils.js';
 import { floorData } from '../data/floor_data_db.js';
 import { saveGame } from './persistence_logic.js';
 import { updateQuestProgress } from './quests_logic.js';
+import { updatePlayerHUD } from './hud_logic.js'; // Importar updatePlayerHUD directamente
 
 /**
  * Renderiza la selección de pisos disponibles para viajar en el modal de navegación.
@@ -69,7 +70,7 @@ export function changeFloor(newFloorNumber) {
  */
 export function openFloorNavigationModal() {
     renderFloorSelection(); // Asegura que las opciones estén actualizadas
-    uiStates.isFloorNavigationModalOpen = true;
+    player.uiStates.isFloorNavigationModalOpen = true;
     domElements.floorNavigationModal.style.display = 'block';
 }
 
@@ -77,6 +78,6 @@ export function openFloorNavigationModal() {
  * Cierra el modal de navegación entre pisos.
  */
 export function closeFloorNavigationModal() {
-    uiStates.isFloorNavigationModalOpen = false;
+    player.uiStates.isFloorNavigationModalOpen = false;
     domElements.floorNavigationModal.style.display = 'none';
 }
