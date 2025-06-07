@@ -30,13 +30,16 @@
 </head>
 
 <body>
-    <audio id="background-music" loop src="audio/sao_theme.mp3"></audio>
+    <audio id="background-music" loop src="sao_theme.mp3"></audio>
+
     <div class="floating-particles" id="particles"></div>
     <div id="notification-area"></div>
+
     <header>
         <nav class="container">
             <div class="logo">⚔️ AINCRAD</div>
             <div class="nav-links">
+                <!-- Los onclick llaman a funciones que main.js expondrá globalmente -->
                 <a href="#wiki-personajes" onclick="setActiveLink(this)">Personajes</a>
                 <a href="#wiki-arsenal" onclick="setActiveLink(this)">Arsenal</a>
                 <a href="#wiki-pisos" onclick="setActiveLink(this)">Pisos</a>
@@ -47,10 +50,23 @@
         </nav>
     </header>
 
+    <section class="hero">
+        <div class="hero-content">
+            <h1>SWORD ART ONLINE</h1>
+            <p class="hero-subtitle">Link Start! Adéntrate en el castillo flotante de Aincrad.</p>
+            <div class="hero-stats">
+                <div class="stat-item"><span class="stat-number" id="trapped-players-stat">10,000</span><span class="stat-label">Atrapados</span></div>
+                <div class="stat-item"><span class="stat-number" id="total-floors-stat">100</span><span class="stat-label">Pisos</span></div>
+                <div class="stat-item"><span class="stat-number" id="start-year-stat">2022</span><span class="stat-label">Inicio</span></div>
+            </div>
+        </div>
+    </section>
+
     <main class="main-content container">
         <section id="game-panel" class="interactive-panel">
             <h2 class="panel-title">Tu Aventura en Aincrad</h2>
             <div class="floor-display">Piso: <span id="current-floor">1</span> - <span id="floor-name">Bosque del Inicio</span></div>
+
             <div class="sao-player-hud">
                 <div class="sao-hud-info">
                     <div class="sao-player-name" id="sao-player-name-display">Jugador</div>
@@ -64,10 +80,105 @@
                 </div>
                 <div class="status-effects-display" id="player-status-effects-display"></div>
             </div>
+            
+            <div class="resource-label">MP: <span id="player-mp-current">50</span>/<span id="player-mp-max">50</span></div>
+            <div class="resource-bar-container">
+                <div class="resource-bar-fill" id="mp-bar-fill" style="width: 100%;"></div>
+            </div>
+
+            <div class="resource-label">EXP: <span id="current-exp">0</span> / <span id="needed-exp">100</span></div>
+            <div class="resource-bar-container">
+                <div class="resource-bar-fill" id="exp-bar-fill" style="width: 0%;"></div>
+            </div>
+            
+            <div class="col-display">Col: <span id="player-col">0</span> 💰</div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" id="combat-btn">🗡️ Combatir</button>
+                <button class="action-btn" id="boss-combat-btn">👹 Jefe del Piso</button>
+                <button class="action-btn" id="quests-btn">📜 Misiones</button>
+                <button class="action-btn" id="train-skill-btn">⚔️ Entrenar (<span id="train-cost-display">50</span> Col)</button>
+                <button class="action-btn" id="inventory-btn">🎒 Inventario</button> 
+                <button class="action-btn shop-btn" id="shop-btn">🛒 Tienda</button>
+                <button class="action-btn blacksmith-btn" id="blacksmith-btn">🛠️ Herrería</button>
+                <button class="action-btn" id="player-stats-btn">📊 Mis Stats</button>
+                <button class="action-btn" id="floor-navigate-btn">🗺️ Desplazarse</button>
+                <button class="action-btn" id="admin-access-btn">🔑 Admin</button>
+                <button class="action-btn" onclick="saveGame()">💾 Guardar</button>
+                <button class="action-btn" onclick="loadGame()">📂 Cargar</button>
+                <button class="action-btn" onclick="confirmResetProgress()">🔄 Nuevo Juego</button>
+            </div>
+        </section>
+
+        <section id="wiki-personajes" class="section">
+            <h2 class="section-title">Personajes Clave</h2>
+            <div class="card-grid" id="characters-grid-display">
+                <!-- Contenido generado por JS -->
+            </div>
+        </section>
+
+        <section id="wiki-arsenal" class="section">
+            <h2 class="section-title">Arsenal Legendario</h2>
+            <div class="card-grid" id="weapons-grid-display">
+                <!-- Contenido generado por JS -->
+            </div>
+        </section>
+        
+        <section id="wiki-pisos" class="section">
+            <h2 class="section-title">Pisos de Aincrad</h2>
+            <div id="floors-info-container">
+                 <p style="text-align:center;">Explora los diversos y peligrosos pisos del castillo flotante.</p>
+                 <!-- Contenido generado por JS -->
+            </div>
+        </section>
+
+        <section id="wiki-gremios" class="section">
+            <h2 class="section-title">Gremios Notables</h2>
+            <div id="guilds-info-container">
+                <p style="text-align:center;">Los gremios forman la espina dorsal de la sociedad de jugadores en Aincrad.</p>
+                <!-- Contenido generado por JS -->
+            </div>
+        </section>
+
+        <section id="wiki-mecanicas" class="section">
+            <h2 class="section-title">Mecánicas del Juego</h2>
+            <div id="mechanics-info-container" class="card-grid">
+                 <div class="card" style="cursor:default;">
+                    <div class="card-icon">🎮</div> <h3 class="card-name">NerveGear</h3>
+                    <p class="card-description">El dispositivo de Inmersión Total (FullDive) que transportó a los jugadores a SAO. Una maravilla tecnológica con una trampa mortal: si tu HP llega a cero en el juego, o si intentan quitarte el casco en el mundo real, un emisor de microondas de alta potencia destruirá tu cerebro.</p>
+                </div>
+                <div class="card" style="cursor:default;">
+                    <div class="card-icon">💀</div> <h3 class="card-name">Muerte Real</h3>
+                    <p class="card-description">La consecuencia más aterradora de SAO. La muerte en el juego es permanente y significa la muerte en la vida real. Esto crea una tensión constante y hace que cada decisión, cada combate, sea crucial para la supervivencia.</p>
+                </div>
+                 <div class="card" style="cursor:default;">
+                    <div class="card-icon">🏰</div> <h3 class="card-name">Aincrad</h3>
+                    <p class="card-description">El castillo flotante de hierro y piedra, el escenario principal de SAO. Consta de 100 pisos, cada uno con su propio ecosistema, ciudades, mazmorras y un jefe formidable. Para escapar del juego, los jugadores deben conquistar el piso 100.</p>
+                </div>
+                <div class="card" style="cursor:default;">
+                    <div class="card-icon">✨</div> <h3 class="card-name">Habilidades de Espada</h3>
+                    <p class="card-description">Sistemas predefinidos de movimientos de espada que se activan al realizar ciertas posturas o gestos. Varían desde simples estocadas hasta complejas combinaciones de múltiples golpes. Dominarlas es clave para el combate.</p>
+                </div>
+            </div>
         </section>
     </main>
 
-    <!-- Script Principal -->
+    <!-- Modales (estructuras simplificadas, el contenido interno es el mismo) -->
+    <div id="infoModal" class="modal"><div class="modal-content"><span class="close-modal-btn" onclick="closeModal('infoModal')">&times;</span><div id="modal-body-content"></div></div></div>
+    <div id="inventoryModal" class="modal"><div class="modal-content large inventory-content"><span class="close-modal-btn" onclick="closeModal('inventoryModal')">&times;</span><h2>🎒 Tu Inventario</h2><div class="inventory-sections"><div class="inventory-grid-container"><h3>Objetos</h3><div class="inventory-grid" id="inventory-grid-display"></div></div><div class="player-equipment-container"><div class="player-equipment"><h3>🛡️ Equipo Actual</h3><div class="equipment-slots"><div class="equipment-slot" id="equip-weapon" data-slot="weapon"></div><div class="equipment-slot" id="equip-shield" data-slot="shield"></div><div class="equipment-slot" id="equip-armor" data-slot="armor"></div><div class="equipment-slot" id="equip-accessory" data-slot="accessory"></div></div></div></div></div></div></div>
+    <div id="shopModal" class="modal"><div class="modal-content large shop-content"><span class="close-modal-btn" onclick="closeModal('shopModal')">&times;</span><h2>🛒 Tienda del Piso <span id="shop-floor-number">1</span></h2><p class="modal-col-balance">Tu Saldo: <span id="shop-player-col">0</span> Col</p><div class="shop-items-container"><h3>Artículos Disponibles</h3><div class="shop-grid" id="shop-grid-display"></div></div></div></div>
+    <div id="blacksmithModal" class="modal"><div class="modal-content large blacksmith-content"><span class="close-modal-btn" onclick="closeModal('blacksmithModal')">&times;</span><h2>🛠️ Herrería del Piso <span id="blacksmith-floor-number">1</span></h2><p class="modal-col-balance">Tu Saldo: <span id="blacksmith-player-col">0</span> Col</p><div class="blacksmith-sections"><div class="blacksmith-recipes-container"><h3>Recetas de Forja</h3><div class="blacksmith-grid" id="blacksmith-grid-display"></div></div><div class="blacksmith-materials-info"><h3>📦 Tus Materiales</h3><ul id="player-materials-list"></ul></div></div></div></div>
+    <div id="playerStatsModal" class="modal"><div class="modal-content"><span class="close-modal-btn" onclick="closeModal('playerStatsModal')">&times;</span><h2>📊 Estadísticas de <span id="stats-player-name">Jugador</span></h2><div class="stats-category"><h3>Atributos Principales</h3><div class="stat-line"><span class="stat-label">Nivel:</span> <span id="stats-level" class="stat-value">1</span></div><div class="stat-line"><span class="stat-label">HP:</span> <span id="stats-hp" class="stat-value">100 / 100</span></div><div class="stat-line"><span class="stat-label">MP:</span> <span id="stats-mp" class="stat-value">50 / 50</span></div><div class="stat-line"><span class="stat-label">EXP:</span> <span id="stats-exp" class="stat-value">0 / 100</span></div><div class="stat-line"><span class="stat-label">Col:</span> <span id="stats-col" class="stat-value">0</span></div></div><div class="stats-category"><h3>Combate</h3><div class="stat-line"><span class="stat-label">Ataque Base:</span> <span id="stats-base-atk" class="stat-value">0</span></div><div class="stat-line"><span class="stat-label">Defensa Base:</span> <span id="stats-base-def" class="stat-value">0</span></div><div class="stat-line"><span class="stat-label">Ataque Equip.:</span> <span id="stats-equip-atk" class="stat-value">0</span></div><div class="stat-line"><span class="stat-label">Defensa Equip.:</span> <span id="stats-equip-def" class="stat-value">0</span></div><div class="stat-line"><span class="stat-label">HP Equip.:</span> <span id="stats-equip-hp" class="stat-value">0</span></div><hr class="stats-divider"><div class="stat-line"><strong><span class="stat-label">Ataque Total:</span></strong> <strong id="stats-total-atk" class="stat-value">0</strong></div><div class="stat-line"><strong><span class="stat-label">Defensa Total:</span></strong> <strong id="stats-total-def" class="stat-value">0</strong></div></div><div class="stats-category"><h3>Habilidades Aprendidas</h3><ul id="stats-skills-list" class="skills-list-display"></ul></div><div class="stats-category"><h3>Habilidades Pasivas</h3><ul id="stats-passive-skills-list" class="skills-list-display"></ul></div></div></div>
+    <div id="combatModal" class="modal"><div class="modal-content xlarge"><span class="close-modal-btn" onclick="closeModal('combatModal')">&times;</span><h2 id="combat-title">¡Combate!</h2><div class="combat-arena"><div class="combatant-display" id="combat-player-display"><h3 id="combat-player-name">Jugador</h3><div class="combatant-icon"><img src="https://placehold.co/200x200/3a3a4c/e0e0e0?text=Jugador" alt="Imagen de Jugador en combate" onerror="this.src='https://placehold.co/200x200/3a3a4c/e0e0e0?text=Jugador';"></div><div class="combat-hp-bar-container"><div class="combat-hp-bar-fill" id="combat-player-hp-bar">100/100</div></div><div class="combat-hp-text">HP: <span id="combat-player-hp-current">100</span>/<span id="combat-player-hp-max">100</span></div><div class="combat-hp-text">MP: <span id="combat-player-mp-current">50</span>/<span id="combat-player-mp-max">50</span></div><div class="combat-stats-preview">ATK: <span id="combat-player-atk">5</span> | DEF: <span id="combat-player-def">2</span></div><div class="status-effects-display" id="combat-player-status-effects-display"></div></div><div class="combatant-display" id="combat-enemy-display"><h3 id="combat-enemy-name">Enemigo</h3><div class="combatant-icon" id="combat-enemy-icon">❓</div><div id="combat-enemy-hp-bars-container"><div class="combat-hp-bar-container single-bar-enemy"><div class="combat-hp-bar-fill" id="combat-enemy-hp-bar-fill">100/100</div></div><div class="combat-hp-multibar-container boss-hp-bars" style="display:none;"><div class="combat-hp-bar-container segment-container"><div class="combat-hp-bar-fill segment" id="combat-enemy-hp-segment-1"></div></div><div class="combat-hp-bar-container segment-container"><div class="combat-hp-bar-fill segment" id="combat-enemy-hp-segment-2"></div></div><div class="combat-hp-bar-container segment-container"><div class="combat-hp-bar-fill segment" id="combat-enemy-hp-segment-3"></div></div><div class="combat-hp-bar-container segment-container"><div class="combat-hp-bar-fill segment" id="combat-enemy-hp-segment-4"></div></div></div></div><div class="combat-hp-text">HP: <span id="combat-enemy-hp-current">100</span>/<span id="combat-enemy-hp-max">100</span></div><div class="combat-stats-preview">ATK: <span id="combat-enemy-atk">0</span> | DEF: <span id="combat-enemy-def">0</span></div><div class="status-effects-display" id="combat-enemy-status-effects-display"></div></div></div><div class="combat-actions"><button class="action-btn" id="combat-action-attack">🗡️ Atacar</button><button class="action-btn" id="combat-action-skills">✨ Habilidades</button><button class="action-btn" id="combat-action-potions">🧪 Pociones</button><button class="action-btn flee-btn" id="combat-action-flee">🏃 Huir</button></div><div id="combat-skills-list-container" class="skills-list" style="display:none;"></div><div id="combat-potions-list-container" class="potions-list" style="display:none;"></div><div class="combat-log" id="combat-log-display"><p class="system-message">Esperando acción...</p></div></div></div>
+    <div id="nameEntryModal" class="modal"><div class="modal-content"><span class="close-modal-btn" onclick="closeModal('nameEntryModal')">&times;</span><h2>Elige el Nombre de tu Personaje</h2><p>Ingresa el nombre que usarás en Aincrad. (Máx. 15 caracteres, solo letras y números)</p><input type="text" id="playerNameInput" maxlength="15" placeholder="Tu Nombre Aquí" class="modal-input"><button class="action-btn modal-submit-btn" id="submitPlayerNameBtn">Confirmar Nombre</button></div></div>
+    <div id="floorNavigationModal" class="modal"><div class="modal-content"><span class="close-modal-btn" onclick="closeModal('floorNavigationModal')">&times;</span><h2>🗺️ Desplazarse entre Pisos</h2><p class="modal-description">Selecciona un piso al que quieras viajar.</p><div id="floor-select-grid" class="floor-select-grid"></div></div></div>
+    <div id="trainingModal" class="modal"><div class="modal-content large training-content"><span class="close-modal-btn" onclick="closeModal('trainingModal')">&times;</span><h2>⚔️ Entrenar Habilidades</h2><p class="modal-col-balance">Tu Saldo: <span id="training-player-col">0</span> Col</p><div class="training-sections"><div class="training-info-container"><h3>Opciones de Entrenamiento</h3><div class="training-grid" id="training-grid-display"></div></div><div class="training-details-container"><h3>📈 Ganancias Estimadas</h3><ul id="training-stats-preview"></ul><p class="modal-description small-text">El entrenamiento mejora tus atributos base. El costo aumenta con tu nivel.</p></div></div></div></div>
+    <div id="questsModal" class="modal"><div class="modal-content xlarge"><span class="close-modal-btn" onclick="closeModal('questsModal')">&times;</span><h2>📜 Misiones</h2><div class="quests-container"><div class="quest-list-column"><h3>Disponibles</h3><div id="available-quests-list" class="quest-list"></div></div><div class="quest-list-column"><h3>Activas</h3><div id="active-quests-list" class="quest-list"></div></div><div class="quest-list-column"><h3>Completadas</h3><div id="completed-quests-list" class="quest-list"></div></div></div><div id="quest-details-area" class="quest-details-display" style="display:none;"><h3 id="quest-detail-title"></h3><p id="quest-detail-description"></p><h4>Objetivos:</h4><ul id="quest-detail-objectives"></ul><h4>Recompensas:</h4><ul id="quest-detail-rewards"></ul><button class="action-btn" id="quest-action-btn"></button></div></div></div>
+    <div id="adminKeyModal" class="modal"><div class="modal-content admin-key-modal-content"><span class="close-modal-btn" onclick="closeModal('adminKeyModal')">&times;</span><h2>Acceso de Administrador</h2><p>Ingresa la clave de administrador:</p><input type="password" id="adminKeyValue" placeholder="Clave Secreta" class="modal-input"><button class="action-btn modal-submit-btn" id="submitAdminKeyBtn">Entrar</button><p id="adminKeyErrorMsg" class="error-message"></p></div></div>
+    <div id="adminPanelModal" class="modal"><div class="modal-content xlarge"> <span class="close-modal-btn" onclick="closeModal('adminPanelModal')">&times;</span><h2>Panel de Administrador</h2> <div class="admin-sections-container"> <div class="admin-section"> <h3>Jugador</h3> <div> <label for="adminSetLevelValue">Nivel:</label> <input type="number" id="adminSetLevelValue" min="1" class="admin-input-short"> <button class="action-btn small-btn" onclick="adminActions.setLevel()">Establecer</button> </div> <div> <label for="adminGiveExpValue">Dar EXP:</label> <input type="number" id="adminGiveExpValue" min="0" class="admin-input-medium"> <button class="action-btn small-btn" onclick="adminActions.giveExp()">Dar</button> </div> <div> <label for="adminGiveColValue">Dar Col:</label> <input type="number" id="adminGiveColValue" min="0" class="admin-input-medium"> <button class="action-btn small-btn" onclick="adminActions.giveCol()">Dar</button> </div> <h4>Estadísticas Base:</h4> <div> <label for="adminSetBaseAtkValue">Ataque Base:</label> <input type="number" id="adminSetBaseAtkValue" min="0" class="admin-input-short"> <button class="action-btn small-btn" onclick="adminActions.setStat('baseAttack', 'adminSetBaseAtkValue')">Est.</button> </div> <div> <label for="adminSetBaseDefValue">Defensa Base:</label> <input type="number" id="adminSetBaseDefValue" min="0" class="admin-input-short"> <button class="action-btn small-btn" onclick="adminActions.setStat('baseDefense', 'adminSetBaseDefValue')">Est.</button> </div> <div> <label for="adminSetBaseMaxHpValue">HP Máx. Base:</label> <input type="number" id="adminSetBaseMaxHpValue" min="1" class="admin-input-short"> <button class="action-btn small-btn" onclick="adminActions.setStat('baseMaxHp', 'adminSetBaseMaxHpValue')">Est.</button> </div> <div> <label for="adminSetBaseMaxMpValue">MP Máx. Base:</label> <input type="number" id="adminSetBaseMaxMpValue" min="0" class="admin-input-short"> <button class="action-btn small-btn" onclick="adminActions.setStat('baseMaxMp', 'adminSetBaseMaxMpValue')">Est.</button> </div> </div> <div class="admin-section"> <h3>Items</h3> <div> <label for="adminItemIdValue">ID del Item:</label> <input type="text" id="adminItemIdValue" placeholder="ej: healing_potion_s" class="admin-input-long"> <button class="action-btn small-btn" onclick="adminActions.showItemDetails()">Ver</button> </div> <div id="adminItemDetailsPreview" class="admin-preview-box">Detalles del item aparecerán aquí...</div> <div> <label for="adminItemQuantityValue">Cantidad:</label> <input type="number" id="adminItemQuantityValue" min="1" value="1" class="admin-input-short"> <button class="action-btn small-btn" onclick="adminActions.giveItem()">Dar Item</button> </div> <h4>Lista de Items (Referencia):</h4> <select id="adminItemQuickSelect" size="6" class="admin-select-list" onchange="adminActions.selectItemFromList()"></select> </div> <div class="admin-section"> <h3>Acceso a Pisos</h3> <div> <label for="adminFloorNumberValue">Piso:</label> <input type="number" id="adminFloorNumberValue" min="1" max="100" class="admin-input-short"> <button class="action-btn small-btn" onclick="adminActions.grantFloorAccess()">Dar Acceso</button> <button class="action-btn small-btn" onclick="adminActions.revokeFloorAccess()">Quitar</button> </div> <h4>Pisos Desbloqueados:</h4> <div id="adminUnlockedFloorsList" class="admin-preview-box">Cargando...</div> </div> <div class="admin-section"> <h3>Misiones</h3> <h4>Definiciones de Misiones:</h4> <select id="adminQuestDefinitionSelect" size="5" class="admin-select-list" onchange="adminActions.loadQuestDefinitionForEditing()"></select> <button class="action-btn small-btn" onclick="adminActions.loadQuestDefinitionForEditing()">Cargar para Editar</button> <button class="action-btn small-btn" onclick="adminActions.deleteQuestDefinition()">Eliminar Definición</button> <h4>Editar/Crear Definición de Misión:</h4> <div><label>ID Misión:</label><input type="text" id="adminQuestId" class="admin-input-long" placeholder="ej: kill_wolves_1"></div> <div><label>Título:</label><input type="text" id="adminQuestTitle" class="admin-input-long"></div> <div><label>Descripción:</label><textarea id="adminQuestDescription" class="admin-input-long" rows="2"></textarea></div> <div><label>Tipo:</label> <select id="adminQuestType" class="admin-input-medium"> <option value="kill">Matar</option> <option value="collect">Recolectar</option> <option value="reach_floor">Alcanzar Piso</option> </ <option value="kill_boss">Matar Jefe</option></select> </div> <div><label>ID Objetivo:</label><input type="text" id="adminQuestTargetId" class="admin-input-long" placeholder="ID monstruo/item/piso"></div> <div><label>Cantidad Objetivo:</label><input type="number" id="adminQuestTargetCount" min="1" class="admin-input-short"></div> <div><label>Req. Nivel:</label><input type="number" id="adminQuestLevelReq" min="0" class="admin-input-short"></div> <h4>Recompensas:</h4> <div><label>Col:</label><input type="number" id="adminQuestRewardCol" min="0" class="admin-input-medium"></div> <div><label>EXP:</label><input type="number" id="adminQuestRewardExp" min="0" class="admin-input-medium"></div> <div><label>Item ID:</label><input type="text" id="adminQuestRewardItemId" class="admin-input-long" placeholder="Opcional"></div> <div><label>Cant. Item:</label><input type="number" id="adminQuestRewardItemQty" min="0" class="admin-input-short"></div> <button class="action-btn small-btn" onclick="adminActions.saveQuestDefinition()">Guardar Definición</button> <button class="action-btn small-btn" onclick="adminActions.clearQuestDefinitionForm()">Limpiar Formulario</button> <h4>Progreso de Misiones del Jugador:</h4> <select id="adminPlayerQuestSelect" size="3" class="admin-select-list"></select> <button class="action-btn small-btn" onclick="adminActions.completePlayerQuest()">Completar Misión (Jugador)</button> <button class="action-btn small-btn" onclick="adminActions.resetPlayerQuest()">Reiniciar Misión (Jugador)</button> </div> </div> <p id="adminPanelMessage" class="admin-feedback-message"></p></div></div>
+
+    <!-- Font Awesome y Script Principal -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script type="module" src="js/main.js" defer></script>
 </body>
 </html>
