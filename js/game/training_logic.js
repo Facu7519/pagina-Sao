@@ -1,11 +1,9 @@
 // js/game/training_logic.js
 
-import { player } from './game_state.js'; // 'uiStates' y 'updatePlayerHUD', 'calculateEffectiveStats' removidos de la importación
+import { player, uiStates, updatePlayerHUD, calculateEffectiveStats } from './game_state.js';
 import { domElements } from '../dom.js';
 import { showNotification, renderGridItems } from '../utils.js';
 import { saveGame } from './persistence_logic.js';
-import { calculateEffectiveStats } from './player_logic.js'; // Importar correctamente desde player_logic.js
-import { updatePlayerHUD } from './hud_logic.js'; // Importar updatePlayerHUD desde hud_logic.js
 
 const BASE_TRAINING_COST = 50; // Costo base del entrenamiento
 
@@ -61,7 +59,7 @@ export function openTrainingModal() {
         };
     }, "No hay opciones de entrenamiento disponibles (esto no debería ocurrir).");
     
-    player.uiStates.isTrainingModalOpen = true;
+    uiStates.isTrainingModalOpen = true;
     domElements.trainingModal.style.display = 'block';
 }
 
@@ -105,6 +103,6 @@ export function performTraining(trainingId) {
  * Cierra el modal de entrenamiento.
  */
 export function closeTrainingModal() {
-    player.uiStates.isTrainingModalOpen = false;
+    uiStates.isTrainingModalOpen = false;
     domElements.trainingModal.style.display = 'none';
 }

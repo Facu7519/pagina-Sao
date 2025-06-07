@@ -1,15 +1,13 @@
 // js/utils.js
 import { domElements, getEl } from './dom.js';
-import { player, currentCombat } from './game/game_state.js';
+import { player, currentCombat } from './game/game_state.js'; // Para closeModal y setActiveLink
 import { renderInventory, renderEquipment } from './game/inventory_logic.js';
 import { renderShop } from './game/shop_logic.js';
-import { renderBlacksmithRecipes, renderPlayerMaterialsList } from './game/blacksmith_logic.js';
+import { renderBlacksmithRecipes } from './game/blacksmith_logic.js';
 import { renderPlayerStats } from './game/stats_modal_logic.js';
-import { openQuestsModal, renderAllQuestLists, showQuestDetails } from './game/quests_logic.js';
+import { openQuestsModal } from './game/quests_logic.js';
 import { populateAdminPanel } from './game/admin_logic.js';
-import { renderFloorSelection } from './game/floor_nav_logic.js';
-import { openTrainingModal } from './game/training_logic.js';
-
+// Importar otras funciones de renderizado de modales si es necesario para openModal
 
 /**
  * Muestra una notificación en pantalla.
@@ -27,108 +25,80 @@ export function showNotification(message, type = 'default', duration = 5000) {
     // eslint-disable-next-line no-unused-expressions
     notification.offsetHeight; // Trigger reflow
 
-    // Reiniciar animación con la duración correcta
-    notification.style.animation = `slideInNotification 0.4s ease-out, fadeOutNotification 0.4s ease-in ${((duration / 1000) - 0.4)}s forwards`;
-
-
+    const fadeOutDelay = Math.max(0, duration / 1000 - 0.4); // Duración de fadeOut es 0.4s
+    notification.style.animation = `slideInNotification 0.4s ease-out, fadeOutNotification 0.4s ease-in ${fadeOutDelay}s forwards`;
+    
     domElements.notificationArea.appendChild(notification);
 
     setTimeout(() => {
-        notification.remove();
+        // Verificar si la notificación aún existe antes de intentar removerla
+        if (notification.parentNode === domElements.notificationArea) {
+            domElements.notificationArea.removeChild(notification);
+        }
     }, duration);
 }
 
 /**
- * Abre un modal específico y renderiza su contenido si es necesario.
+ * Abre un modal específico y cierra otros modales no persistentes.
  * @param {string} modalId - El ID del modal a abrir.
  */
 export function openModal(modalId) {
-    const modalElement = domElements[modalId]; // Usar domElements para obtener la referencia
-    if (!modalElement) {
-        console.error(`Modal con ID '${modalId}' no encontrado.`);
+    const modalToOpen = getEl(modalId);
+    if (!modalToOpen) {
+        console.error(`Modal con ID "${modalId}" no encontrado.`);
         return;
     }
 
-    // Ocultar todos los modales primero, excepto si estamos re-abriendo uno que ya está activo
-    // para evitar que se superpongan si la lógica lo permite.
-    document.querySelectorAll('.modal').forEach(modal => {
-        if (modal.id !== modalId) {
-            modal.style.display = 'none';
+    // Cierra otros modales que no deberían superponerse o persistir
+    document.querySelectorAll('.modal').forEach(m => {
+        if (m.id !== modalId && m.style.display === 'block') {
+            // Define qué modales no deben cerrarse automáticamente aquí
+            const nonClosableModals = ['nameEntryModal', 'adminKeyModal']; // Añade IDs si es necesario
+            if (m.id === 'combatModal' && currentCombat.active) return; // No cerrar combate modal si está activo
+            if (nonClosableModals.includes(m.id) && player.name === "") return; // No cerrar ciertos modales si el nombre no está puesto
+
+            // No cerrar adminPanelModal si el adminKeyModal se está abriendo o viceversa
+            if (!((modalId === 'adminPanelModal' && m.id === 'adminKeyModal') || (modalId === 'adminKeyModal' && m.id === 'adminPanelModal'))) {
+                 if (m.id !== 'infoModal') { // infoModal puede ser genérico
+                    m.style.display = 'none';
+                 }
+            }
         }
     });
 
-    // Resetear scroll del modal al abrir
-    modalElement.scrollTop = 0;
+    modalToOpen.style.display = 'block';
 
-    // Renderizar contenido específico del modal si aplica
+    // Lógica específica al abrir ciertos modales
     switch (modalId) {
         case 'inventoryModal':
-            renderInventory();
-            renderEquipment();
+            if (typeof renderInventory === 'function') renderInventory();
+            if (typeof renderEquipment === 'function') renderEquipment();
             break;
         case 'shopModal':
-            renderShop();
+            if (typeof renderShop === 'function') renderShop();
             break;
         case 'blacksmithModal':
-            renderBlacksmithRecipes();
-            renderPlayerMaterialsList(); // Asegurarse de que los materiales se muestren
+            if (typeof renderBlacksmithRecipes === 'function') renderBlacksmithRecipes();
             break;
         case 'playerStatsModal':
-            renderPlayerStats();
+            if (typeof renderPlayerStats === 'function') renderPlayerStats();
+            break;
+        case 'nameEntryModal':
+            if (domElements.playerNameInputElement) domElements.playerNameInputElement.focus();
             break;
         case 'questsModal':
-            // openQuestsModal ya llama a renderAllQuestLists y setea el display de questDetailsArea
-            // No es necesario llamar a renderAllQuestLists aquí también
-            openQuestsModal(); 
+            if (typeof openQuestsModal === 'function') openQuestsModal(); // Esta función ya maneja su renderizado interno
             break;
-        case 'floorNavigationModal':
-            renderFloorSelection();
-            break;
-        case 'trainingModal':
-            // openTrainingModal ya renderiza todo lo necesario y se llama a sí misma al final para actualizar el costo.
-            openTrainingModal(); 
+        case 'adminKeyModal':
+            if (domElements.adminKeyValueInput) domElements.adminKeyValueInput.value = '';
+            if (domElements.adminKeyErrorMsg) domElements.adminKeyErrorMsg.style.display = 'none';
+            if (domElements.adminKeyValueInput) domElements.adminKeyValueInput.focus();
             break;
         case 'adminPanelModal':
-            populateAdminPanel();
+             if (typeof populateAdminPanel === 'function') populateAdminPanel();
             break;
-        case 'combatModal':
-        case 'nameEntryModal':
-        case 'adminKeyModal':
-            // Estos modales tienen su propia lógica de apertura/inicialización
-            // o su contenido se inyecta antes de llamar a openModal.
-            break;
-        case 'infoModal':
-            // El contenido de infoModal ya se setea antes de llamar a openModal.
-            // Asegurarse de que el botón de cerrar esté visible.
-            const closeBtn = modalElement.querySelector('.close-button');
-            if (closeBtn) closeBtn.style.display = 'block';
-            break;
-        default:
-            console.log(`Abriendo modal: ${modalId}`);
-            break;
+        // Añadir más casos según sea necesario
     }
-
-    // Actualizar el estado de UI si es un modal conocido
-    if (player.uiStates && typeof player.uiStates === 'object') {
-        switch (modalId) {
-            case 'inventoryModal': player.uiStates.isInventoryModalOpen = true; break;
-            case 'shopModal': player.uiStates.isShopModalOpen = true; break;
-            case 'blacksmithModal': player.uiStates.isBlacksmithModalOpen = true; break;
-            case 'playerStatsModal': player.uiStates.isPlayerStatsModalOpen = true; break;
-            // questsModal maneja su propio isQuestsModalOpen internamente
-            case 'floorNavigationModal': player.uiStates.isFloorNavigationModalOpen = true; break;
-            case 'trainingModal': player.uiStates.isTrainingModalOpen = true; break;
-            case 'adminPanelModal': player.uiStates.isAdminPanelOpen = true; break;
-            case 'adminKeyModal': player.uiStates.isAdminKeyModalOpen = true; break;
-            case 'combatModal': player.uiStates.isCombatModalOpen = true; break;
-            case 'nameEntryModal': player.uiStates.isNameEntryModalOpen = true; break;
-            case 'infoModal': player.uiStates.isInfoModalOpen = true; break;
-            default: break;
-        }
-    }
-
-
-    modalElement.style.display = 'block';
 }
 
 /**
@@ -136,177 +106,162 @@ export function openModal(modalId) {
  * @param {string} modalId - El ID del modal a cerrar.
  */
 export function closeModal(modalId) {
-    const modalElement = domElements[modalId]; // Usar domElements para obtener la referencia
-    if (!modalElement) {
-        console.error(`Modal con ID '${modalId}' no encontrado.`);
+    if (modalId === 'nameEntryModal' && !player.name) {
+        showNotification("Debes ingresar un nombre.", "error");
+        if (domElements.playerNameInputElement) domElements.playerNameInputElement.focus();
         return;
     }
-    modalElement.style.display = 'none';
+    // Prevenir cerrar el modal de combate si el combate está activo.
+    if (modalId === 'combatModal' && currentCombat.active) {
+        showNotification("No puedes cerrar el combate. Usa 'Huir'.", "error");
+        return;
+    }
 
-    // Restablecer los estados de UI en el objeto player
-    if (player.uiStates && typeof player.uiStates === 'object') {
-        switch (modalId) {
-            case 'inventoryModal': player.uiStates.isInventoryModalOpen = false; break;
-            case 'shopModal': player.uiStates.isShopModalOpen = false; break;
-            case 'blacksmithModal': player.uiStates.isBlacksmithModalOpen = false; break;
-            case 'playerStatsModal': player.uiStates.isPlayerStatsModalOpen = false; break;
-            case 'questsModal': player.uiStates.isQuestsModalOpen = false; break;
-            case 'floorNavigationModal': player.uiStates.isFloorNavigationModalOpen = false; break;
-            case 'trainingModal': player.uiStates.isTrainingModalOpen = false; break;
-            case 'adminPanelModal': player.uiStates.isAdminPanelOpen = false; break;
-            case 'adminKeyModal': player.uiStates.isAdminKeyModalOpen = false; break;
-            case 'combatModal': player.uiStates.isCombatModalOpen = false; break;
-            case 'nameEntryModal': player.uiStates.isNameEntryModalOpen = false; break;
-            case 'infoModal': 
-                player.uiStates.isInfoModalOpen = false; 
-                if (domElements.modalBodyContentElement) {
-                    domElements.modalBodyContentElement.innerHTML = ''; // Limpiar contenido al cerrar
-                }
-                break;
-            default: break;
-        }
+    const modal = getEl(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+
+    // Limpiar contenido específico si es necesario
+    if (modalId === 'infoModal' && domElements.modalBodyContentElement) {
+        domElements.modalBodyContentElement.innerHTML = '';
+    }
+    // Lógica adicional al cerrar adminPanelModal
+    if (modalId === 'adminPanelModal' && domElements.adminPanelMessage) {
+        domElements.adminPanelMessage.style.display = 'none';
+        domElements.adminPanelMessage.textContent = '';
     }
 }
 
+/**
+ * Obtiene el color para la barra de HP basado en el porcentaje de vida.
+ * @param {number} current - HP actual.
+ * @param {number} max - HP máximo.
+ * @returns {string} Color HSL para la barra de HP.
+ */
+export function getHpColor(current, max) {
+    const percentage = max > 0 ? (current / max) * 100 : 0;
+    if (percentage > 75) return 'hsl(120, 70%, 45%)'; // Verde
+    if (percentage > 50) return 'hsl(90, 70%, 45%)';  // Verde-Amarillo
+    if (percentage > 25) return 'hsl(60, 70%, 45%)';  // Amarillo
+    if (percentage > 10) return 'hsl(30, 70%, 45%)';  // Naranja
+    return 'hsl(0, 70%, 45%)'; // Rojo
+}
 
 /**
- * Renderiza una cuadrícula de elementos (usado para inventario, tienda, etc.).
- * @param {HTMLElement} containerElement - El elemento del DOM donde se renderizará la cuadrícula.
- * @param {Array<object>} itemsArray - El array de objetos a renderizar.
- * @param {function} getItemHtmlCallback - Función que devuelve el HTML para cada elemento.
- * @param {string} emptyMessage - Mensaje a mostrar si el array está vacío.
+ * Actualiza una barra de recursos (HP, MP, EXP) en la UI.
+ * @param {HTMLElement} barElement - El elemento de la barra a actualizar.
+ * @param {number} current - Valor actual del recurso.
+ * @param {number} max - Valor máximo del recurso.
+ * @param {boolean} [isHpBar=false] - Indica si es una barra de HP para aplicar color dinámico.
  */
-export function renderGridItems(containerElement, itemsArray, getItemHtmlCallback, emptyMessage = "No hay elementos para mostrar.") {
-    if (!containerElement) {
-        console.error("Contenedor no encontrado para renderGridItems.");
+export function updateResourceBar(barElement, current, max, isHpBar = false) {
+    if (!barElement) return;
+    const percentage = max > 0 ? (Math.max(0, current) / max) * 100 : 0;
+    barElement.style.width = `${Math.min(100, percentage)}%`; // Asegurar que no exceda 100%
+    if (isHpBar) {
+        barElement.style.backgroundColor = getHpColor(current, max);
+    }
+}
+
+/**
+ * Renderiza una colección de items en un elemento de cuadrícula del DOM.
+ * @param {HTMLElement} gridElement - El elemento del DOM donde se renderizará la cuadrícula.
+ * @param {Array<Object>} items - Array de objetos de datos para renderizar.
+ * @param {Function} itemRendererFn - Función que toma un item y su índice, y devuelve un objeto con las propiedades para renderizar (icon, name, details, onClick, etc.).
+ * @param {string} emptyMessage - Mensaje a mostrar si no hay items.
+ */
+export function renderGridItems(gridElement, items, itemRendererFn, emptyMessage) {
+    if (!gridElement) return;
+    gridElement.innerHTML = '';
+    if (!items || items.length === 0) {
+        gridElement.innerHTML = `<p style="text-align:center; opacity:0.7;">${emptyMessage}</p>`;
         return;
     }
-    containerElement.innerHTML = ''; // Limpiar contenido anterior
 
-    if (!itemsArray || itemsArray.length === 0) {
-        containerElement.innerHTML = `<p class="empty-grid-message">${emptyMessage}</p>`;
-        return;
-    }
+    items.forEach((itemData, index) => {
+        const renderedItem = itemRendererFn(itemData, index); // La función renderer debe manejar la lógica de qué mostrar
+        if (renderedItem) { 
+            const itemDiv = document.createElement('div');
+            // Clase base, más específica si se provee
+            itemDiv.className = renderedItem.itemClass || (gridElement.id.includes('inventory') ? 'inventory-item' : 
+                                (gridElement.id.includes('shop') ? 'shop-item' : 
+                                (gridElement.id.includes('blacksmith') ? 'blacksmith-item' : 
+                                (gridElement.id.includes('training') ? 'training-option' : 'grid-item'))));
 
-    itemsArray.forEach((item, index) => {
-        const itemHtmlData = getItemHtmlCallback(item, index);
-        if (!itemHtmlData) return; // Si la callback devuelve null, no renderizar
 
-        const itemDiv = document.createElement('div');
-        itemDiv.className = `grid-item ${itemHtmlData.itemClass || ''} ${itemHtmlData.disabled ? 'disabled' : ''}`;
-        
-        let tooltipText = itemHtmlData.details || '';
-        if (itemHtmlData.levelReq) tooltipText += `<br/>${itemHtmlData.levelReq}`;
-        if (itemHtmlData.materials) tooltipText += `<br/>${itemHtmlData.materials}`;
-        if (itemHtmlData.price) tooltipText += `<br/>${itemHtmlData.price}`;
-        if (itemHtmlData.chance) tooltipText += `<br/>${itemHtmlData.chance}`;
-        if (itemHtmlData.disabledMessage) tooltipText += `<br/><span class="tooltip-error">${itemHtmlData.disabledMessage}</span>`;
+            let content = `<span class="item-icon">${renderedItem.icon || '❓'}</span>
+                           <span class="item-name">${renderedItem.name || 'Desconocido'}</span>`;
+            
+            if (renderedItem.details) content += renderedItem.details; // details puede ser HTML preformateado
+            if (renderedItem.levelReq) content += `<span class="item-level-req">${renderedItem.levelReq}</span>`;
+            if (renderedItem.materials) content += `<span class="item-materials">${renderedItem.materials}</span>`;
+            if (renderedItem.price) content += `<span class="item-price">${renderedItem.price}</span>`;
+            if (renderedItem.chance) content += `<span class="item-chance">${renderedItem.chance}</span>`;
+            if (renderedItem.count) content += `<span class="item-count">${renderedItem.count}</span>`;
+            
+            itemDiv.innerHTML = content;
 
-        // Asegurarse de que itemHtmlData.icon siempre sea una cadena válida
-        const icon = itemHtmlData.icon || '❔'; // Usar '❔' como icono predeterminado si no se proporciona
-
-        itemDiv.innerHTML = `
-            <span class="item-icon">${icon}</span>
-            <span class="item-name">${itemHtmlData.name || ''} ${itemHtmlData.count || ''}</span>
-            <span class="tooltiptext">${tooltipText}</span>
-        `;
-        // Los tooltips son puramente CSS, pero la clase tooltip se añade aquí.
-        itemDiv.classList.add('tooltip'); // Añadir clase tooltip para el CSS
-
-        if (itemHtmlData.onClick && !itemHtmlData.disabled) {
-            itemDiv.addEventListener('click', itemHtmlData.onClick);
-        } else if (itemHtmlData.disabled) {
-            itemDiv.style.cursor = 'not-allowed';
+            if (renderedItem.onClick) {
+                itemDiv.onclick = renderedItem.onClick;
+                itemDiv.style.cursor = "pointer";
+            }
+            if (renderedItem.disabled) {
+                itemDiv.style.opacity = "0.6";
+                itemDiv.style.cursor = "not-allowed";
+                itemDiv.title = renderedItem.disabledMessage || "No cumples los requisitos";
+                if (renderedItem.onClick) itemDiv.onclick = null; // Deshabilitar click si está deshabilitado
+            }
+            gridElement.appendChild(itemDiv);
         }
-
-        containerElement.appendChild(itemDiv);
     });
 }
 
 /**
- * Actualiza una barra de recursos (HP, EXP, MP) en el HUD.
- * @param {HTMLElement} barElement - El elemento de la barra (el contenedor).
- * @param {number} currentValue - El valor actual del recurso.
- * @param {number} maxValue - El valor máximo del recurso.
- * @param {boolean} [invertColors=false] - Si los colores deben invertirse (ej. rojo para HP si está bajo).
+ * Establece el enlace activo en la navegación principal.
+ * @param {HTMLElement} selectedLink - El elemento <a> del enlace seleccionado.
  */
-export function updateResourceBar(barElement, currentValue, maxValue, invertColors = false) {
-    if (!barElement) return;
-
-    const fillElement = barElement.querySelector('.resource-bar-fill');
-    if (!fillElement) return;
-
-    const percentage = (currentValue / maxValue) * 100;
-    fillElement.style.width = `${Math.max(0, Math.min(100, percentage))}%`; // Asegurar que esté entre 0 y 100
-
-    // Opcional: Cambiar color de la barra según el porcentaje
-    if (invertColors) {
-        if (percentage < 20) {
-            fillElement.style.backgroundColor = '#d9534f'; // Rojo
-        } else if (percentage < 50) {
-            fillElement.style.backgroundColor = '#f0ad4e'; // Naranja
-        } else {
-            fillElement.style.backgroundColor = ''; // Usar el color original (desde CSS)
-        }
+export function setActiveLink(selectedLink) {
+    if (domElements.navLinks) {
+        domElements.navLinks.forEach(link => link.classList.remove('active'));
+    }
+    if (selectedLink) {
+        selectedLink.classList.add('active');
     }
 }
 
-
 /**
- * Calcula la EXP necesaria para el siguiente nivel.
- * Puede ser una función lineal o exponencial dependiendo del diseño del juego.
- * @param {number} level - El nivel para el que se calcula la EXP necesaria.
- * @returns {number} La cantidad de EXP necesaria para alcanzar el siguiente nivel.
+ * Calcula la EXP necesaria para alcanzar un nivel dado.
+ * @param {number} level - El nivel para el cual calcular la EXP necesaria.
+ * @returns {number} La cantidad de EXP necesaria.
  */
 export function calculateNeededExpForLevel(level) {
-    if (level <= 1) return 100;
-    // Fórmula de ejemplo: EXP_n = EXP_n-1 * 1.35 + 80 (redondeado)
+    if (level <= 1) return 100; // EXP base para el nivel 1
     let exp = 100;
-    for (let i = 2; i <= level; i++) {
-        exp = Math.floor(exp * 1.35 + 80);
+    for (let i = 1; i < level; i++) {
+        exp = Math.floor(exp * 1.35 + (80 * (i * 0.5 + 1))); // Curva de EXP ajustada
     }
-    return exp;
-}
-
-
-/**
- * Establece el enlace de navegación activo.
- * @param {HTMLElement} activeLinkElement - El elemento 'a' del enlace que debe estar activo.
- */
-export function setActiveLink(activeLinkElement) {
-    // Remover la clase 'active' de todos los enlaces de navegación
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.classList.remove('active');
-    });
-
-    // Añadir la clase 'active' al enlace clickeado
-    if (activeLinkElement) {
-        activeLinkElement.classList.add('active');
-    }
+    return Math.max(100, exp); // Asegurar un mínimo
 }
 
 /**
- * Inicializa listeners globales para cerrar modales al hacer click fuera o presionar Escape.
+ * Inicializa los listeners de eventos globales para cerrar modales.
+ * Esto debe llamarse una vez, por ejemplo en main.js.
  */
 export function initializeGlobalModalClosers() {
-    // Cerrar modal al hacer click fuera del contenido (pero dentro del overlay)
-    document.addEventListener('click', (event) => {
-        const openModals = document.querySelectorAll('.modal[style*="display: block"]');
-        openModals.forEach(modal => {
-            const modalContent = modal.querySelector('.modal-content');
-            // Asegurarse de que el clic no fue dentro del contenido del modal
-            if (modalContent && !modalContent.contains(event.target) && modal.contains(event.target)) {
-                // Verificar si es un modal que no debe cerrarse con click fuera
-                if (modal.id === 'nameEntryModal' && !player.name) return; // No cerrar si espera nombre
-                if (modal.id === 'combatModal' && currentCombat.active) return; // No cerrar durante combate
-                // No cerrar adminKeyModal o adminPanelModal si están activos
-                if ((modal.id === 'adminKeyModal' && domElements.adminKeyModal.style.display === 'block') ||
-                    (modal.id === 'adminPanelModal' && domElements.adminPanelModal.style.display === 'block')) {
-                    return;
-                }
-                closeModal(modal.id);
-            }
-        });
+    // Cerrar modal al hacer clic fuera de él
+    window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+            const modalId = event.target.id;
+            // Condiciones especiales para no cerrar ciertos modales
+            if (modalId === 'nameEntryModal' && !player.name) return;
+            if (modalId === 'combatModal' && currentCombat.active) return;
+            // Permitir cerrar infoModal, pero otros podrían tener reglas
+            if (modalId === 'adminKeyModal' && getEl('adminKeyModal').style.display === 'block') return;
+            if (modalId === 'adminPanelModal' && getEl('adminPanelModal').style.display === 'block') return;
+
+            closeModal(modalId);
+        }
     });
 
     // Cerrar modal con la tecla Escape
@@ -314,11 +269,11 @@ export function initializeGlobalModalClosers() {
         if (event.key === "Escape") {
             const openModals = document.querySelectorAll('.modal[style*="display: block"]');
             if (openModals.length > 0) {
-                const topModal = openModals[openModals.length - 1]; // Obtener el modal superior
-
-                // No cerrar si es el modal de entrada de nombre y el nombre no está establecido
+                // Intenta cerrar el modal "superior" (el último en la lista de nodos, o el que tenga mayor z-index si se gestionara así)
+                // Por simplicidad, tomamos el último que encuentre abierto.
+                const topModal = openModals[openModals.length - 1];
+                
                 if (topModal.id === 'nameEntryModal' && !player.name) return;
-                // No cerrar el modal de combate si está activo
                 if (topModal.id === 'combatModal' && currentCombat.active) return;
                  // No cerrar adminKeyModal o adminPanelModal con Escape si están activos y son el modal superior
                 if ((topModal.id === 'adminKeyModal' || topModal.id === 'adminPanelModal') && topModal.style.display === 'block') return;

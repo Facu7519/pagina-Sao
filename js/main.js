@@ -1,188 +1,226 @@
 // js/main.js
 
 // --- Configuración e Importaciones de Módulos ---
-import { ADMIN_SECRET_KEY, NUM_BOSS_HP_BARS, SAVE_KEY } from './config.js';
-import { domElements, getEl } from './dom.js';
+// Se importan las variables de config.js como están exportadas allí
+import { VERSION, ADMIN_SECRET_KEY, NUM_BOSS_HP_BARS, SAVE_KEY } from '../config.js'; // Corregido a ../config.js
+import { domElements, getEl } from '../dom.js'; // Corregido a ../dom.js
 import {
     showNotification,
     openModal,
     closeModal,
     renderGridItems,
     setActiveLink,
-    calculateNeededExpForLevel, // Importado de utils.js
-    initializeGlobalModalClosers
-} from './utils.js';
+    calculateNeededExpForLevel,
+    initializeGlobalModalClosers // Corregido según tu utils.js
+} from '../utils.js'; // Corregido a ../utils.js
 
 // Importaciones del estado del juego y datos
-import { player, currentCombat, initializeDefaultPlayerItemsAndSkills } from './game/game_state.js';
-import { baseItems } from './data/items_db.js';
-import { skillData, passiveSkillData } from './data/skills_db.js';
-import { floorData } from './data/floor_data_db.js';
-import { questDefinitions } from './data/quests_db.js'; // Solo importar las definiciones
-import { blacksmithRecipes } from './data/recipes_db.js';
-import { statusEffects } from './data/status_effects_db.js';
+import { player, currentCombat, initializeDefaultPlayerItemsAndSkills } from './game_state.js';
+import { baseItems } from '../data/items_db.js';
+import { skillData, passiveSkillData } from '../data/skills_db.js';
+import { floorData } from '../data/floor_data_db.js';
+import { questDefinitions, initializeQuestDefinitions } from '../data/quests_db.js';
+import { blacksmithRecipes } from '../data/recipes_db.js';
+import { statusEffects } from '../data/status_effects_db.js';
 import {
     wikiCharacterData,
     wikiWeaponData,
     wikiFloorsData,
-    wikiGuildsData
-} from './data/wiki_data_db.js';
+    wikiGuildsData,
+    loadWikiContent,
+    showWikiInfo
+} from '../wiki/wiki_content.js'; // Corregido a ../wiki/wiki_content.js
+
 
 // Importaciones de lógica de juego
-import { loadWikiContent, showWikiInfo } from './wiki/wiki_content.js';
-import { initializeNewPlayer, saveGame, loadGame, confirmResetProgress } from './game/persistence_logic.js';
-import { updatePlayerHUD } from './game/hud_logic.js';
-import { openInventoryModal, renderInventory, renderEquipment } from './game/inventory_logic.js';
-import { openShopModal, renderShop } from './game/shop_logic.js';
-import { openBlacksmithModal, renderBlacksmithRecipes, renderPlayerMaterialsList } from './game/blacksmith_logic.js';
-import { openPlayerStatsModal, renderPlayerStats } from './game/stats_modal_logic.js';
-import { startCombat, startBossCombat, useCombatSkill, useCombatPotion, toggleCombatSkills, toggleCombatPotions, addCombatLog } from './game/combat_logic.js';
-import { openFloorNavigationModal, renderFloorSelection } from './game/floor_nav_logic.js';
-import { openTrainingModal, performTraining } from './game/training_logic.js';
-// ¡Importante! initializeQuestDefinitions se importa desde quests_logic.js
-import { openQuestsModal, renderAllQuestLists, showQuestDetails, claimQuestReward, updateQuestProgress, initializeQuestDefinitions } from './game/quests_logic.js';
-import { adminActions, openAdminPanel, checkAdminKey, populateAdminPanel } from './game/admin_logic.js';
-import { toggleMusic, createParticles } from './game/audiovisual_logic.js';
+import { calculateEffectiveStats, levelUp, gainExp, takeDamage, restoreResource } from './player_logic.js';
+import { updatePlayerHUD } from './hud_logic.js';
+
+import {
+    loadGame,
+    saveGame,
+    initializeNewPlayer,
+    promptForPlayerName,
+    confirmAndSavePlayerName,
+    confirmResetProgress,
+    executeReset
+} from './persistence_logic.js';
+
+import {
+    initCombat,
+    playerAttack,
+    usePlayerSkill,
+    useCombatPotion,
+    fleeCombat,
+    // setupCombatActionListeners, // Se llama en DOMContentLoaded
+    // showCombatSkills, // La lógica está en DOMContentLoaded
+    // showCombatPotions // La lógica está en DOMContentLoaded
+} from './combat_logic.js';
+
+import {
+    renderInventory,
+    renderEquipment,
+    handleItemClick,
+    equipItem,
+    unequipItem,
+    addItemToInventory,
+    useConsumable
+} from './inventory_logic.js';
+
+import { renderShop, buyItem } from './shop_logic.js';
+import { renderBlacksmithRecipes, attemptForge, addMaterial, renderPlayerMaterials } from './blacksmith_logic.js';
+import { renderPlayerStats, renderSkillListInStats } from './stats_modal_logic.js';
+import { renderFloorSelection, changeFloor } from './floor_nav_logic.js';
+import { openTrainingModal, performTraining } from './training_logic.js';
+
+import {
+    openQuestsModal,
+    renderAllQuestLists,
+    showQuestDetails,
+    acceptQuest,
+    updateQuestProgress,
+    claimQuestReward
+} from './quests_logic.js';
+
+import {
+    adminActions,
+    openAdminLoginModal,
+    checkAdminKey,
+    openAdminPanel
+} from './admin_logic.js';
+
+import { toggleMusic, createParticles, SAO_PARTICLES } from './audiovisual_logic.js';
 
 
-// --- Inicialización del Juego ---
+// --- Exposición de Funciones a `window` (para llamadas desde HTML onclick) ---
+// Esto permite que los `onclick="nombreFuncion()"` en index1.html funcionen.
+window.saveGame = saveGame;
+window.loadGame = loadGame;
+window.confirmResetProgress = confirmResetProgress;
+window.executeReset = executeReset; // Usado en el modal de confirmación (infoModal)
+window.setActiveLink = setActiveLink;
+window.showWikiInfo = showWikiInfo;
+window.closeModal = closeModal; // Para los botones de cierre en los modales
+window.openModal = openModal;   // Por si algún HTML lo usa directamente
+window.toggleMusic = toggleMusic; // Para el botón de música
+window.openAdminLoginModal = openAdminLoginModal; // Para el botón de admin
+window.checkAdminKey = checkAdminKey; // Para el modal de clave de admin
+window.adminActions = adminActions; // Para los botones dentro del panel de admin
+window.submitPlayerName = confirmAndSavePlayerName; // Para el modal de nombre de jugador
+
+// Las funciones de combate como playerAttack, fleeCombat, etc., se asignan
+// a los botones específicos en DOMContentLoaded más abajo.
+// Si el HTML generara dinámicamente botones con onclick="playerAttack()",
+// entonces también necesitaríamos window.playerAttack = playerAttack;
+
+
+// --- Lógica Principal de Inicialización del Juego ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar el jugador si es la primera vez o cargar el juego
-    // La función initializeQuestDefinitions se encarga de que questDefinitions esté cargado
-    initializeQuestDefinitions(); 
-    initializeNewPlayer(); // Intenta cargar el juego o inicia uno nuevo
+    console.log(`Sword Art Online: Aincrad Chronicles - Initializing (Version ${VERSION || 'N/A'})`);
+    console.log(`Save Key: ${SAVE_KEY}, Admin Key Hint: First 3 chars: ${ADMIN_SECRET_KEY.substring(0,3)}`);
 
-    // Inicializar los listeners para cerrar modales globalmente (Escape y clicks fuera)
-    initializeGlobalModalClosers();
+    initializeQuestDefinitions();
+    initializeGlobalModalClosers(); // Configura listeners para cerrar modales (Esc, click fuera)
 
-    // Cargar contenido de la Wiki
-    loadWikiContent();
+    loadGame(); // Carga el juego o inicializa uno nuevo. Actualiza HUD, etc.
+    loadWikiContent(); // Carga el contenido de la wiki.
 
-    // Crear partículas de fondo
-    createParticles();
+    if (typeof createParticles === 'function' && SAO_PARTICLES && domElements.particlesContainer) {
+        createParticles(SAO_PARTICLES, domElements.particlesContainer);
+    } else {
+        console.warn('createParticles, SAO_PARTICLES o domElements.particlesContainer no están disponibles. Audiovisual_logic.js podría necesitar revisión.');
+    }
 
-    // Actualizar HUD inicial
-    updatePlayerHUD();
+    // --- Asignación de Event Listeners para Botones Principales del HUD ---
+    // (Usando los IDs de los botones definidos en domElements)
+    if (domElements.combatBtn) domElements.combatBtn.onclick = () => initCombat(false);
+    if (domElements.bossCombatBtn) domElements.bossCombatBtn.onclick = () => initCombat(true);
+    if (domElements.questsBtn) domElements.questsBtn.onclick = () => openModal('questsModal'); // openModal se encarga de llamar a openQuestsModal de quests_logic
+    if (domElements.trainSkillBtn) domElements.trainSkillBtn.onclick = openTrainingModal;
+    
+    if (domElements.inventoryBtn) domElements.inventoryBtn.onclick = () => openModal('inventoryModal');
+    if (domElements.shopBtn) domElements.shopBtn.onclick = () => openModal('shopModal');
+    if (domElements.blacksmithBtn) domElements.blacksmithBtn.onclick = () => openModal('blacksmithModal');
+    if (domElements.playerStatsBtn) domElements.playerStatsBtn.onclick = () => openModal('playerStatsModal');
+    if (domElements.floorNavigateBtn) domElements.floorNavigateBtn.onclick = () => {
+        renderFloorSelection(); 
+        openModal('floorNavigationModal');
+    };
 
-    // --- Configuración de Event Listeners ---
+    // Botones cuyos onclick ya llaman a funciones en window (definidas arriba)
+    if (domElements.musicToggleBtn) domElements.musicToggleBtn.onclick = window.toggleMusic;
+    if (domElements.adminAccessBtn) domElements.adminAccessBtn.onclick = window.openAdminLoginModal; // Llama a la función en window
+    if (domElements.submitAdminKeyBtn) domElements.submitAdminKeyBtn.onclick = window.checkAdminKey; // Llama a la función en window
+    if (domElements.submitPlayerNameBtn) domElements.submitPlayerNameBtn.onclick = window.submitPlayerName; // Llama a la función en window
+    
+    // --- Asignación de Event Listeners para el Modal de Combate ---
+    if (domElements.combatActionAttackBtn) domElements.combatActionAttackBtn.onclick = playerAttack;
+    if (domElements.combatActionFleeBtn) domElements.combatActionFleeBtn.onclick = fleeCombat;
 
-    // Navegación principal (enlaces)
-    domElements.navPersonajesLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        setActiveLink(this);
-        window.location.hash = 'wiki-personajes';
-    });
-    domElements.navArsenalLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        setActiveLink(this);
-        window.location.hash = 'wiki-arsenal';
-    });
-    domElements.navPisosLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        setActiveLink(this);
-        window.location.hash = 'wiki-pisos';
-    });
-    domElements.navGremiosLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        setActiveLink(this);
-        window.location.hash = 'wiki-gremios';
-    });
-    domElements.navGameLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        setActiveLink(this);
-        window.location.hash = 'game-panel';
-    });
+    if (domElements.combatActionSkillsBtn) {
+        domElements.combatActionSkillsBtn.onclick = () => {
+            if(domElements.combatPotionsListContainer) domElements.combatPotionsListContainer.style.display = 'none';
+            const skillContainer = domElements.combatSkillsListContainer;
+            if (!skillContainer) return;
+            skillContainer.innerHTML = '';
+            // Asegúrate que player.skills y skillData estén disponibles y correctos.
+            const availableSkills = player.skills.filter(skillRef => {
+                const skillDef = skillData[skillRef.id] || skillRef; // Usar skillRef si ya tiene todos los datos
+                return player.level >= (skillDef.levelReq || 0);
+            });
 
-    // Botón de música
-    domElements.musicToggleBtn.addEventListener('click', toggleMusic);
-
-    // Botones del panel de juego
-    domElements.combatBtn.addEventListener('click', () => startCombat());
-    domElements.bossCombatBtn.addEventListener('click', () => startBossCombat());
-    domElements.questsBtn.addEventListener('click', openQuestsModal);
-    domElements.trainSkillBtn.addEventListener('click', openTrainingModal);
-    domElements.inventoryBtn.addEventListener('click', openInventoryModal);
-    domElements.shopBtn.addEventListener('click', openShopModal);
-    domElements.blacksmithBtn.addEventListener('click', openBlacksmithModal);
-    domElements.playerStatsBtn.addEventListener('click', openPlayerStatsModal);
-    domElements.floorNavigateBtn.addEventListener('click', openFloorNavigationModal);
-    domElements.adminAccessBtn.addEventListener('click', openAdminPanel);
-    domElements.saveGameBtn.addEventListener('click', saveGame);
-    domElements.loadGameBtn.addEventListener('click', loadGame);
-    domElements.newGameBtn.addEventListener('click', confirmResetProgress);
-
-    // Botones de modales (cerrar)
-    domElements.closeInfoModalBtn.addEventListener('click', () => closeModal('infoModal'));
-    domElements.closeInventoryModalBtn.addEventListener('click', () => closeModal('inventoryModal'));
-    domElements.closeShopModalBtn.addEventListener('click', () => closeModal('shopModal'));
-    domElements.closeBlacksmithModalBtn.addEventListener('click', () => closeModal('blacksmithModal'));
-    domElements.closePlayerStatsModalBtn.addEventListener('click', () => closeModal('playerStatsModal'));
-    domElements.closeCombatModalBtn.addEventListener('click', () => closeModal('combatModal'));
-    domElements.closeNameEntryModalBtn.addEventListener('click', () => closeModal('nameEntryModal'));
-    domElements.closeFloorNavModalBtn.addEventListener('click', () => closeModal('floorNavigationModal'));
-    domElements.closeTrainingModalBtn.addEventListener('click', () => closeModal('trainingModal'));
-    domElements.closeQuestsModalBtn.addEventListener('click', () => closeModal('questsModal'));
-    domElements.closeAdminKeyModalBtn.addEventListener('click', () => closeModal('adminKeyModal'));
-    domElements.closeAdminPanelModalBtn.addEventListener('click', () => closeModal('adminPanelModal'));
-
-
-    // Modal de entrada de nombre de jugador
-    domElements.submitPlayerNameBtn.addEventListener('click', () => {
-        const playerName = domElements.playerNameInput.value.trim();
-        if (playerName) {
-            player.name = playerName;
-            updatePlayerHUD();
-            saveGame();
-            closeModal('nameEntryModal');
-        } else {
-            showNotification('Por favor, ingresa un nombre válido.', 'error');
-        }
-    });
-
-    // Panel de administración - Event Listeners
-    domElements.submitAdminKeyBtn.addEventListener('click', checkAdminKey);
-
-    domElements.adminSetLevelBtn.addEventListener('click', adminActions.setLevel);
-    domElements.adminGiveExpBtn.addEventListener('click', adminActions.giveExp);
-    domElements.adminGiveColBtn.addEventListener('click', adminActions.giveCol);
-    domElements.adminSetBaseAtkBtn.addEventListener('click', () => adminActions.setStat('baseAttack', 'adminSetBaseAtkValue'));
-    domElements.adminSetBaseDefBtn.addEventListener('click', () => adminActions.setStat('baseDefense', 'adminSetBaseDefValue'));
-    domElements.adminSetBaseMaxHpBtn.addEventListener('click', () => adminActions.setStat('baseMaxHp', 'adminSetBaseMaxHpValue'));
-    domElements.adminSetBaseMaxMpBtn.addEventListener('click', () => adminActions.setStat('baseMaxMp', 'adminSetBaseMaxMpValue'));
-    domElements.adminShowItemDetailsBtn.addEventListener('click', adminActions.showItemDetails);
-    domElements.adminGiveItemBtn.addEventListener('click', adminActions.giveItem);
-    domElements.adminItemQuickSelect.addEventListener('change', adminActions.selectItemFromList);
-    domElements.adminGrantFloorAccessBtn.addEventListener('click', adminActions.grantFloorAccess);
-    domElements.adminRevokeFloorAccessBtn.addEventListener('click', adminActions.revokeFloorAccess);
-    domElements.adminLoadQuestForEditingBtn.addEventListener('click', adminActions.loadQuestDefinitionForEditing);
-    domElements.adminDeleteQuestDefinitionBtn.addEventListener('click', adminActions.deleteQuestDefinition);
-    domElements.adminSaveQuestDefinitionBtn.addEventListener('click', adminActions.saveQuestDefinition);
-    domElements.adminClearQuestDefinitionFormBtn.addEventListener('click', adminActions.clearQuestDefinitionForm);
-    domElements.adminPlayerQuestSelect.addEventListener('change', () => showQuestDetails(domElements.adminPlayerQuestSelect.value, 'admin'));
-    domElements.adminCompletePlayerQuestBtn.addEventListener('click', adminActions.completePlayerQuest);
-    domElements.adminResetPlayerQuestBtn.addEventListener('click', adminActions.resetPlayerQuest);
-
-
-    // Wiki - Manejo de clicks en las tarjetas para mostrar info (delegación de eventos)
-    document.querySelectorAll('.card-grid, #floors-info-container, #guilds-info-container').forEach(container => {
-        container.addEventListener('click', (event) => {
-            const card = event.target.closest('.card');
-            if (card) {
-                const type = card.dataset.wikiType;
-                const id = card.dataset.wikiId;
-                if (type && id) {
-                    showWikiInfo(type, id);
-                }
+            if (availableSkills.length === 0) {
+                skillContainer.innerHTML = '<p>No has aprendido habilidades.</p>';
+            } else {
+                availableSkills.forEach(skillRef => {
+                    const skillFullData = skillData[skillRef.id] || skillRef;
+                    const skillBtn = document.createElement('button');
+                    skillBtn.className = 'action-btn tooltip';
+                    let mpCost = Math.max(0, Math.floor(skillFullData.mpCost * (1 - (player.tempMpCostReduction || 0))));
+                    skillBtn.innerHTML = `${skillFullData.icon || '✨'} ${skillFullData.name} (${mpCost} MP) <span class="tooltiptext">${skillFullData.description || 'Sin descripción'}</span>`;
+                    skillBtn.onclick = () => usePlayerSkill(skillFullData.id);
+                    skillBtn.disabled = player.mp < mpCost || (skillFullData.requiresCombo && player.attackComboCount < 2);
+                    skillContainer.appendChild(skillBtn);
+                });
             }
-        });
-    });
+            skillContainer.style.display = skillContainer.style.display === 'none' || !skillContainer.style.display ? 'flex' : 'none';
+        };
+    }
 
+    if (domElements.combatActionPotionsBtn) {
+        domElements.combatActionPotionsBtn.onclick = () => {
+            if(domElements.combatSkillsListContainer) domElements.combatSkillsListContainer.style.display = 'none';
+            const potionContainer = domElements.combatPotionsListContainer;
+            if (!potionContainer) return;
+            potionContainer.innerHTML = '';
+            const potions = player.inventory.filter(item => {
+                const itemBase = baseItems[item.id];
+                return itemBase && itemBase.type === 'consumable' && (itemBase.effect?.hp || itemBase.effect?.mp || itemBase.effect?.cure);
+            });
 
-    // Lógica específica para el botón de entrenamiento (ya que su texto depende del costo)
-    domElements.trainSkillBtn.addEventListener('click', openTrainingModal);
+            if (potions.length === 0) {
+                potionContainer.innerHTML = '<p>No tienes pociones.</p>';
+            } else {
+                potions.forEach((potionInstance) => { 
+                    const itemBase = baseItems[potionInstance.id];
+                    const originalIndex = player.inventory.findIndex(invItem => invItem.id === potionInstance.id); // Busca por ID, puede ser frágil si hay items idénticos no apilados. Idealmente el objeto potionInstance sería la referencia directa.
+                    
+                    const potionBtn = document.createElement('button');
+                    potionBtn.className = 'action-btn tooltip';
+                    potionBtn.innerHTML = `${itemBase.icon || '🧪'} ${itemBase.name} (x${potionInstance.count}) <span class="tooltiptext">${itemBase.description || 'Sin descripción'}</span>`;
+                    potionBtn.onclick = () => useCombatPotion(originalIndex); // `useCombatPotion` debe estar preparado para manejar el índice o el ID.
+                    potionContainer.appendChild(potionBtn);
+                });
+            }
+            potionContainer.style.display = potionContainer.style.display === 'none' || !potionContainer.style.display ? 'flex' : 'none';
+        };
+    }
 
     // Activar enlace "Juego" por defecto en la navegación
-    setActiveLink(domElements.navGameLink);
+    const gamePanelLink = document.querySelector('.nav-links a[href="#game-panel"]');
+    if (gamePanelLink && typeof setActiveLink === 'function') {
+        setActiveLink(gamePanelLink);
+    }
 
     console.log("Game initialized and ready. If you see errors, ensure you are using a local web server.");
 });
