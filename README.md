@@ -1,5 +1,4 @@
 # pagina-Sao
-
 ⚔️ Sword Art Online: Aincrad Chronicles
 ¡Link Start! Bienvenido a Aincrad Chronicles, un juego de rol (RPG) basado en navegador e inspirado en el icónico universo de Sword Art Online. Este proyecto te permite experimentar una versión simplificada de la lucha por la supervivencia dentro del castillo flotante de Aincrad. Crea tu personaje, combate contra monstruos, derrota a los jefes de piso y equípate con armas legendarias para avanzar a través de los 100 niveles.
 
