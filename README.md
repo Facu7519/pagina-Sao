@@ -5,7 +5,7 @@
 
 ![wp2458466-sword-art-online-hd-wallpapers](https://github.com/user-attachments/assets/8541780a-3c09-43ae-94f6-4d94b985c745)
 
-Este proyecto web está construido enteramente con HTML, CSS y JavaScript vainilla, demostrando la capacidad de crear experiencias de juego complejas sin necesidad de frameworks pesados.
+Este proyecto web está construido enteramente con HTML, CSS y JavaScript vainilla, demostrando la capacidad de crear experiencias de juego "complejas" sin necesidad de frameworks pesados.
 
 📜 Índice
 Introducción al Juego
