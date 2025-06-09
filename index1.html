@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sword Art Online: Aincrad Chronicles</title>
+    <!-- Links de fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Enlace a archivos CSS´S  -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <button id="toggle-header-btn" aria-label="Ocultar/Mostrar encabezado">
+        <i class="fas fa-arrow-up"></i> </button>
+
+    <audio id="background-music" loop src="sao_theme.mp3"></audio>
+
+    <div class="floating-particles" id="particles"></div>
+    <div class="floating-particles" id="particles"></div>
+    <div id="notification-area"></div>
+
+    <header>
+        <nav class="container"> 
+            <a
+             href="#top" class="logo-link"> <div class="logo">⚔️ AINCRAD</div>
+            </a>
+            <div class="nav-links">
+                <a href="#wiki-personajes" onclick="setActiveLink(this)">Personajes</a>
+                <a href="#wiki-arsenal" onclick="setActiveLink(this)">Arsenal</a>
+                <a href="#wiki-pisos" onclick="setActiveLink(this)">Pisos</a>
+                <a href="#wiki-gremios" onclick="setActiveLink(this)">Gremios</a>
+                <a href="#game-panel" onclick="setActiveLink(this)">Juego</a>
+                <button id="music-toggle-btn">🔊 Música</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>SWORD ART ONLINE</h1>
+            <p class="hero-subtitle">Link Start! Adéntrate en el castillo flotante de Aincrad.</p>
+            <div class="hero-stats">
+                <div class="stat-item"><span class="stat-number" id="trapped-players-stat">10,000</span><span class="stat-label">Atrapados</span></div>
+                <div class="stat-item"><span class="stat-number" id="total-floors-stat">100</span><span class="stat-label">Pisos</span></div>
+                <div class="stat-item"><span class="stat-number" id="start-year-stat">2022</span><span class="stat-label">Inicio</span></div>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content container">
+        <section id="game-panel" class="interactive-panel">
+            <h2 class="panel-title">Tu Aventura en Aincrad</h2>
+            <div class="floor-display">Piso: <span id="current-floor">1</span> - <span id="floor-name">Bosque del Inicio</span></div>
+
+            <div class="sao-player-hud">
+                <div class="sao-hud-info">
+                    <div class="sao-player-name" id="sao-player-name-display">Jugador</div>
+                    <div class="sao-hp-bar-container">
+                        <div class="sao-hp-bar-fill" id="sao-hp-bar"></div>
+                    </div>
+                </div>
+                <div class="sao-hud-stats">
+                    <div class="sao-hp-text"><span id="player-hp-current">100</span>/<span id="player-hp-max">100</span></div>
+                    <div class="sao-player-level">LV: <span id="player-level">1</span></div>
+                </div>
+                <!-- Status effects display for player -->
+                <div class="status-effects-display" id="player-status-effects-display"></div>
+            </div>
+            
+            <div class="resource-label">MP: <span id="player-mp-current">50</span>/<span id="player-mp-max">50</span></div>
+            <div class="resource-bar-container">
+                <div class="resource-bar-fill" id="mp-bar-fill" style="width: 100%"></div>
+            </div>
+
+            <div class="resource-label">EXP: <span id="current-exp">0</span> / <span id="needed-exp">100</span></div>
+            <div class="resource-bar-container">
+                <div class="resource-bar-fill" id="exp-bar-fill" style="width: 0%"></div>
+            </div>
+            
+            <div class="col-display">Col: <span id="player-col">0</span> 💰</div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" id="combat-btn">🗡️ Combatir</button>
+                <button class="action-btn" id="boss-combat-btn">👹 Jefe del Piso</button>
+                <button class="action-btn" id="train-skill-btn">⚔️ Entrenar (<span id="train-cost-display">50</span>) Col</button>
+                <button class="action-btn" id="inventory-btn">🎒 Inventario</button> 
+                <button class="action-btn shop-btn" id="shop-btn">🛒 Tienda</button>
+                <button class="action-btn blacksmith-btn" id="blacksmith-btn">🛠️ Herrería</button>
+                <button class="action-btn" id="player-stats-btn">📊 Mis Stats</button>
+                <button class="action-btn" id="floor-navigate-btn">🗺️ Desplazarse entre Pisos</button>
+                <button class="action-btn" id="admin-access-btn">🔑 Admin</button> <!-- Nuevo Botón Admin -->
+                <button class="action-btn" onclick="saveGame()">💾 Guardar</button>
+                <button class="action-btn" onclick="loadGame()">📂 Cargar</button>
+                <button class="action-btn" onclick="confirmResetProgress()">🔄 Nuevo Juego</button>
+            </div>
+        </section>
+
+        <section id="wiki-personajes" class="section">
+            <h2 class="section-title">Personajes Clave</h2>
+            <div class="card-grid" id="characters-grid-display">
+                </div>
+        </section>
+
+        <section id="wiki-arsenal" class="section">
+            <h2 class="section-title">Arsenal Legendario</h2>
+            <div class="card-grid" id="weapons-grid-display">
+                </div>
+        </section>
+        
+        <section id="wiki-pisos" class="section">
+            <h2 class="section-title">Pisos de Aincrad</h2>
+            <div id="floors-info-container">
+                 <p style="text-align:center;">Explora los diversos y peligrosos pisos del castillo flotante.</p>
+                 </div>
+        </section>
+
+        <section id="wiki-gremios" class="section">
+            <h2 class="section-title">Gremios Notables</h2>
+            <div id="guilds-info-container">
+                <p style="text-align:center;">Los gremios forman la espina dorsal de la sociedad de jugadores en Aincrad.</p>
+                </div>
+        </section>
+
+        <section id="wiki-mecanicas" class="section">
+            <h2 class="section-title">Mecánicas del Juego</h2>
+            <div id="mechanics-info-container" class="card-grid">
+                 <div class="card" style="cursor:default;">
+                    <div class="card-icon">🎮</div> <h3 class="card-name">NerveGear</h3>
+                    <p class="card-description">El dispositivo de Inmersión Total (FullDive) que transportó a los jugadores a SAO. Una maravilla tecnológica con una trampa mortal: si tu HP llega a cero en el juego, o si intentan quitarte el casco en el mundo real, un emisor de microondas de alta potencia destruirá tu cerebro.</p>
+                </div>
+                <div class="card" style="cursor:default;">
+                    <div class="card-icon">💀</div> <h3 class="card-name">Muerte Real</h3>
+                    <p class="card-description">La consecuencia más aterradora de SAO. La muerte en el juego es permanente y significa la muerte en la vida real. Esto crea una tensión constante y hace que cada decisión, cada combate, sea crucial para la supervivencia.</p>
+                </div>
+                 <div class="card" style="cursor:default;">
+                    <div class="card-icon">🏰</div> <h3 class="card-name">Aincrad</h3>
+                    <p class="card-description">El castillo flotante de hierro y piedra, el escenario principal de SAO. Consta de 100 pisos, cada uno con su propio ecosistema, ciudades, mazmorras y un jefe formidable. Para escapar del juego, los jugadores deben conquistar el piso 100.</p>
+                </div>
+                <div class="card" style="cursor:default;">
+                    <div class="card-icon">✨</div> <h3 class="card-name">Habilidades de Espada</h3>
+                    <p class="card-description">Sistemas predefinidos de movimientos de espada que se activan al realizar ciertas posturas o gestos. Varían desde simples estocadas hasta complejas combinaciones de múltiples golpes. Dominarlas es clave para el combate.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Información General -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" onclick="closeModal('infoModal')">&times;</span>
+            <div id="modal-body-content"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Inventario -->
+    <div id="inventoryModal" class="modal">
+        <div class="modal-content large inventory-content">
+            <span class="close-modal-btn" onclick="closeModal('inventoryModal')">&times;</span>
+            <h2>🎒 Tu Inventario</h2>
+            <div class="inventory-sections">
+                <div class="inventory-grid-container">
+                    <h3>Objetos</h3>
+                    <div class="inventory-grid" id="inventory-grid-display"></div>
+                </div>
+                <div class="player-equipment-container">
+                    <div class="player-equipment">
+                        <h3>🛡️ Equipo Actual</h3>
+                        <div class="equipment-slots">
+                            <div class="equipment-slot" id="equip-weapon" data-slot="weapon"></div>
+                            <div class="equipment-slot" id="equip-shield" data-slot="shield"></div>
+                            <div class="equipment-slot" id="equip-armor" data-slot="armor"></div>
+                            <div class="equipment-slot" id="equip-accessory" data-slot="accessory"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Tienda -->
+    <div id="shopModal" class="modal">
+        <div class="modal-content large shop-content">
+            <span class="close-modal-btn" onclick="closeModal('shopModal')">&times;</span>
+            <h2>🛒 Tienda del Piso <span id="shop-floor-number">1</span></h2>
+            <p style="text-align:center; margin-bottom:1rem;">Tu Saldo: <span id="shop-player-col" style="color:#FFD700; font-weight:bold;">0</span> Col</p>
+            <div class="shop-items-container">
+                <h3>Artículos Disponibles</h3>
+                <div class="shop-grid" id="shop-grid-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Herrería -->
+    <div id="blacksmithModal" class="modal">
+        <div class="modal-content large blacksmith-content">
+            <span class="close-modal-btn" onclick="closeModal('blacksmithModal')">&times;</span>
+            <h2>🛠️ Herrería del Piso <span id="blacksmith-floor-number">1</span></h2>
+            <p style="text-align:center; margin-bottom:1rem;">Tu Saldo: <span id="blacksmith-player-col" style="color:#FFD700; font-weight:bold;">0</span> Col</p>
+            <div class="blacksmith-sections">
+                <div class="blacksmith-recipes-container">
+                    <h3>Recetas de Forja</h3>
+                    <div class="blacksmith-grid" id="blacksmith-grid-display"></div>
+                </div>
+                <div class="blacksmith-materials-info">
+                    <h3>📦 Tus Materiales</h3>
+                    <ul id="player-materials-list">
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Estadísticas del Jugador -->
+    <div id="playerStatsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" onclick="closeModal('playerStatsModal')">&times;</span>
+            <h2>📊 Estadísticas de <span id="stats-player-name">Jugador</span></h2>
+            
+            <div class="stats-category">
+                <h3>Atributos Principales</h3>
+                <div class="stat-line"><span class="stat-label">Nivel:</span> <span id="stats-level" class="stat-value">1</span></div>
+                <div class="stat-line"><span class="stat-label">HP:</span> <span id="stats-hp" class="stat-value">100 / 100</span></div>
+                <div class="stat-line"><span class="stat-label">MP:</span> <span id="stats-mp" class="stat-value">50 / 50</span></div>
+                <div class="stat-line"><span class="stat-label">EXP:</span> <span id="stats-exp" class="stat-value">0 / 100</span></div>
+                <div class="stat-line"><span class="stat-label">Col:</span> <span id="stats-col" class="stat-value">0</span></div>
+            </div>
+
+            <div class="stats-category">
+                <h3>Combate</h3>
+                <div class="stat-line"><span class="stat-label">Ataque Base:</span> <span id="stats-base-atk" class="stat-value">0</span></div>
+                <div class="stat-line"><span class="stat-label">Defensa Base:</span> <span id="stats-base-def" class="stat-value">0</span></div>
+                <div class="stat-line"><span class="stat-label">Ataque Equip.:</span> <span id="stats-equip-atk" class="stat-value">0</span></div>
+                <div class="stat-line"><span class="stat-label">Defensa Equip.:</span> <span id="stats-equip-def" class="stat-value">0</span></div>
+                <div class="stat-line"><span class="stat-label">HP Equip.:</span> <span id="stats-equip-hp" class="stat-value">0</span></div>
+                <hr style="border-color: rgba(70,130,180,0.3); margin: 0.5rem 0;">
+                <div class="stat-line"><span class="stat-label"><strong>Ataque Total:</strong></span> <span id="stats-total-atk" class="stat-value"><strong>0</strong></span></div>
+                <div class="stat-line"><span class="stat-label"><strong>Defensa Total:</strong></span> <span id="stats-total-def" class="stat-value"><strong>0</strong></span></div>
+            </div>
+             <div class="stats-category">
+                <h3>Habilidades Aprendidas</h3>
+                <ul id="stats-skills-list" style="list-style-type: '❖ '; padding-left: 20px;">
+                    </ul>
+            </div>
+            <div class="stats-category">
+                <h3>Habilidades Pasivas</h3>
+                <ul id="stats-passive-skills-list" style="list-style-type: '🌟 '; padding-left: 20px;">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Combate -->
+    <div id="combatModal" class="modal">
+        <div class="modal-content xlarge">
+            <span class="close-modal-btn" onclick="closeModal('combatModal')">&times;</span>
+            <h2 id="combat-title">¡Combate!</h2>
+            <div class="combat-arena">
+                <div class="combatant-display" id="combat-player-display">
+                    <h3 id="combat-player-name">Jugador</h3>
+                    <div class="combatant-icon">
+                        <img src="https://1.bp.blogspot.com/-nbJQwJhSNUA/UXusEdjyxxI/AAAAAAAAACg/HDkAnGAH3s0/s1600/sao_ep9_dualwield_kirito_oa.png" alt="Imagen de Kirito en combate">
+                    </div>
+                    <div class="combat-hp-bar-container">
+                        <div class="combat-hp-bar-fill" id="combat-player-hp-bar">100/100</div>
+                    </div>
+                    <div class="combat-hp-text">HP: <span id="combat-player-hp-current">100</span>/<span id="combat-player-hp-max">100</span></div>
+                    <div class="combat-hp-text">MP: <span id="combat-player-mp-current">50</span>/<span id="combat-player-mp-max">50</span></div>
+                    <div class="combat-stats-preview">ATK: <span id="combat-player-atk">5</span> | DEF: <span id="combat-player-def">2</span></div>
+                    <div class="status-effects-display" id="combat-player-status-effects-display"></div>
+                </div>
+                <div class="combatant-display" id="combat-enemy-display">
+                    <h3 id="combat-enemy-name">Enemigo</h3>
+                    <div class="combatant-icon" id="combat-enemy-icon">❓</div>
+                    <div class="combat-hp-bar-container">
+                        <div class="combat-hp-bar-fill" id="combat-enemy-hp-bar-fill">100/100</div> <!-- Changed ID here -->
+                    </div>
+                    <div class="combat-hp-text">HP: <span id="combat-enemy-hp-current">100</span>/<span id="combat-enemy-hp-max">100</span></div>
+                     <div class="combat-stats-preview">ATK: <span id="combat-enemy-atk">0</span> | DEF: <span id="combat-enemy-def">0</span></div>
+                     <div class="status-effects-display" id="combat-enemy-status-effects-display"></div>
+                </div>
+            </div>
+            <div class="combat-actions">
+                <button class="action-btn" id="combat-action-attack">🗡️ Atacar</button>
+                <button class="action-btn" id="combat-action-skills">✨ Habilidades</button>
+                <button class="action-btn" id="combat-action-potions">🧪 Pociones</button>
+                <button class="action-btn" id="combat-action-flee" style="background: linear-gradient(180deg, #ffc107, #f0ad4e); border-bottom-color: #d58512;">🏃 Huir</button>
+            </div>
+            <div id="combat-skills-list-container" class="skills-list" style="display:none;"></div>
+            <div id="combat-potions-list-container" class="potions-list" style="display:none;"></div>
+            <div class="combat-log" id="combat-log-display">
+                <p class="system-message">Esperando acción...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Entrada de Nombre -->
+    <div id="nameEntryModal" class="modal">
+        <div class="modal-content">
+            <h2>Elige el Nombre de tu Personaje</h2>
+            <p>Ingresa el nombre que usarás en Aincrad. (Máx. 15 caracteres, solo letras y números)</p>
+            <input type="text" id="playerNameInput" maxlength="15" placeholder="Tu Nombre Aquí">
+            <button class="action-btn" id="submitPlayerNameBtn">Confirmar Nombre</button>
+        </div>
+    </div>
+
+    <!-- Modal de Navegación entre Pisos -->
+    <div id="floorNavigationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" onclick="closeModal('floorNavigationModal')">&times;</span>
+            <h2>🗺️ Desplazarse entre Pisos</h2>
+            <p style="text-align:center; margin-bottom:1rem;">Selecciona un piso al que quieras viajar.</p>
+            <div id="floor-select-grid" class="floor-select-grid">
+                <!-- Floor buttons will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Entrenamiento -->
+    <div id="trainingModal" class="modal">
+        <div class="modal-content large training-content">
+            <span class="close-modal-btn" onclick="closeModal('trainingModal')">&times;</span>
+            <h2>⚔️ Entrenar Habilidades</h2>
+            <p style="text-align:center; margin-bottom:1rem;">Tu Saldo: <span id="training-player-col" style="color:#FFD700; font-weight:bold;">0</span> Col</p>
+            <div class="training-sections">
+                <div class="training-info-container">
+                    <h3>Opciones de Entrenamiento</h3>
+                    <div class="training-grid" id="training-grid-display">
+                        <!-- Training options will be rendered here -->
+                    </div>
+                </div>
+                <div class="training-details-container">
+                    <h3>📈 Ganancias Estimadas</h3>
+                    <ul id="training-stats-preview">
+                        <li>Ataque: +1</li>
+                        <li>Defensa: +0-2</li>
+                        <li>HP Máx: +5</li>
+                        <li>MP Máx: +2</li>
+                    </ul>
+                    <p style="margin-top:1rem; font-size:0.9em; color:#b0c4de;">El entrenamiento mejora tus atributos base. El costo aumenta con tu nivel.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Clave de Administrador -->
+    <div id="adminKeyModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-modal-btn" onclick="closeModal('adminKeyModal')">&times;</span>
+            <h2>Acceso de Administrador</h2>
+            <p>Ingresa la clave de administrador:</p>
+            <input type="password" id="adminKeyValue" placeholder="Clave Secreta" style="width: calc(100% - 20px); padding: 10px; margin: 10px auto; display:block; border-radius: 5px; border: 1px solid #555; background-color: #222; color: #fff;">
+            <button class="action-btn" id="submitAdminKeyBtn" style="display:block; margin: 10px auto;">Entrar</button>
+            <p id="adminKeyErrorMsg" style="color: #ff6b6b; text-align: center; margin-top: 10px; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- Modal del Panel de Administrador -->
+    <div id="adminPanelModal" class="modal">
+        <div class="modal-content xlarge"> <!-- Usar xlarge para más espacio -->
+            <span class="close-modal-btn" onclick="closeModal('adminPanelModal')">&times;</span>
+            <h2>Panel de Administrador</h2>
+
+            <div class="admin-sections-container">
+
+                <!-- Sección: Jugador -->
+                <div class="admin-section">
+                    <h3>Jugador</h3>
+                    <div>
+                        <label for="adminSetLevelValue">Nivel:</label>
+                        <input type="number" id="adminSetLevelValue" min="1" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setLevel()">Establecer Nivel</button>
+                    </div>
+                    <div>
+                        <label for="adminGiveExpValue">Dar EXP:</label>
+                        <input type="number" id="adminGiveExpValue" min="0" style="width: 100px;">
+                        <button class="action-btn small-btn" onclick="adminActions.giveExp()">Dar EXP</button>
+                    </div>
+                    <div>
+                        <label for="adminGiveColValue">Dar Col:</label>
+                        <input type="number" id="adminGiveColValue" min="0" style="width: 100px;">
+                        <button class="action-btn small-btn" onclick="adminActions.giveCol()">Dar Col</button>
+                    </div>
+
+                    <h4>Estadísticas Base:</h4>
+                    <div>
+                        <label for="adminSetBaseAtkValue">Ataque Base:</label>
+                        <input type="number" id="adminSetBaseAtkValue" min="0" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseAttack', 'adminSetBaseAtkValue')">Establecer</button>
+                    </div>
+                    <div>
+                        <label for="adminSetBaseDefValue">Defensa Base:</label>
+                        <input type="number" id="adminSetBaseDefValue" min="0" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseDefense', 'adminSetBaseDefValue')">Establecer</button>
+                    </div>
+                    <div>
+                        <label for="adminSetBaseMaxHpValue">HP Máx. Base:</label>
+                        <input type="number" id="adminSetBaseMaxHpValue" min="1" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseMaxHp', 'adminSetBaseMaxHpValue')">Establecer</button>
+                    </div>
+                    <div>
+                        <label for="adminSetBaseMaxMpValue">MP Máx. Base:</label>
+                        <input type="number" id="adminSetBaseMaxMpValue" min="0" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.setStat('baseMaxMp', 'adminSetBaseMaxMpValue')">Establecer</button>
+                    </div>
+                </div>
+
+                <!-- Sección: Items -->
+                <div class="admin-section">
+                    <h3>Items</h3>
+                    <div>
+                        <label for="adminItemIdValue">ID del Item:</label>
+                        <input type="text" id="adminItemIdValue" placeholder="ej: healing_potion_s" style="width: 180px;">
+                        <button class="action-btn small-btn" onclick="adminActions.showItemDetails()">Ver Detalles</button>
+                    </div>
+                    <div id="adminItemDetailsPreview">Detalles del item aparecerán aquí...</div>
+                    
+                    <div>
+                        <label for="adminItemQuantityValue">Cantidad:</label>
+                        <input type="number" id="adminItemQuantityValue" min="1" value="1" style="width: 80px;">
+                        <button class="action-btn small-btn" onclick="adminActions.giveItem()">Dar Item</button>
+                    </div>
+                    
+                    <h4>Lista de Items (Referencia):</h4>
+                    <select id="adminItemQuickSelect" size="6" style="width: 100%; background: #222; color: #fff; border-radius: 5px; padding: 5px; margin-top:5px;">
+                        <!-- Opciones se llenarán con JS -->
+                    </select>
+                    <button class="action-btn small-btn" onclick="adminActions.selectItemFromList()" style="margin-top: 5px;">Usar ID Seleccionado</button>
+                </div>
+
+                <!-- Sección: Pisos -->
+                <div class="admin-section">
+                    <h3>Acceso a Pisos</h3>
+                    <div>
+                        <label for="adminFloorNumberValue">Número de Piso:</label>
+                        <input type="number" id="adminFloorNumberValue" min="1" max="100" style="width: 80px;"> 
+                        <button class="action-btn small-btn" onclick="adminActions.grantFloorAccess()">Dar Acceso</button>
+                        <button class="action-btn small-btn" onclick="adminActions.revokeFloorAccess()">Quitar Acceso</button>
+                    </div>
+                    
+                    <h4>Pisos Desbloqueados:</h4>
+                    <div id="adminUnlockedFloorsList">Cargando...</div>
+                </div>
+            </div>
+            <p id="adminPanelMessage" style="display: none;"></p> <!-- Mensaje de feedback -->
+        </div>
+    </div>
+
+    <div id="mobSelectionModal" class="modal">
+    <div class="modal-content sao-panel">
+        <span class="close-modal-btn" onclick="ui.closeModal('mobSelectionModal')">&times;</span>
+        <h2 class="panel-title">Selecciona un Enemigo</h2>
+        <div id="mobListContainer" class="mob-list-grid">
+            </div>
+        <p id="mobSelectionMessage" class="modal-message"></p>
+    </div>
+</div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
