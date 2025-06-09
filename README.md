@@ -261,3 +261,5 @@ Este proyecto es un humilde homenaje hecho por y para fans, celebrando el incre�
 Todos los personajes, la historia, los nombres y los derechos relacionados con el universo de Sword Art Online pertenecen a sus respectivos creadores, editoriales y propietarios. No se pretende infringir ningún derecho de autor.
 
 ¡Gracias por jugar y que disfrutes tu estancia en Aincrad!
+
+https://facu7519.github.io/pagina-Sao/
