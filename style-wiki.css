@@ -212,12 +212,13 @@ header .container {
     animation: breatheGlow 3s infinite alternate ease-in-out;
 
     /* Transiciones suaves para todas las propiedades relevantes */
-    transition: color 0.3s ease-in-out,
-                border-color 0.3s ease-in-out,
-                background-color 0.3s ease-in-out,
-                box-shadow 0.3s ease-in-out,
-                filter 0.3s ease,
-                transform 0.08s ease; /* Transición para el scale en active */
+    /* ¡AQUÍ ESTÁ LA CLAVE PARA LA SUAVIDAD EN EL CAMBIO DE MÚSICA, INCLUYENDO EL COLOR DEL TEXTO! */
+    transition: color 0.2s ease-in-out, /* Aumentado a 0.5s para más suavidad en el texto */
+                border-color 0.4s ease-in-out,
+                background-color 0.4s ease-in-out,
+                box-shadow 0.5s ease-in-out, /* Más lento para una transición más suave */
+                filter 0.5s ease-in-out,    /* Más lento para una transición más suave */
+                transform 0.08s ease; /* Rápido para el feedback de click */
     
     /* Pseudo-elemento para el efecto de "halo" o brillo que recorre el botón (en hover) */
     /* Este SÍ se mueve, pero SOLO en hover */
@@ -329,8 +330,8 @@ header .container {
     /* Sombra compleja para el estado activo: múltiples capas para un efecto "vibrante" */
     box-shadow: 
         0 0 20px rgba(0, 255, 255, 1), /* Capa base cian súper intensa */
-        0 0 35px rgba(0, 255, 255, 0.8), /* Capa cian más difusa */
-        0 0 50px rgba(255, 255, 255, 0.6); /* Capa blanca sutil para profundidad */
+        0 0 35px rgba(0, 255, 255, 0.8), 
+        0 0 50px rgba(255, 255, 255, 0.6); 
     
     /* Animación de "pulso vibrante" para el estado activo */
     animation: pulseVibrantGlow 2s infinite alternate ease-in-out; 
@@ -340,24 +341,23 @@ header .container {
         content: ''; 
         position: absolute;
         top: 0;
-        left: 0; /* Lo fijamos en su lugar, no se mueve */
+        left: 0; 
         width: 100%;
         height: 100%;
-        background: transparent; /* Ahora el ::before no tiene background constante */
-        transition: none; /* Desactivamos transiciones de hover */
-        animation: none; /* Desactivamos cualquier animación de movimiento para ::before */
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3) inset, 0 0 20px rgba(0, 255, 255, 0.1) inset; /* Brillo interno sutil */
-        border-radius: 5px; /* Para que coincida con el botón */
+        background: transparent; 
+        transition: none; 
+        animation: none; 
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3) inset, 0 0 20px rgba(0, 255, 255, 0.1) inset; 
+        border-radius: 5px; 
         z-index: -1;
     }
-    /* El ::after del .music-active ahora ya NO es la onda de energía. Vuelve a ser el fondo base de after. */
-    /* Lo que haremos es asegurarnos de que no interfiera y que la animación de click lo pueda usar. */
+    
     &::after {
-        opacity: 0.1; /* Sutil fondo constante */
+        opacity: 0.1; 
         transform: scale(1);
         background-color: var(--sao-cyan-hud, #87ceeb);
-        transition: none; /* Desactivamos transiciones para que el click lo pueda usar */
-        animation: none; /* Sin animaciones constantes aquí */
+        transition: none; 
+        animation: none; 
     }
 }
 
@@ -366,11 +366,11 @@ header .container {
     color: var(--sao-bright-white, #ffffff); 
     /* Intensifica el brillo activo al hover */
     box-shadow: 
-        0 0 35px rgba(0, 255, 255, 1.2), /* Cian aún más potente */
-        0 0 60px rgba(0, 255, 255, 1), /* Cian más difuso, casi explosivo */
-        0 0 80px rgba(255, 255, 255, 0.8); /* Blanco más notorio y difuso */
-    animation: none; /* Pausar las animaciones constantes en hover */
-    filter: brightness(1.2) saturate(1.3); /* Un extra de brillo y saturación */
+        0 0 35px rgba(0, 255, 255, 1.2), 
+        0 0 60px rgba(0, 255, 255, 1), 
+        0 0 80px rgba(255, 255, 255, 0.8); 
+    animation: none; 
+    filter: brightness(1.2) saturate(1.3); 
 }
 
 
@@ -390,7 +390,7 @@ header .container {
             0 0 25px rgba(0, 255, 255, 1.1), 
             0 0 40px rgba(0, 255, 255, 0.9), 
             0 0 55px rgba(255, 255, 255, 0.7); 
-        filter: hue-rotate(8deg) saturate(1.3); /* Cambia a un cian-verde, más saturado */
+        filter: hue-rotate(8deg) saturate(1.3); 
     }
     50% { 
         box-shadow: 
@@ -404,7 +404,7 @@ header .container {
             0 0 25px rgba(0, 255, 255, 1.1), 
             0 0 40px rgba(0, 255, 255, 0.9), 
             0 0 55px rgba(255, 255, 255, 0.7); 
-        filter: hue-rotate(-8deg) saturate(1.3); /* Cambia a un cian-púrpura, más saturado */
+        filter: hue-rotate(-8deg) saturate(1.3); 
     }
     100% { 
         box-shadow: 
