@@ -504,25 +504,72 @@
             turnCount: 0, 
         };
 
-        // ===============================================
-        //           MÚSICA DE FONDO (Archivo de Audio)
+// ===============================================
+        //            MÚSICA DE FONDO (Archivo de Audio)
         // ===============================================
         const backgroundMusic = document.getElementById('background-music');
         const musicToggleBtn = document.getElementById('music-toggle-btn'); 
 
-        backgroundMusic.volume = 0.3;
+        // Solo procede si ambos elementos (audio y botón) existen en el DOM
+        if (backgroundMusic && musicToggleBtn) {
+            backgroundMusic.volume = 0.3; // Establece el volumen inicial
 
-        function toggleMusic() {
-            if (backgroundMusic.paused) {
-                backgroundMusic.play().catch(e => console.warn("Error al reproducir música:", e)); // Añadir catch
-                musicToggleBtn.textContent = "🔇 Silenciar";
-                showNotification("Música iniciada.", "default", 1500);
-            } else {
-                backgroundMusic.pause();
-                backgroundMusic.currentTime = 0; 
-                musicToggleBtn.textContent = "🔊 Música";
-                showNotification("Música detenida.", "default", 1500);
+            // Función para actualizar el texto y la clase CSS del botón
+            function updateMusicButtonUI() {
+                if (!backgroundMusic.paused) {
+                    musicToggleBtn.textContent = "🔇 Silenciar";
+                    musicToggleBtn.classList.add('music-active'); // Añade la clase si la música está sonando
+                } else {
+                    musicToggleBtn.textContent = "🔊 Música";
+                    musicToggleBtn.classList.remove('music-active'); // Quita la clase si la música está pausada
+                }
             }
+
+            // Función principal para alternar la música
+            function toggleMusic() {
+                if (backgroundMusic.paused) {
+                    // Intenta reproducir la música. .play() devuelve una Promesa.
+                    backgroundMusic.play()
+                        .then(() => {
+                            // La reproducción fue exitosa (o no fue bloqueada)
+                            updateMusicButtonUI(); // Actualiza el UI del botón
+                            showNotification("Música iniciada.", "default", 1500);
+                        })
+                        .catch(error => {
+                            // La reproducción fue bloqueada por el navegador o falló por otra razón
+                            console.warn("Error al intentar reproducir música:", error);
+                            showNotification("Error: Click de nuevo para reproducir la música (requiere interacción).", "error", 3000);
+                            // Asegúrate de que el botón refleje el estado pausado si la reproducción no pudo iniciarse
+                            updateMusicButtonUI(); 
+                        });
+                } else {
+                    // La música está sonando, la pausamos
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0; // Opcional: Reinicia la música al principio
+                    updateMusicButtonUI(); // Actualiza el UI del botón
+                    showNotification("Música detenida.", "default", 1500);
+                }
+            }
+
+            // Asocia la función toggleMusic al evento 'click' del botón de música
+            // Este es el único event listener directo que necesitas para el click del usuario
+            musicToggleBtn.addEventListener('click', toggleMusic);
+
+            // Importante: Escucha los eventos 'play', 'pause' y 'ended' del propio elemento <audio>
+            // Esto asegura que el botón se actualice SIEMPRE que el estado de la música cambie,
+            // ya sea por un click del usuario, si termina la canción, o si el navegador la pausa/reproduce por su cuenta.
+            backgroundMusic.addEventListener('play', updateMusicButtonUI);
+            backgroundMusic.addEventListener('pause', updateMusicButtonUI);
+            backgroundMusic.addEventListener('ended', updateMusicButtonUI); // Cuando la canción llega al final
+
+            // Cuando el DOM está completamente cargado, inicializa el estado visual del botón.
+            // Esto es crucial para que el botón muestre el texto y estilo correctos al cargar la página.
+            // (La música siempre estará "pausada" al cargar la página sin interacción previa)
+            document.addEventListener('DOMContentLoaded', updateMusicButtonUI);
+
+        } else {
+            // Si por alguna razón los IDs no existen, muestra un error en la consola para depuración
+            console.error("Error: Elementos 'background-music' o 'music-toggle-btn' no encontrados en el DOM. Revisa tus IDs en HTML.");
         }
 
         // ===============================================
@@ -2481,7 +2528,6 @@
             shopBtn.onclick = () => openModal('shopModal');
             blacksmithBtn.onclick = () => openModal('blacksmithModal');
             playerStatsBtn.onclick = () => openModal('playerStatsModal');
-            musicToggleBtn.onclick = toggleMusic; 
             adminAccessBtn.onclick = openAdminLoginModal; // Listener para el botón de admin
             submitAdminKeyBtn.onclick = checkAdminKey; // Listener para el botón de enviar clave admin
 
@@ -2562,15 +2608,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Control del Botón de Música (sin sonidos por ahora)
-    const musicToggleButton = document.getElementById('music-toggle-btn');
-    if (musicToggleButton) {
-        musicToggleButton.addEventListener('click', () => {
-            console.log('¡Música togleada!');
-            // Tu lógica para la música aquí
-        });
-    }
-
     // 4. Función para las Partículas
     // NO redeclares headerElement aquí, ya lo declaraste arriba
      let particlesContainer;
@@ -2615,21 +2652,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     */
 );
-
-
-
-    // Para el botón de música, si quieres un sonido al hacer click
-    const musicToggleButton = document.getElementById('music-toggle-btn');
-    if (musicToggleButton) {
-        musicToggleButton.addEventListener('click', () => {
-            // Aquí puedes añadir tu lógica de toggle de música
-            console.log("¡Música toggleada!");
-
-            // Opcional: Sonido al click (necesitas un archivo de sonido)
-            // const clickSound = new Audio('path/to/your/sao-click-sound.mp3');
-            // clickSound.play();
-        });
-    }
 
     // Asegúrate de que setActiveLink esté definida si la usas
     // function setActiveLink(clickedLink) {

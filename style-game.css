@@ -1,0 +1,971 @@
+/*
+ * style-game.css
+ * Este archivo contiene los estilos CSS específicos de la interfaz interactiva del juego.
+ * Incluye:
+ * - Paneles Interactivos (interactive-panel)
+ * - HUD del Jugador (sao-player-hud, barras de HP/EXP/MP)
+ * - Botones de Acción
+ * - Modales (general, inventario, stats, combate, selección de mob, admin)
+ * - Listas de ítems (inventario, tienda, herrería, entrenamiento)
+ * - Tooltips y Notificaciones
+ * - Estilos Responsive (para tabletas y móviles) que afectan a estas secciones.
+ */
+
+/* --- Panel Interactivo Principal del Juego --- */
+.interactive-panel {
+    background: rgba(15, 15, 28, 0.7); /* Fondo semi-transparente */
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin: 4rem auto; /* Centrado y con margen superior/inferior */
+    text-align: center;
+    box-shadow: 0 8px 32px 0 rgba(10, 10, 18, 0.3);
+    border: 1px solid rgba(70, 130, 180, 0.25);
+    max-width: 1200px; /* Limita el ancho del panel */
+}
+.interactive-panel .panel-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #a1d8ff; /* Color cian/azulado claro */
+    text-shadow: 0 0 8px rgba(161, 216, 255, 0.5); /* Brillo sutil */
+}
+.floor-display {
+    font-size: 1.8rem;
+    color: #ffd700; /* Dorado para el piso actual */
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+/* --- SAO Player HUD (Interfaz de Usuario del Jugador) --- */
+.sao-player-hud {
+    display: flex;
+    align-items: center;
+    background-color: #2a2d3a;
+    border: 2px solid #4a4f66;
+    border-radius: 8px;
+    padding: 8px 12px;
+    max-width: 550px;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    position: relative;
+}
+.sao-player-hud::before { /* Icono decorativo al inicio del HUD */
+    content: '+';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background-color: #4a4f66;
+    color: #e0e0e0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 4px 0 0 4px;
+    margin-right: 10px;
+    border-right: 1px solid #333;
+}
+.sao-hud-info {
+    flex-grow: 1;
+    text-align: left;
+}
+.sao-player-name {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.sao-hp-bar-container {
+    width: 100%;
+    height: 20px;
+    background-color: #1e1f26;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #4a4f66;
+    position: relative;
+}
+.sao-hp-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #5cb85c, #4cae4c); /* Verde para HP */
+    border-radius: 3px;
+    transition: width 0.3s ease-out;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+/* Clases para estados de HP */
+.sao-hp-bar-fill.low {
+    background: linear-gradient(to right, #ffc107, #f0ad4e); /* Naranja */
+}
+.sao-hp-bar-fill.critical {
+    background: linear-gradient(to right, #d9534f, #c9302c); /* Rojo */
+}
+
+.sao-hud-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+.sao-hp-text {
+    color: #c0c0d0;
+    font-size: 0.9rem;
+}
+.sao-player-level {
+    color: #87ceeb; /* Cian para el nivel */
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+.sao-status-indicator { /* Indicador de estado (ej. "En combate") */
+    position: absolute;
+    top: 50%;
+    right: 45px;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: #ffd700;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.sao-status-indicator.active {
+    opacity: 1;
+}
+
+/* Barras de EXP y MP */
+.resource-bar-container {
+    width: 70%;
+    max-width: 400px;
+    height: 18px;
+    background: rgba(10, 10, 18, 0.5);
+    border-radius: 9px;
+    overflow: hidden;
+    margin: 1rem auto;
+    border: 1px solid rgba(70, 130, 180, 0.3);
+    position: relative;
+}
+.resource-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s ease-in-out;
+    box-shadow: 0 0 8px rgba(135, 206, 235, 0.4) inset;
+}
+#exp-bar-fill { background: linear-gradient(90deg, #6a5acd, #9370db); } /* Morado para EXP */
+#mp-bar-fill { background: linear-gradient(90deg, #4682B4, #87CEEB); } /* Azul para MP */
+
+.resource-label {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+    color: #b0c4de;
+}
+.col-display { /* Display de la moneda (Col) */
+    font-size: 1.5rem;
+    color: #FFD700; /* Dorado */
+    margin: 1rem 0;
+    font-weight: bold;
+}
+
+/* --- Botones de Acción (Generales del Juego) --- */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap; /* Para que se adapten en pantallas pequeñas */
+}
+
+.action-btn {
+    background: linear-gradient(180deg, #5a9bd8 0%, #4a80c0 100%); /* Gradiente azul por defecto */
+    color: #ffffff;
+    border: none;
+    padding: 0.7rem 1.3rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3), inset 0 -2px 0 rgba(0,0,0,0.2);
+    border-bottom: 3px solid #3a6a9a; /* Borde inferior para efecto 3D */
+    min-width: 130px;
+}
+
+.action-btn:hover {
+    background: linear-gradient(180deg, #6bb8ff 0%, #5a90e2 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(74, 144, 226, 0.3), inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+.action-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(0,0,0,0.2);
+    background: linear-gradient(180deg, #4a80c0 0%, #3a6a9a 100%);
+}
+/* Estilos específicos para botones con clases adicionales */
+.action-btn.shop-btn {
+    background: linear-gradient(180deg, #f0ad4e 0%, #eea236 100%); /* Naranja para la tienda */
+    border-bottom-color: #d58512;
+}
+.action-btn.shop-btn:hover {
+     background: linear-gradient(180deg, #f5c062 0%, #f0b14e 100%);
+     box-shadow: 0 5px 12px rgba(240, 173, 78, 0.3), inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+.action-btn.blacksmith-btn {
+    background: linear-gradient(180deg, #778899 0%, #708090 100%); /* Gris acero para herrería */
+    border-bottom-color: #5a6873;
+}
+.action-btn.blacksmith-btn:hover {
+     background: linear-gradient(180deg, #8d9aa6 0%, #8090a0 100%);
+     box-shadow: 0 5px 12px rgba(112, 128, 144, 0.3), inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border-bottom: none;
+}
+/* Estilos para botones pequeños (usados en el panel de admin) */
+.action-btn.small-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    min-width: auto;
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+/* --- Modal General (Contenedores de ventanas emergentes) --- */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 2000; /* Por encima de la mayoría de los elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 18, 0.9); /* Fondo oscuro semi-transparente */
+    backdrop-filter: blur(5px); /* Desenfoque del fondo */
+    overflow-y: auto; /* Scroll si el contenido es largo */
+    padding-top: 30px;
+    animation: fadeInModalBg 0.3s ease-out; /* Animación de aparición del fondo */
+}
+@keyframes fadeInModalBg {
+    from { background: rgba(10, 10, 18, 0); backdrop-filter: blur(0px); }
+    to { background: rgba(10, 10, 18, 0.9); backdrop-filter: blur(5px); }
+}
+
+.modal-content {
+    background: linear-gradient(145deg, rgba(25, 28, 45, 0.98), rgba(35, 40, 60, 0.98)); /* Gradiente de fondo del modal */
+    margin: 2% auto; /* Margen superior y centrado horizontal */
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 750px; /* Ancho máximo por defecto */
+    position: relative;
+    animation: modalSlideIn 0.35s ease-out; /* Animación de aparición del modal */
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    border: 1px solid rgba(70, 130, 180, 0.4);
+}
+/* Clases para diferentes tamaños de modales */
+.modal-content.large { max-width: 950px; }
+.modal-content.xlarge { max-width: 1100px; }
+
+.modal-content h2 {
+    color: #a1d8ff;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 2.2rem;
+    text-shadow: 0 0 6px rgba(161, 216, 255, 0.4);
+}
+.modal-content p, .modal-content li {
+    font-size: 1rem;
+    line-height: 1.7;
+    opacity: 0.95;
+    color: #c0d0e0;
+}
+.modal-content strong { color: #87CEEB; }
+.modal-content ul { margin-top: 0.5rem; padding-left: 25px; list-style-type: '✧ '; } /* Lista con icono personalizado */
+
+.modal-icon { /* Icono grande dentro de algunos modales */
+    font-size: 5rem;
+    display: block;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #87CEEB;
+}
+
+/* Estilos para el modal de nombre de personaje */
+#nameEntryModal .modal-content {
+    max-width: 500px;
+}
+#playerNameInput {
+    width: calc(100% - 20px);
+    padding: 12px;
+    margin: 1rem auto;
+    border-radius: 8px;
+    border: 1px solid rgba(70, 130, 180, 0.5);
+    background-color: rgba(10,10,18,0.7);
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    display: block;
+}
+#playerNameInput:focus {
+    outline: none;
+    border-color: #87CEEB;
+    box-shadow: 0 0 8px rgba(135, 206, 235, 0.5);
+}
+#submitPlayerNameBtn {
+    display: block;
+    margin: 1.5rem auto 0;
+    width: 50%;
+}
+
+/* Animación para el modal de contenido */
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-50px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.close-modal-btn {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 2.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: rgba(200,210,220,0.6);
+    transition: all 0.3s ease;
+    line-height: 1;
+    padding: 5px;
+}
+.close-modal-btn:hover {
+    transform: scale(1.15) rotate(90deg);
+    color: #87CEEB;
+}
+
+/* --- Secciones dentro de Modales (Inventario, Tienda, Herrería, Entrenamiento) --- */
+.inventory-sections, .shop-sections, .blacksmith-sections, .training-sections {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+.inventory-grid-container, .shop-items-container, .blacksmith-recipes-container, .training-info-container {
+    flex: 2; /* Ocupa más espacio que el contenedor lateral */
+    min-height: 300px;
+}
+.player-equipment-container, .blacksmith-materials-info, .training-details-container {
+    flex: 1; /* Ocupa menos espacio (panel lateral) */
+}
+.blacksmith-materials-info h4, .training-details-container h4 { color: #a1d8ff; margin-bottom: 0.8rem; }
+.blacksmith-materials-info ul, .training-details-container ul { list-style-type: '✶ '; padding-left: 20px; font-size: 0.9em; }
+.blacksmith-materials-info li, .training-details-container li { margin-bottom: 0.3rem; }
+
+/* Grillas para ítems (Inventario, Tienda, Herrería, Entrenamiento) */
+.inventory-grid, .shop-grid, .blacksmith-grid, .training-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    border: 1px solid rgba(70, 130, 180, 0.25);
+    padding: 15px;
+    border-radius: 10px;
+    max-height: 480px;
+    overflow-y: auto; /* Habilita el scroll */
+    background: rgba(10,10,18,0.3);
+}
+
+/* Estilos de cada ítem dentro de las grillas */
+.inventory-item, .shop-item, .blacksmith-item, .training-option {
+    background: rgba(45, 50, 75, 0.6);
+    border: 1px solid rgba(70, 130, 180, 0.4);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 140px;
+}
+/* Efectos al pasar el mouse sobre un ítem */
+.inventory-item:hover, .shop-item:hover, .blacksmith-item:hover, .training-option:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(135, 206, 235, 0.25);
+    background: rgba(55, 60, 85, 0.7);
+    border-color: #87CEEB;
+}
+.item-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 8px;
+    color: #e0e0e0;
+}
+.item-name {
+    font-weight: bold;
+    color: #a1d8ff;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+}
+.item-details, .item-price, .item-level-req, .item-materials, .item-chance, .training-stats-gain {
+    font-size: 0.75em;
+    color: #b0c4de;
+    margin-top: 3px;
+}
+.item-price { color: #FFD700; font-weight: bold; } /* Color dorado para precios */
+.item-level-req { color: #ff8a8a; } /* Rojo claro para requisitos de nivel */
+.item-materials { font-size: 0.7em; color: #9FB6D7; margin-top: 5px; }
+.item-chance { color: #66CDAA; font-weight: bold; } /* Verde para porcentajes de éxito */
+
+
+.item-count { /* Cantidad de ítems en el inventario */
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 50%;
+    padding: 3px 7px;
+    font-size: 0.75em;
+    color: #e0e0e0;
+}
+
+/* Contenedores de Equipo del Jugador */
+.player-equipment h3, .shop-info h3, .blacksmith-info h3, .training-info h3 {
+    color: #a1d8ff;
+    margin-bottom: 1.2rem;
+    text-align: center;
+    font-size: 1.6rem;
+}
+.equipment-slots {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+.equipment-slot {
+    background: rgba(20, 22, 38, 0.5);
+    border: 2px dashed rgba(70, 130, 180, 0.5); /* Borde punteado para slots vacíos */
+    border-radius: 10px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.85em;
+    color: rgba(180, 190, 210, 0.7);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.equipment-slot.has-item { /* Estilo cuando un slot tiene un ítem equipado */
+    border: 2px solid #87CEEB;
+    background: rgba(30, 35, 55, 0.7);
+}
+.equipment-slot .item-icon { font-size: 2.8rem; color: #E0FFFF; margin-bottom: 5px; }
+.equipment-slot .item-name { font-size: 0.95em; font-weight: bold; color: #a1d8ff; }
+.equipment-slot-label {
+    font-size: 0.8em;
+    color: #8090b0;
+    margin-bottom: 5px;
+}
+
+/* --- Player Stats Modal (Modal de estadísticas del jugador) --- */
+#playerStatsModal .modal-content { max-width: 600px; }
+.stats-category { margin-bottom: 1.5rem; }
+.stats-category h3 {
+    color: #87CEEB;
+    font-size: 1.4rem;
+    border-bottom: 1px solid rgba(70, 130, 180, 0.3);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    font-size: 1rem;
+}
+.stat-line .stat-label { color: #b0c4de; }
+.stat-line .stat-value { color: #e0e0e0; font-weight: bold; }
+.stat-line .stat-bonus { color: #5cb85c; margin-left: 5px; } /* Verde para bonus de stats */
+
+
+/* --- Combat Modal (Modal de combate) --- */
+#combatModal .modal-content { max-width: 850px; }
+.combat-arena {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+.combatant-display {
+    background: rgba(20,20,35,0.5);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(70,130,180,0.3);
+    width: 45%;
+    text-align: center;
+    position: relative; /* Para efectos de estado */
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.combatant-display.active-turn { /* Indicador de turno activo */
+    border-color: #ffd700; /* Borde dorado */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); /* Sombra dorada */
+}
+.combatant-display.damage-flash { /* Animación de flash al recibir daño */
+    animation: damageFlash 0.2s ease-out;
+}
+@keyframes damageFlash {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.8; filter: brightness(1.5); }
+    100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+
+.combatant-display h3 {
+    color: #a1d8ff;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+.combatant-icon { font-size: 4rem; margin-bottom: 0.5rem; }
+.combatant-icon img { /* Para la imagen del personaje (Kirito) en combate */
+    max-width: 200px;
+    height: auto;
+    border-radius: 8px;
+}
+.combat-hp-bar-container {
+    width: 100%;
+    height: 25px;
+    background-color: #1e1f26;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    border: 1px solid #4a4f66;
+}
+.combat-hp-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #5cb85c, #4cae4c); /* Verde para el jugador */
+    border-radius: 4px;
+    transition: width 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+}
+
+/* Estilo específico para la barra de HP del enemigo */
+#combat-enemy-hp-bar {
+    background: linear-gradient(to right, #d9534f, #c9302c); /* Rojo sólido por defecto */
+}
+#combat-enemy-hp-bar.low {
+    background: linear-gradient(to right, #ffc107, #f0ad4e); /* Naranja para HP bajo */
+}
+#combat-enemy-hp-bar.critical {
+    background: linear-gradient(to right, #d9534f, #c9302c); /* Rojo oscuro para HP crítico */
+}
+
+.combat-hp-text { font-size: 0.9rem; color: #c0d0e0; }
+.combat-stats-preview { font-size: 0.85rem; color: #b0c4de; margin-top: 0.5rem; }
+
+/* Display de Efectos de Estado (ej. Veneno, Aturdimiento) */
+.status-effects-display {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+}
+.status-effect-icon {
+    font-size: 1.2rem;
+    cursor: help;
+    filter: grayscale(0.5); /* Icono atenuado por defecto */
+    transition: filter 0.2s ease;
+}
+.status-effect-icon:hover {
+    filter: grayscale(0); /* Icono a todo color al pasar el mouse */
+}
+
+.combat-actions { text-align: center; margin-bottom: 1.5rem; }
+.combat-actions .action-btn { margin: 0.5rem; }
+.combat-log { /* Registro de mensajes de combate */
+    background: rgba(10,10,18,0.4);
+    border-radius: 8px;
+    padding: 1rem;
+    height: 150px;
+    overflow-y: auto; /* Scroll para el log */
+    font-size: 0.9rem;
+    color: #c0d0e0;
+    border: 1px solid rgba(70,130,180,0.2);
+}
+.combat-log p { margin-bottom: 0.5rem; line-height: 1.4; }
+.combat-log .player-action { color: #87CEEB; } /* Mensajes de acciones del jugador */
+.combat-log .enemy-action { color: #FF7F7F; } /* Mensajes de acciones del enemigo */
+.combat-log .system-message { color: #FFD700; font-style: italic; } /* Mensajes del sistema (ej. victoria/derrota) */
+.combat-log .combo-message { color: #ff69b4; font-weight: bold; } /* Mensajes de combo (nuevo estilo) */
+.combat-log .status-message { color: #98fb98; font-style: italic; } /* Mensajes de efectos de estado (nuevo estilo) */
+
+
+.skills-list, .potions-list, .floor-select-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(10,10,18,0.2);
+    border-radius: 5px;
+}
+.skills-list button, .potions-list button, .floor-select-grid button {
+    font-size: 0.85rem; padding: 6px 10px;
+}
+.floor-select-grid { /* Cuadrícula para seleccionar pisos */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    max-height: 400px;
+    overflow-y: auto;
+}
+.floor-select-grid button {
+    background: linear-gradient(180deg, #4a80c0 0%, #3a6a9a 100%);
+    border-bottom: 3px solid #2a507a;
+}
+.floor-select-grid button:hover {
+    background: linear-gradient(180deg, #5a9bd8 0%, #4a80c0 100%);
+}
+.floor-select-grid button:disabled {
+    background: #333;
+    border-bottom: 3px solid #222;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* --- Tooltip (para habilidades/pociones/ítems con descripciones) --- */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Posiciona el tooltip encima del texto */
+    left: 50%;
+    margin-left: -100px; /* Centra el tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+.tooltip .tooltiptext::after { /* Flecha del tooltip */
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* --- Notificaciones Custom (mensajes emergentes) --- */
+#notification-area {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.notification {
+    background-color: rgba(30, 35, 55, 0.9);
+    color: #e0e0e0;
+    padding: 12px 18px;
+    border-radius: 8px;
+    border-left: 5px solid #87CEEB; /* Borde lateral de color */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideInNotification 0.4s ease-out, fadeOutNotification 0.4s ease-in 4.6s forwards; /* Animaciones de entrada y salida */
+    min-width: 250px;
+    font-size: 0.95rem;
+}
+.notification.error { border-left-color: #d9534f; } /* Color para notificaciones de error */
+.notification.success { border-left-color: #5cb85c; } /* Color para notificaciones de éxito */
+
+@keyframes slideInNotification {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeOutNotification {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100%); }
+}
+
+/* --- Estilos para el Panel de Administrador --- */
+.admin-section input[type="number"], 
+.admin-section input[type="text"], 
+.admin-section select {
+    background-color: #2a2d3a;
+    color: #e0e0e0;
+    border: 1px solid #4a4f66;
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}
+.admin-section label {
+    margin-right: 5px;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+.admin-section h3, .admin-section h4 {
+    color: #a1d8ff;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.admin-section h4 { font-size: 1.1rem; }
+.admin-sections-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.admin-section {
+    flex: 1 1 300px; /* Permite que las secciones crezcan y se envuelvan */
+    background: rgba(25, 28, 40, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(70, 130, 180, 0.3);
+}
+#adminItemDetailsPreview, #adminUnlockedFloorsList {
+    font-size: 0.9em;
+    margin-top: 8px;
+    color: #ccc;
+    padding: 8px;
+    background: rgba(10,10,18,0.4);
+    border-radius: 5px;
+    min-height: 30px;
+}
+#adminUnlockedFloorsList {
+    max-height:120px;
+    overflow-y:auto;
+}
+#adminPanelMessage {
+    color: #87CEEB;
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: rgba(10,10,18,0.5);
+    border-radius: 5px;
+    border: 1px solid #87CEEB;
+    display: none; /* Inicialmente oculto */
+}
+
+/* --- NUEVO DISEÑO: Estilos para el panel de selección de Mobs (Estilo SAO Avanzado) --- */
+
+/* Contenedor principal de la cuadrícula de mobs */
+.mob-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Columnas responsivas */
+    gap: 18px; /* Espacio entre los items */
+    padding: 25px; /* Más padding */
+    max-height: 420px; /* Altura máxima */
+    overflow-y: auto; /* Scroll vertical */
+    border: 1px solid rgba(0, 255, 255, 0.2); /* Borde cian muy sutil y translúcido */
+    border-radius: 12px; /* Bordes más redondeados */
+    background: rgba(10, 15, 25, 0.9); /* Fondo muy oscuro, casi opaco */
+    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.08), 0 0 20px rgba(0, 0, 0, 0.5); /* Sombra interna y externa */
+    backdrop-filter: blur(3px); /* Efecto de desenfoque suave */
+    -webkit-backdrop-filter: blur(3px); /* Para compatibilidad Safari */
+}
+
+/* Scrollbar personalizado para la cuadrícula de mobs */
+.mob-list-grid::-webkit-scrollbar {
+    width: 8px;
+}
+.mob-list-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.mob-list-grid::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+}
+.mob-list-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.5);
+}
+
+
+/* Estilos para cada tarjeta de mob */
+.mob-card {
+    background: linear-gradient(135deg, rgba(35, 45, 60, 0.7), rgba(20, 30, 45, 0.7)); /* Gradiente de fondo sutil */
+    border: 1px solid rgba(0, 255, 255, 0.15); /* Borde cian muy fino y translúcido */
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Curva de animación suave */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(0, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Pseudo-elemento para un efecto de brillo interno o de "marco" en la tarjeta de mob */
+.mob-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid rgba(0, 255, 255, 0.08); /* Borde interno muy sutil */
+    border-radius: 10px;
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+}
+
+/* Efecto al pasar el ratón por encima (hover) de la tarjeta de mob */
+.mob-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 12px 30px rgba(0, 255, 255, 0.25), inset 0 0 20px rgba(0, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(45, 55, 70, 0.8), rgba(25, 35, 50, 0.8));
+    border-color: rgba(0, 255, 255, 0.5);
+}
+
+.mob-card:hover::before {
+    border-color: rgba(0, 255, 255, 0.3);
+}
+
+/* Estilo cuando la tarjeta de mob está seleccionada */
+.mob-card.selected {
+    border: 2px solid var(--sao-red-alert); /* Borde rojo prominente */
+    box-shadow: 0 0 30px rgba(255, 99, 71, 0.5), inset 0 0 15px rgba(255, 99, 71, 0.2);
+    transform: scale(1.05);
+    background: linear-gradient(135deg, rgba(70, 40, 40, 0.8), rgba(50, 20, 20, 0.8));
+}
+
+/* Icono del mob */
+.mob-card-icon {
+    font-size: 3.2em;
+    margin-bottom: 8px;
+    color: var(--sao-text-primary);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    line-height: 1;
+}
+
+/* Nombre del mob */
+.mob-card-name {
+    font-family: 'Exo 2', sans-serif; /* Si la tienes de alguna fuente */
+    font-size: 1.5em;
+    color: var(--sao-cyan-hud);
+    margin-bottom: 12px;
+    text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+/* Información del mob (HP, ATK, DEF, etc.) */
+.mob-card-info {
+    font-size: 0.95em;
+    color: var(--sao-text-primary);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Iconos de HP y Ataque dentro de la información del mob */
+.mob-card-hp-icon {
+    color: var(--sao-red-alert);
+    font-size: 1em;
+}
+
+.mob-card-attack-icon {
+    color: #ffcc00; /* Dorado brillante */
+    font-size: 1em;
+}
+
+/* --- Ajustes Responsive para Elementos del Juego --- */
+@media (max-width: 992px) {
+    /* Modales */
+    .inventory-sections, .shop-sections, .blacksmith-sections, .training-sections, .admin-sections-container {
+        flex-direction: column; /* Apila las secciones del modal */
+    }
+    .combat-arena { flex-direction: column; align-items: center; } /* Apila los combatientes */
+    .combatant-display { width: 80%; } /* Ancho para combatientes apilados */
+
+    /* Mob Selection */
+    .mob-list-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        padding: 18px;
+        gap: 12px;
+    }
+    .mob-card {
+        padding: 15px;
+    }
+    .mob-card-name {
+        font-size: 1.3em;
+    }
+    .mob-card-icon {
+        font-size: 2.5em;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Paneles y Botones */
+    .interactive-panel .panel-title { font-size: 2.4rem; }
+    .action-buttons { flex-direction: column; align-items: center; }
+    .action-btn { width: 70%; max-width: 280px; } /* Botones más anchos y centrados */
+
+    /* Modales */
+    .modal-content { margin: 5% auto; padding: 1.5rem; max-width: 95%; }
+    .sao-player-hud { max-width: 95%; } /* HUD del jugador más ancho en móvil */
+
+    /* Grillas de ítems */
+    .inventory-grid, .shop-grid, .blacksmith-grid, .training-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Ítems más pequeños en grilla */
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Paneles */
+    .interactive-panel .panel-title { font-size: 2rem; }
+    .action-btn { padding: 0.7rem 1.2rem; font-size: 0.9rem; }
+
+    /* Modales */
+    .modal-content h2 { font-size: 1.8rem; }
+    .modal-icon { font-size: 4rem; }
+    .close-modal-btn { font-size: 2rem; right: 0.8rem; top: 0.8rem; }
+    .inventory-grid, .shop-grid, .blacksmith-grid, .training-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+    .item-icon { font-size: 2.5rem; }
+
+    /* Combate */
+    .combatant-display { width: 95%; }
+
+    /* Mob Selection */
+    .mob-list-grid {
+        grid-template-columns: 1fr; /* Una columna en pantallas muy pequeñas */
+        padding: 15px;
+    }
+    .mob-card-name {
+        font-size: 1.2em;
+    }
+    .mob-card-icon {
+        font-size: 2.2em;
+    }
+}
