@@ -262,4 +262,4 @@ Todos los personajes, la historia, los nombres y los derechos relacionados con e
 
 ¡Gracias por jugar y que disfrutes tu estancia en Aincrad!
 
-https://facu7519.github.io/saoproject/
+https://facu7519.github.io/pagina-Sao/

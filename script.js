@@ -1,11 +1,63 @@
         // ===============================================
         //           CONFIGURACIÓN INICIAL Y DATOS
         // ===============================================
-        const ADMIN_SECRET_KEYS = [ "SAO_ADMIN_2025",
-                                    "facugay",
-                                    "nicogay",
-                                    "utu",
-                                    "kirito"];// Clave secreta para el panel de admin 
+        // ADMIN AUTH (mejorado):
+        // - Por seguridad, preferible mover la verificación al servidor.
+        // - Aquí incluimos soporte para comparar SHA-256 del valor ingresado contra
+        //   un hash precomputado (establecer ADMIN_SECRET_HASH a la cadena hex).
+        // - Si ADMIN_SECRET_HASH === null, se usa un fallback temporal (clave en texto)
+        //   para mantener compatibilidad; reemplázalo por el hash lo antes posible.
+    const ADMIN_SECRET_HASH = '542238441123f9240bfe04c84f6cb8f521405d62ae85c5d4d43bb68c73298b6b'; // SHA-256 hex de la contraseña admin (reemplazable)
+
+        // Lockout / logging (local) — mitigación temporal para proteger intentos bruteforce.
+        const ADMIN_MAX_ATTEMPTS = 5; // Intentos fallidos antes de bloquear
+        const ADMIN_LOCKOUT_MS = 5 * 60 * 1000; // 5 minutos de bloqueo por defecto
+        const ADMIN_STORAGE_KEY = 'sao_admin_lockstate_v1';
+
+        function readAdminLockState() {
+            try {
+                const raw = localStorage.getItem(ADMIN_STORAGE_KEY);
+                if (!raw) return { attempts: 0, lockedUntil: 0, logs: [] };
+                return JSON.parse(raw);
+            } catch (e) {
+                console.error('Error leyendo lockstate admin:', e);
+                return { attempts: 0, lockedUntil: 0, logs: [] };
+            }
+        }
+
+        function writeAdminLockState(state) {
+            try {
+                localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error('Error guardando lockstate admin:', e);
+            }
+        }
+
+        function recordAdminAttempt(success) {
+            const state = readAdminLockState();
+            state.logs = state.logs || [];
+            state.logs.push({ ts: Date.now(), success: !!success });
+            if (success) {
+                state.attempts = 0;
+                state.lockedUntil = 0;
+            } else {
+                state.attempts = (state.attempts || 0) + 1;
+                if (state.attempts >= ADMIN_MAX_ATTEMPTS) {
+                    state.lockedUntil = Date.now() + ADMIN_LOCKOUT_MS;
+                }
+            }
+            writeAdminLockState(state);
+            return state;
+        }
+
+        // Helper: calcular SHA-256 y devolver hex string (browser SubtleCrypto)
+        async function sha256Hex(message) {
+            const enc = new TextEncoder();
+            const data = enc.encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
         const NUM_BOSS_HP_BARS = 4; // Número de barras de HP para jefes
         let player = {
             name: "", 
@@ -53,17 +105,17 @@
         };
         
         // Datos de Items Base (sin cambios)
-        const baseItems = {
+    const baseItems = {
             'healing_potion_s': { name: 'Poción Vida (P)', icon: '🧪', type: 'consumable', effect: { hp: 50 }, description: "Restaura 50 HP." },
             'healing_potion_m': { name: 'Poción Vida (M)', icon: '🧪', type: 'consumable', effect: { hp: 120 }, description: "Restaura 120 HP." },
             'healing_potion_l': { name: 'Poción Vida (G)', icon: '🧪', type: 'consumable', effect: { hp: 300 }, description: "Restaura 300 HP." },
             'mana_potion_s': { name: 'Poción Maná (P)', icon: '💧', type: 'consumable', effect: { mp: 30 }, description: "Restaura 30 MP." },
             'mana_potion_m': { name: 'Poción Maná (M)', icon: '💧', type: 'consumable', effect: { mp: 75 }, description: "Restaura 75 MP." },
             'antidote_herb': { name: 'Hierba Antídoto', icon: '🌿', type: 'consumable', effect: { cure: 'poison' }, description: "Cura el veneno." },
-            'basic_sword': { name: 'Espada Básica', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 5 }, levelReq: 1, description: "Una espada simple." },
+            'basic_sword': { name: 'Espada Básica', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 5 }, levelReq: 1, description: "Una espada simple.", rarity: 'Common', sockets: 0 },
             'short_sword': { name: 'Espada Corta', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 8 }, levelReq: 2, description: "Un poco mejor que la básica." },
-            'iron_sword': { name: 'Espada de Hierro', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 15 }, levelReq: 5, description: "Hoja de hierro confiable." },
-            'steel_longsword': { name: 'Mandoble de Acero', icon: '⚔️', type: 'weapon', slot: 'weapon', stats: { attack: 25, defense: 2 }, levelReq: 10, description: "Una espada larga y robusta." },
+            'iron_sword': { name: 'Espada de Hierro', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 15 }, levelReq: 5, description: "Hoja de hierro confiable.", rarity: 'Common', sockets: 0 },
+            'steel_longsword': { name: 'Mandoble de Acero', icon: '⚔️', type: 'weapon', slot: 'weapon', stats: { attack: 25, defense: 2 }, levelReq: 10, description: "Una espada larga y robusta.", rarity: 'Rare', sockets: 1 },
             'knight_sword': { name: 'Espada de Caballero', icon: '⚔️', type: 'weapon', slot: 'weapon', stats: { attack: 35, defense: 5 }, levelReq: 15, description: "Arma estándar de caballero." },
             'elucidator_prototype': { name: 'Prototipo Elucidator', icon: '⚫', type: 'weapon', slot: 'weapon', stats: { attack: 50, hp: 20 }, levelReq: 25, description: "Un intento de replicar una leyenda." },
             'lambent_light_replica': { name: 'Réplica Luz Lambent', icon: '✨', type: 'weapon', slot: 'weapon', stats: { attack: 45, mp: 15 }, levelReq: 25, description: "Imita la velocidad de la famosa estoque." },
@@ -85,9 +137,9 @@
             'obsidian_shard': { name: 'Esquirla de Obsidiana', icon: '🌑', type: 'material', description: "Fragmento de roca volcánica."},
             'dragon_scale': { name: 'Escama de Dragón', icon: '🐉', type: 'material', description: "Material raro y resistente."},
             'divine_fragment': { name: 'Fragmento Divino', icon: '🌟', type: 'material', description: "Material legendario, casi imposible de encontrar."},
-            'elucidator': { name: 'Elucidator', icon: '⚫', type: 'weapon', slot: 'weapon', stats: { attack: 150, hp: 100 }, levelReq: 50, description: "Espada negra legendaria, forjada de un cristal de alta densidad." },
+            'elucidator': { name: 'Elucidator', icon: '⚫', type: 'weapon', slot: 'weapon', stats: { attack: 150, hp: 100 }, levelReq: 50, description: "Espada negra legendaria, forjada de un cristal de alta densidad.", rarity: 'Mythic', sockets: 2 },
             'dark_repulser': { name: 'Dark Repulser', icon: '🟢', type: 'weapon', slot: 'weapon', stats: { attack: 140, defense: 20 }, levelReq: 50, description: "Espada verde cristalina, forjada por Lisbeth con un lingote de Crystallite." },
-            'lambent_light': { name: 'Lambent Light', icon: '✨', type: 'weapon', slot: 'weapon', stats: { attack: 130, mp: 50 }, levelReq: 48, description: "Estoque de Asuna, increíblemente rápido y preciso." },
+            'lambent_light': { name: 'Lambent Light', icon: '✨', type: 'weapon', slot: 'weapon', stats: { attack: 130, mp: 50 }, levelReq: 48, description: "Estoque de Asuna, increíblemente rápido y preciso.", rarity: 'Epic', sockets: 1 },
             'heathcliff_shield': { name: 'Escudo de Heathcliff', icon: '🛡️', type: 'shield', slot: 'shield', stats: { defense: 100, hp: 200 }, levelReq: 60, description: "El escudo inamovible del líder de los KoB." }
         };
 
@@ -103,7 +155,9 @@
         
         // Habilidades del Jugador (Actualizado con nuevas habilidades)
         const skillData = {
-            'quick_slash': { name: 'Corte Rápido', icon: '⚡', mpCost: 5, damageMultiplier: 1.3, type: 'attack', description: "Un ataque veloz que consume 5 MP." },
+            'quick_slash': { name: 'Corte Rápido', icon: '⚡', mpCost: 5, damageMultiplier: 1.2, type: 'attack', description: "Un ataque veloz que consume 5 MP." },
+            'special_strike': { name: 'Golpe Especial', icon: '🔥', mpCost: 12, damageMultiplier: 1.8, type: 'attack', levelReq: 1, description: "Un ataque más poderoso que consume MP. Buen trade-off daño/MP." },
+            'basic_guard': { name: 'Guardia Básica', icon: '🛡️', mpCost: 8, type: 'defensive', statusEffect: { type: 'protected', duration: 1, value: 0.4 }, levelReq: 1, description: "Reduce el daño recibido el siguiente turno en 40%. Coste: 8 MP." },
             'power_strike': { name: 'Golpe Poderoso', icon: '💥', mpCost: 15, damageMultiplier: 2.0, type: 'attack', levelReq: 5, description: "Un golpe devastador. Coste: 15 MP. Req LV: 5." },
             'heal_light': { name: 'Curación Ligera', icon: '➕', mpCost: 20, healAmount: 50, type: 'heal', levelReq: 3, description: "Restaura 50 HP. Coste: 20 MP. Req LV: 3." },
             'shield_bash': { name: 'Golpe de Escudo', icon: '🛡️', mpCost: 10, damageMultiplier: 0.8, stunChance: 0.3, type: 'utility', levelReq: 8, description: "Aturde al enemigo con el escudo. Coste: 10 MP. Req LV: 8." },
@@ -305,7 +359,7 @@
                     exp: 2000,
                     col: 1000,
                     icon: '👁️‍🗨️👁️', // Cambié el emoji por uno más genérico y compatible
-                    drops: { 'dragon_scale': 0.1, 'divine_fragment': 0.02, 'elucidator_prototype': 0.01 },
+                    drops: { 'dragon_scale': 0.12, 'divine_fragment': 0.025, 'elucidator_prototype': 0.02 },
                     skills: [
                         { id: 'boss_tremor', name: 'Temblor de Tierra', damageMultiplier: 1.6, statusEffect: { type: 'stunned', duration: 1, chance: 0.5 } }
                     ]
@@ -334,7 +388,7 @@
                     exp: 3000,
                     col: 1500,
                     icon: '🐐👹',
-                    drops: { 'divine_fragment': 0.05, 'dragon_scale': 0.2, 'elucidator': 0.005 },
+                    drops: { 'divine_fragment': 0.06, 'dragon_scale': 0.22, 'elucidator': 0.008 },
                     skills: [
                         { id: 'boss_cleave', name: 'Tajo Brutal', damageMultiplier: 2.0, statusEffect: { type: 'bleeding', duration: 3, value: 0.12 } }
                     ]
@@ -504,25 +558,135 @@
             turnCount: 0, 
         };
 
-        // ===============================================
-        //           MÚSICA DE FONDO (Archivo de Audio)
+// ===============================================
+        //            MÚSICA DE FONDO (Archivo de Audio)
         // ===============================================
         const backgroundMusic = document.getElementById('background-music');
         const musicToggleBtn = document.getElementById('music-toggle-btn'); 
 
-        backgroundMusic.volume = 0.3;
+        // Solo procede si ambos elementos (audio y botón) existen en el DOM
+        if (backgroundMusic && musicToggleBtn) {
+            backgroundMusic.volume = 0.3; // Establece el volumen inicial
 
-        function toggleMusic() {
-            if (backgroundMusic.paused) {
-                backgroundMusic.play().catch(e => console.warn("Error al reproducir música:", e)); // Añadir catch
-                musicToggleBtn.textContent = "🔇 Silenciar";
-                showNotification("Música iniciada.", "default", 1500);
-            } else {
-                backgroundMusic.pause();
-                backgroundMusic.currentTime = 0; 
-                musicToggleBtn.textContent = "🔊 Música";
-                showNotification("Música detenida.", "default", 1500);
+            // Función para actualizar el texto y la clase CSS del botón
+            function updateMusicButtonUI() {
+                if (!backgroundMusic.paused) {
+                    musicToggleBtn.textContent = "🔇 Silenciar";
+                    musicToggleBtn.classList.add('music-active'); // Añade la clase si la música está sonando
+                } else {
+                    musicToggleBtn.textContent = "🔊 Música";
+                    musicToggleBtn.classList.remove('music-active'); // Quita la clase si la música está pausada
+                }
             }
+
+            // Función principal para alternar la música
+            function toggleMusic() {
+                if (backgroundMusic.paused) {
+                    // Intenta reproducir la música. .play() devuelve una Promesa.
+                    backgroundMusic.play()
+                        .then(() => {
+                            // La reproducción fue exitosa (o no fue bloqueada)
+                            updateMusicButtonUI(); // Actualiza el UI del botón
+                            showNotification("Música iniciada.", "default", 1500);
+                        })
+                        .catch(error => {
+                            // La reproducción fue bloqueada por el navegador o falló por otra razón
+                            console.warn("Error al intentar reproducir música:", error);
+                            showNotification("Error: Click de nuevo para reproducir la música (requiere interacción).", "error", 3000);
+                            // Asegúrate de que el botón refleje el estado pausado si la reproducción no pudo iniciarse
+                            updateMusicButtonUI(); 
+                        });
+                } else {
+                    // La música está sonando, la pausamos
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0; // Opcional: Reinicia la música al principio
+                    updateMusicButtonUI(); // Actualiza el UI del botón
+                    showNotification("Música detenida.", "default", 1500);
+                }
+            }
+
+            // Asocia la función toggleMusic al evento 'click' del botón de música
+            // Este es el único event listener directo que necesitas para el click del usuario
+            musicToggleBtn.addEventListener('click', toggleMusic);
+
+            // Importante: Escucha los eventos 'play', 'pause' y 'ended' del propio elemento <audio>
+            // Esto asegura que el botón se actualice SIEMPRE que el estado de la música cambie,
+            // ya sea por un click del usuario, si termina la canción, o si el navegador la pausa/reproduce por su cuenta.
+            backgroundMusic.addEventListener('play', updateMusicButtonUI);
+            backgroundMusic.addEventListener('pause', updateMusicButtonUI);
+            backgroundMusic.addEventListener('ended', updateMusicButtonUI); // Cuando la canción llega al final
+
+            // Cuando el DOM está completamente cargado, inicializa el estado visual del botón.
+            // Esto es crucial para que el botón muestre el texto y estilo correctos al cargar la página.
+            // (La música siempre estará "pausada" al cargar la página sin interacción previa)
+            document.addEventListener('DOMContentLoaded', updateMusicButtonUI);
+
+        } else {
+            // Si por alguna razón los IDs no existen, muestra un error en la consola para depuración
+            console.error("Error: Elementos 'background-music' o 'music-toggle-btn' no encontrados en el DOM. Revisa tus IDs en HTML.");
+        }
+
+        // --- Sistema simple de SFX y texto flotante in-combat ---
+        const audioContext = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
+        const sfxBuffers = {};
+        async function loadSfx(name, url) {
+            if (!audioContext) return;
+            try {
+                const res = await fetch(url);
+                const ab = await res.arrayBuffer();
+                sfxBuffers[name] = await audioContext.decodeAudioData(ab);
+            } catch (e) {
+                console.warn('SFX load failed', name, e);
+            }
+        }
+        function playSfx(name) {
+            try {
+                if (audioContext && sfxBuffers[name]) {
+                    const src = audioContext.createBufferSource();
+                    src.buffer = sfxBuffers[name];
+                    const gain = audioContext.createGain();
+                    gain.gain.value = 0.7;
+                    src.connect(gain).connect(audioContext.destination);
+                    src.start(0);
+                } else {
+                    // fallback: short silent/audio placeholder to avoid errors
+                    const a = new Audio();
+                    a.src = ''; // no-op placeholder
+                    a.volume = 0.01; a.play().catch(()=>{});
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        function showFloatingText(text, anchorElement, opts = {}) {
+                    try {
+                        const span = document.createElement('div');
+                        span.className = 'floating-text';
+                        span.textContent = text;
+                        const rect = anchorElement.getBoundingClientRect();
+                        span.style.left = `${rect.left + rect.width/2}px`;
+                        span.style.top = `${rect.top - 8}px`;
+                        span.style.pointerEvents = 'none';
+                        span.style.zIndex = 9999;
+                        // Determine style by opts.type
+                        const t = opts.type || (text.startsWith('-') ? 'damage' : (text.startsWith('+') ? 'heal' : 'status'));
+                        span.classList.add(t);
+                        // Optional color override
+                        if (opts.color) span.style.color = opts.color;
+
+                        // Larger for critical/important
+                        if (opts.large) span.style.fontSize = '2.8rem';
+
+                        document.body.appendChild(span);
+
+                        // Choose animation: shaky for big hits/heal, animate for normal
+                        if (opts.shaky) span.classList.add('shaky');
+                        else span.classList.add('animate');
+
+                        // Remove after animation ends
+                        span.addEventListener('animationend', () => { if (span.parentNode) span.parentNode.removeChild(span); });
+                        // Fallback removal
+                        setTimeout(()=>{ if (span.parentNode) span.parentNode.removeChild(span); }, 1200);
+                    } catch (e) { console.warn('floating text err', e); }
         }
 
         // ===============================================
@@ -668,61 +832,72 @@
 
             const protectedEffect = target.activeStatusEffects.find(eff => eff.type === 'protected');
             if (protectedEffect) {
-                damageTaken *= (1 - protectedEffect.value); 
+                damageTaken *= (1 - protectedEffect.value);
                 addCombatLog(`${target.name} está protegido, daño reducido.`, 'status-message');
             }
 
             const counterEffect = target.activeStatusEffects.find(eff => eff.type === 'counter');
             if (counterEffect && target === player && currentCombat.enemy) { // Solo el jugador puede contraatacar al enemigo
-                const damageReductionFromCounter = damageTaken * counterEffect.damageReduction;
+                const damageReductionFromCounter = damageTaken * (counterEffect.damageReduction || 0);
                 damageTaken -= damageReductionFromCounter;
-                const reflectedDamage = Math.floor(damageTaken * counterEffect.value); // Refleja sobre el daño ya reducido
-                
-                currentCombat.enemy.currentHp -= reflectedDamage; 
+                const reflectedDamage = Math.floor(damageTaken * (counterEffect.value || 0)); // Refleja sobre el daño ya reducido
+
+                currentCombat.enemy.currentHp -= reflectedDamage;
                 addCombatLog(`${target.name} contraataca, ${currentCombat.enemy.name} recibe ${reflectedDamage} de daño reflejado.`, 'player-action');
                 updateCombatEnemyDisplay();
+                showFloatingText(`-${reflectedDamage}`, combatEnemyDisplay, { type: 'damage', color: '#ff9f9f', shaky: true });
                 if (currentCombat.enemy.currentHp <= 0) {
                     endCombat(true); // El enemigo puede morir por el contraataque
                     return; // Termina la función si el enemigo muere
                 }
             }
-            
+
             damageTaken = Math.floor(damageTaken); // Redondear daño final
 
             if (target === player) {
                 target.hp -= damageTaken;
                 if (target.hp < 0) target.hp = 0;
             } else if (target === currentCombat.enemy) {
-                target.currentHp -= damageTaken; 
-                if (target.currentHp < 0) target.currentHp = 0; 
+                target.currentHp -= damageTaken;
+                if (target.currentHp < 0) target.currentHp = 0;
             }
 
-
+            // Visual & audio feedback
             if (target === player) {
                 combatPlayerDisplay.classList.add('damage-flash');
-                setTimeout(() => combatPlayerDisplay.classList.remove('damage-flash'), 200); 
-
+                setTimeout(() => combatPlayerDisplay.classList.remove('damage-flash'), 220);
+                // Floating text + sfx for player hit
+                showFloatingText(`-${damageTaken}`, combatPlayerDisplay, { type: 'damage', color:'#ff6b6b', shaky: damageTaken > Math.max(1, Math.floor(player.maxHp * 0.12)) });
+                playSfx('hit');
                 updatePlayerHUD();
                 if (currentCombat.active) {
                     updateCombatPlayerDisplay();
                     addCombatLog(`${sourceName} te inflige ${damageTaken} de daño.`, 'enemy-action');
                 } else {
-                     showNotification(`${sourceName} te ha infligido ${damageTaken} de daño.`, "error");
+                    showNotification(`${sourceName} te ha infligido ${damageTaken} de daño.`, "error");
                 }
                 if (player.hp === 0) {
-                    if(currentCombat.active) {
-                        endCombat(false); 
-                    } else {
-                        gameOver(); 
-                    }
+                    if (currentCombat.active) endCombat(false);
+                    else gameOver();
                 }
             } else if (target === currentCombat.enemy) {
                 combatEnemyDisplay.classList.add('damage-flash');
-                setTimeout(() => combatEnemyDisplay.classList.remove('damage-flash'), 200); 
+                setTimeout(() => combatEnemyDisplay.classList.remove('damage-flash'), 220);
 
                 updateCombatEnemyDisplay();
                 addCombatLog(`Infliges ${damageTaken} de daño a ${target.name}.`, 'player-action');
-                if (target.currentHp === 0) { 
+                // Floating text + sfx for enemy hit
+                showFloatingText(`-${damageTaken}`, combatEnemyDisplay, { type: 'damage', color:'#ffd700', shaky: damageTaken > Math.max(1, Math.floor(currentCombat.enemy.hp * 0.12)) });
+                playSfx('hit_enemy');
+                // small screen shake on heavy hit
+                if (damageTaken > Math.max(1, Math.floor((currentCombat.enemy.hp || 1) * 0.18))) {
+                    const modalCont = document.querySelector('#combatModal .modal-content');
+                    if (modalCont) {
+                        modalCont.classList.add('screen-shake');
+                        setTimeout(() => modalCont.classList.remove('screen-shake'), 450);
+                    }
+                }
+                if (target.currentHp === 0) {
                     endCombat(true);
                 }
             }
@@ -748,6 +923,12 @@
             }
             updatePlayerHUD();
             if (currentCombat.active) updateCombatPlayerDisplay();
+            // Floating text for restores (if in combat show above target)
+            try {
+                const anchor = (currentCombat.active && target === player) ? combatPlayerDisplay : (currentCombat.active && target === currentCombat.enemy ? combatEnemyDisplay : null);
+                const text = `+${amount}`;
+                if (anchor) showFloatingText(text, anchor, { type: 'heal', color: '#7CFC00', large: true, shaky: true });
+            } catch (e) { /* silent */ }
         }
         
         function openTrainingModal() {
@@ -760,15 +941,20 @@
                 <li>MP Máx: +2</li>
                 <li>Costo: ${cost} Col</li>
             `;
-            trainingGridDisplay.innerHTML = `
-                <div class="training-option" onclick="performTraining()">
-                    <span class="item-icon">💪</span>
-                    <span class="item-name">Entrenamiento Físico</span>
-                    <span class="training-stats-gain">Mejora tus atributos base.</span>
-                    <span class="item-price">Costo: ${cost} Col</span>
-                </div>
+            trainingGridDisplay.innerHTML = '';
+            const trainingOptionDiv = document.createElement('div');
+            trainingOptionDiv.className = 'training-option';
+            trainingOptionDiv.tabIndex = 0;
+            trainingOptionDiv.setAttribute('role', 'button');
+            trainingOptionDiv.innerHTML = `
+                <span class="item-icon">💪</span>
+                <span class="item-name">Entrenamiento Físico</span>
+                <span class="training-stats-gain">Mejora tus atributos base.</span>
+                <span class="item-price">Costo: ${cost} Col</span>
             `;
-            const trainingOptionDiv = trainingGridDisplay.querySelector('.training-option');
+            trainingOptionDiv.addEventListener('click', performTraining);
+            trainingOptionDiv.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); performTraining(); } });
+            trainingGridDisplay.appendChild(trainingOptionDiv);
             if (player.col < cost) {
                 trainingOptionDiv.style.opacity = "0.6";
                 trainingOptionDiv.style.pointerEvents = "none";
@@ -1254,15 +1440,21 @@
         }
 
         function endCombat(playerWon) {
-            currentCombat.active = false;
-            enableCombatActions(false); 
-            player.activeStatusEffects = []; 
-            if(currentCombat.enemy) currentCombat.enemy.activeStatusEffects = []; 
-            updatePlayerHUD(); 
-            if(currentCombat.enemy) updateCombatEnemyDisplay(); 
-            combatPlayerDisplay.classList.remove('active-turn'); 
-            combatEnemyDisplay.classList.remove('active-turn'); 
+            // Visual cue: add victory/defeat class to modal content briefly
+            const modalCont = document.querySelector('#combatModal .modal-content');
+            if (modalCont) {
+                if (playerWon) modalCont.classList.add('combat-victory');
+                else modalCont.classList.add('combat-defeat');
+            }
 
+            currentCombat.active = false;
+            enableCombatActions(false);
+            player.activeStatusEffects = [];
+            if (currentCombat.enemy) currentCombat.enemy.activeStatusEffects = [];
+            updatePlayerHUD();
+            if (currentCombat.enemy) updateCombatEnemyDisplay();
+            combatPlayerDisplay.classList.remove('active-turn');
+            combatEnemyDisplay.classList.remove('active-turn');
 
             if (playerWon) {
                 const enemy = currentCombat.enemy;
@@ -1281,40 +1473,50 @@
                         }
                     }
                 }
+                // Screen shake + floating "Victory" text
+                if (modalCont) {
+                    setTimeout(() => modalCont.classList.remove('combat-victory'), 1600);
+                }
+                showFloatingText('¡Victoria!', combatPlayerDisplay, { type: 'status', color: '#7CFC00', large: true, shaky: true });
+
                 if (currentCombat.isBoss) {
                     const nextFloor = player.currentFloor + 1;
-                    if (floorData[nextFloor]) { 
+                    if (floorData[nextFloor]) {
                         if (!player.unlockedFloors.includes(nextFloor)) {
-                            player.unlockedFloors.push(nextFloor); 
-                            floorData[nextFloor].unlocked = true; 
-                            showNotification(`¡Has desbloqueado el Piso ${nextFloor}: ${floorData[nextFloor].name}!`, "success", 10000); 
+                            player.unlockedFloors.push(nextFloor);
+                            floorData[nextFloor].unlocked = true;
+                            showNotification(`¡Has desbloqueado el Piso ${nextFloor}: ${floorData[nextFloor].name}!`, "success", 10000);
                             player.currentFloor = nextFloor;
-                            updatePlayerHUD(); 
+                            updatePlayerHUD();
                         } else {
                             showNotification(`Ya habías desbloqueado el Piso ${nextFloor}.`, "default", 8000);
                         }
                     } else {
                         showNotification("¡FELICIDADES! ¡Has conquistado todos los pisos de Aincrad y completado el juego!", "success", 20000);
                         addCombatLog("¡Has completado Aincrad!", "system-message");
-                        disableGameActions(true); 
+                        disableGameActions(true);
                     }
-                    setTimeout(() => { 
-                        if (!currentCombat.active) closeModal('combatModal'); 
-                    }, 3000); 
+                    setTimeout(() => {
+                        if (!currentCombat.active) closeModal('combatModal');
+                    }, 3000);
                 } else {
-                    setTimeout(() => { 
-                        if (!currentCombat.active) closeModal('combatModal'); 
-                    }, 4000); 
+                    setTimeout(() => {
+                        if (!currentCombat.active) closeModal('combatModal');
+                    }, 4000);
                 }
-            } else { 
+            } else {
                 addCombatLog("Has sido derrotado...", "system-message");
                 showNotification("Has caído en combate. Serás transportado al último punto seguro.", "error", 8000);
-                player.hp = Math.floor(player.maxHp * 0.1); 
-                if (player.hp === 0 && player.maxHp > 0) player.hp = 1; 
-                player.col = Math.floor(player.col * 0.8); 
-                setTimeout(() => { 
-                    if (!currentCombat.active) closeModal('combatModal'); 
-                }, 4000); 
+                player.hp = Math.floor(player.maxHp * 0.1);
+                if (player.hp === 0 && player.maxHp > 0) player.hp = 1;
+                player.col = Math.floor(player.col * 0.8);
+                // Defeat text & visual
+                showFloatingText('¡Derrota...', combatPlayerDisplay, { type: 'status', color: '#ff6b6b', large: true, shaky: true });
+                if (modalCont) setTimeout(() => modalCont.classList.remove('combat-defeat'), 1600);
+
+                setTimeout(() => {
+                    if (!currentCombat.active) closeModal('combatModal');
+                }, 4000);
             }
             updatePlayerHUD();
             saveGame(); // Guardar después de cada combate
@@ -1409,6 +1611,10 @@
                 const itemData = baseItems[item.id] || item; 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'inventory-item';
+                // apply rarity class for border/glow
+                const rarityLabel = itemData.rarity || 'Common';
+                const rarityClass = rarityLabel.toLowerCase();
+                itemDiv.classList.add(`rarity-${rarityClass}`);
                 let detailsHtml = itemData.description ? `<span class="item-details">${itemData.description}</span>` : '';
                 if (itemData.stats) {
                     detailsHtml += `<span class="item-details">ATK:${itemData.stats.attack || 0} DEF:${itemData.stats.defense || 0} HP:${itemData.stats.hp || 0} MP:${itemData.stats.mp || 0}</span>`;
@@ -1416,10 +1622,14 @@
                 if (itemData.effect) { // Asegurarse que itemData.effect existe
                      detailsHtml += `<span class="item-details">Efecto: ${Object.entries(itemData.effect).map(([key, val]) => `${key.toUpperCase()}: ${val}`).join(', ')}</span>`;
                 }
+                const rarityColor = rarityLabel === 'Epic' ? '#b19cd9' : (rarityLabel === 'Rare' ? '#87ceeb' : (rarityLabel === 'Mythic' ? '#ff4d4d' : '#cccccc'));
+                const socketHtml = itemData.sockets ? `<span class="item-sockets">🔵×${itemData.sockets}</span>` : '';
                 itemDiv.innerHTML = `
                     <span class="item-icon">${itemData.icon}</span>
-                    <span class="item-name">${itemData.name}</span>
+                    <span class="item-name ${rarityLabel === 'Mythic' ? 'mythic' : ''}">${itemData.name}</span>
+                    <span class="item-rarity" style="color:${rarityColor}; font-weight:700; margin-left:0.4rem;">${rarityLabel}</span>
                     ${detailsHtml}
+                    ${socketHtml}
                     ${itemData.levelReq ? `<span class="item-level-req">Req. LV: ${itemData.levelReq}</span>` : ''}
                     ${item.count > 1 ? `<span class="item-count">x${item.count}</span>` : ''}
                 `;
@@ -1435,9 +1645,17 @@
                 const itemData = equippedItem ? (baseItems[equippedItem.id] || equippedItem) : null;
                 slotElement.innerHTML = `<span class="equipment-slot-label">${slotName.charAt(0).toUpperCase() + slotName.slice(1)}</span>`;
                 if (itemData) {
+                    const rarity = itemData.rarity || 'Common';
+                    const rarityColor = rarity === 'Epic' ? '#b19cd9' : (rarity === 'Rare' ? '#87ceeb' : (rarity === 'Mythic' ? '#ff4d4d' : '#cccccc'));
+                    // clear previous rarity classes then add rarity class to slot for border/glow
+                    slotElement.classList.remove('rarity-common','rarity-rare','rarity-epic','rarity-mythic');
+                    slotElement.classList.add(`rarity-${(rarity||'Common').toLowerCase()}`);
+                    const socketHtml = itemData.sockets ? `<span class="item-sockets">🔵×${itemData.sockets}</span>` : '';
                     slotElement.innerHTML += `
                         <span class="item-icon">${itemData.icon}</span>
-                        <span class="item-name">${itemData.name}</span>
+                        <span class="item-name ${rarity === 'Mythic' ? 'mythic' : ''}">${itemData.name}</span>
+                        <span class="item-rarity" style="color:${rarityColor}; margin-left:0.4rem; font-weight:700;">${rarity}</span>
+                        ${socketHtml}
                     `;
                     slotElement.classList.add('has-item');
                     slotElement.onclick = () => unequipItem(slotName);
@@ -1546,14 +1764,22 @@
                 const itemToDisplay = { ...itemBase, ...shopEntry }; 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'shop-item';
+                // rarity class + mythic name color
+                const shopRarity = (itemToDisplay.rarity || 'Common').toLowerCase();
+                itemDiv.classList.add(`rarity-${shopRarity}`);
                 let detailsHtml = itemToDisplay.description ? `<span class="item-details">${itemToDisplay.description}</span>` : '';
                  if (itemToDisplay.stats) {
                     detailsHtml += `<span class="item-details">ATK:${itemToDisplay.stats.attack || 0} DEF:${itemToDisplay.stats.defense || 0} HP:${itemToDisplay.stats.hp || 0} MP:${itemToDisplay.stats.mp || 0}</span>`;
                 }
+                const rarity = itemToDisplay.rarity || 'Common';
+                const rarityColor = rarity === 'Epic' ? '#b19cd9' : (rarity === 'Rare' ? '#87ceeb' : (rarity === 'Mythic' ? '#ff4d4d' : '#cccccc'));
+                const socketHtml = itemToDisplay.sockets ? `<span class="item-sockets">🔵×${itemToDisplay.sockets}</span>` : '';
                 itemDiv.innerHTML = `
                     <span class="item-icon">${itemToDisplay.icon}</span>
-                    <span class="item-name">${itemToDisplay.name}</span>
+                    <span class="item-name ${itemToDisplay.rarity === 'Mythic' ? 'mythic' : ''}">${itemToDisplay.name}</span>
+                    <span class="item-rarity" style="color:${rarityColor}; font-weight:700; margin-left:0.4rem;">${rarity}</span>
                     ${detailsHtml}
+                    ${socketHtml}
                     ${itemToDisplay.levelReq ? `<span class="item-level-req">Req. LV: ${itemToDisplay.levelReq}</span>` : ''}
                     <span class="item-price">${itemToDisplay.price} Col</span>
                 `;
@@ -1633,6 +1859,8 @@
                 if (!itemToCraftBase) { console.warn("Item base no encontrado para receta:", recipe.itemId); return; }
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'blacksmith-item';
+                const craftRarity = (itemToCraftBase.rarity || 'Common').toLowerCase();
+                itemDiv.classList.add(`rarity-${craftRarity}`);
                 let materialsHtml = "Materiales: ";
                 let canCraft = true;
                 for (const matId in recipe.materials) {
@@ -1651,7 +1879,7 @@
                 }
                 itemDiv.innerHTML = `
                     <span class="item-icon">${itemToCraftBase.icon}</span>
-                    <span class="item-name">${itemToCraftBase.name}</span>
+                    <span class="item-name ${itemToCraftBase.rarity === 'Mythic' ? 'mythic' : ''}">${itemToCraftBase.name}</span>
                     ${detailsHtml}
                     ${itemToCraftBase.levelReq ? `<span class="item-level-req">Req. LV: ${itemToCraftBase.levelReq}</span>` : ''}
                     <span class="item-materials">${materialsHtml}</span>
@@ -1954,23 +2182,40 @@
         };
 
         function loadWikiContent() { 
-            charactersGridDisplay.innerHTML = Object.entries(wikiCharacterData).map(([id, char]) => `
-                <div class="card" onclick="showWikiInfo('character', '${id}')">
+            // Render characters as DOM nodes and wire listeners (no inline onclick)
+            charactersGridDisplay.innerHTML = '';
+            Object.entries(wikiCharacterData).forEach(([id, char]) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.tabIndex = 0;
+                card.setAttribute('role', 'button');
+                card.innerHTML = `
                     <div class="card-avatar" style="font-size: ${char.icon.length > 2 ? '2.5rem' : '3.5rem'};">${char.icon}</div>
                     <h3 class="card-name">${char.name}</h3>
                     <p class="card-subtitle">${char.role}</p>
                     <p class="card-description">${char.description}</p>
-                </div>
-            `).join('');
-            weaponsGridDisplay.innerHTML = Object.entries(wikiWeaponData).map(([id, wpn]) => `
-                 <div class="card" onclick="showWikiInfo('weapon', '${id}')">
+                `;
+                card.addEventListener('click', () => showWikiInfo('character', id));
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showWikiInfo('character', id); } });
+                charactersGridDisplay.appendChild(card);
+            });
+            weaponsGridDisplay.innerHTML = '';
+            Object.entries(wikiWeaponData).forEach(([id, wpn]) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.tabIndex = 0;
+                card.setAttribute('role', 'button');
+                card.innerHTML = `
                     <div class="card-icon" style="font-size: ${wpn.icon.length > 2 ? '3rem' : '4.5rem'};">${wpn.icon}</div>
                     <h3 class="card-name">${wpn.name}</h3>
                     <p class="card-subtitle">${wpn.type}</p>
                     <div class="weapon-stats"><span>${wpn.stats}</span></div>
                     <p class="card-description" style="font-size:0.9em; margin-top:10px;">${wpn.description}</p>
-                </div>
-            `).join('');
+                `;
+                card.addEventListener('click', () => showWikiInfo('weapon', id));
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showWikiInfo('weapon', id); } });
+                weaponsGridDisplay.appendChild(card);
+            });
             floorsInfoContainer.innerHTML = `<p style="text-align:center; margin-bottom:2rem;">Aincrad, el castillo flotante, consta de 100 pisos, cada uno con sus propios paisajes, ciudades, monstruos y un temible jefe que guarda el acceso al siguiente nivel. Superar cada piso es un logro monumental para los jugadores atrapados.</p>` + 
             '<div class="card-grid">' + Object.entries(wikiFloorsData).map(([id, floor]) => `
                 <div class="card" style="cursor:default;">
@@ -2121,7 +2366,11 @@
                     { id: 'basic_sword', count: 1 }
                 ].map(itemRef => ({ ...baseItems[itemRef.id], ...itemRef, id: itemRef.id })), 
                 equipment: { weapon: null, shield: null, armor: null, accessory: null },
-                skills: [{ id: 'quick_slash', ...skillData['quick_slash'] }],
+                skills: [
+                    { id: 'quick_slash', ...skillData['quick_slash'] },
+                    { id: 'special_strike', ...skillData['special_strike'] },
+                    { id: 'basic_guard', ...skillData['basic_guard'] }
+                ],
                 passiveSkills: [], 
                 materials: { 'raw_hide': 10, 'iron_ore': 5, 'kobold_fang': 0, 'silver_ingot': 0, 'blue_crystal': 0, 'obsidian_shard': 0, 'dragon_scale': 0, 'divine_fragment': 0 },
                 activeStatusEffects: [],
@@ -2179,14 +2428,16 @@
 
 
         function confirmResetProgress() {
-            modalBodyContentElement.innerHTML = `
-                <h2>Confirmar Reinicio</h2>
-                <p>¿Estás seguro de que quieres iniciar un nuevo personaje? Todo tu progreso actual (incluyendo guardado local) se perderá.</p>
-                <div class="action-buttons" style="margin-top:1.5rem;">
-                    <button class="action-btn" onclick="executeReset()">Sí, Reiniciar</button>
-                    <button class="action-btn" onclick="closeModal('infoModal')">Cancelar</button>
-                </div>
-            `;
+            modalBodyContentElement.innerHTML = '';
+            const h2 = document.createElement('h2'); h2.textContent = 'Confirmar Reinicio';
+            const p = document.createElement('p'); p.textContent = '¿Estás seguro de que quieres iniciar un nuevo personaje? Todo tu progreso actual (incluyendo guardado local) se perderá.';
+            const actionsDiv = document.createElement('div'); actionsDiv.className = 'action-buttons'; actionsDiv.style.marginTop = '1.5rem';
+            const yesBtn = document.createElement('button'); yesBtn.className = 'action-btn'; yesBtn.textContent = 'Sí, Reiniciar';
+            yesBtn.addEventListener('click', executeReset);
+            const cancelBtn = document.createElement('button'); cancelBtn.className = 'action-btn'; cancelBtn.textContent = 'Cancelar';
+            cancelBtn.addEventListener('click', () => closeModal('infoModal'));
+            actionsDiv.appendChild(yesBtn); actionsDiv.appendChild(cancelBtn);
+            modalBodyContentElement.appendChild(h2); modalBodyContentElement.appendChild(p); modalBodyContentElement.appendChild(actionsDiv);
             openModal('infoModal');
         }
 
@@ -2210,20 +2461,47 @@
         }
 
         function checkAdminKey() {
-            const enteredKey = adminKeyValueInput.value;
-            if (ADMIN_SECRET_KEYS.includes(enteredKey)) {
-                player.isAdmin = true;
-                saveGame();
-                closeModal('adminKeyModal');
-                openAdminPanel();
-                showNotification("Acceso Concedido ⚔️", "success");
-                showAdminPanelMessage("Acceso de administrador concedido.", "success");
-            } else {
-                showNotification("Acceso Denegado 🥶💀", "error");
-                adminKeyErrorMsg.textContent = "Clave incorrecta.";
-                adminKeyErrorMsg.style.display = 'block';
-                adminKeyValueInput.value = ''; // Limpiar input
+            const enteredKey = adminKeyValueInput.value || '';
+            // Requerimos que ADMIN_SECRET_HASH esté configurado para la verificación.
+            if (!ADMIN_SECRET_HASH) {
+                console.error('ADMIN_SECRET_HASH no configurado. No se permite verificación insegura en cliente.');
+                showNotification('Administración desactivada (configuración insegura).', 'error');
+                return;
             }
+
+            const lockState = readAdminLockState();
+            if (lockState.lockedUntil && Date.now() < lockState.lockedUntil) {
+                const remaining = Math.ceil((lockState.lockedUntil - Date.now()) / 1000);
+                adminKeyErrorMsg.textContent = `Bloqueado por intentos fallidos. Intenta en ${remaining}s.`;
+                adminKeyErrorMsg.style.display = 'block';
+                showNotification('Acceso temporalmente bloqueado.', 'error');
+                return;
+            }
+
+            sha256Hex(enteredKey).then(hex => {
+                if (hex === ADMIN_SECRET_HASH) {
+                    player.isAdmin = true;
+                    saveGame();
+                    closeModal('adminKeyModal');
+                    openAdminPanel();
+                    showNotification('Acceso Concedido ⚔️', 'success');
+                    showAdminPanelMessage('Acceso de administrador concedido.', 'success');
+                    recordAdminAttempt(true);
+                } else {
+                    const newState = recordAdminAttempt(false);
+                    adminKeyErrorMsg.textContent = 'Clave incorrecta.';
+                    adminKeyErrorMsg.style.display = 'block';
+                    adminKeyValueInput.value = '';
+                    if (newState.lockedUntil && Date.now() < newState.lockedUntil) {
+                        showNotification('Demasiados intentos. Bloqueo temporal activado.', 'error');
+                    } else {
+                        showNotification('Acceso Denegado', 'error');
+                    }
+                }
+            }).catch(err => {
+                console.error('Error al calcular hash:', err);
+                showNotification('Error interno. Intenta de nuevo.', 'error');
+            });
         }
 
         function populateAdminPanel() {
@@ -2481,9 +2759,27 @@
             shopBtn.onclick = () => openModal('shopModal');
             blacksmithBtn.onclick = () => openModal('blacksmithModal');
             playerStatsBtn.onclick = () => openModal('playerStatsModal');
-            musicToggleBtn.onclick = toggleMusic; 
             adminAccessBtn.onclick = openAdminLoginModal; // Listener para el botón de admin
             submitAdminKeyBtn.onclick = checkAdminKey; // Listener para el botón de enviar clave admin
+
+            // Quick combat action buttons (if present)
+            const quickSpecialBtn = document.getElementById('combat-action-skill-quick');
+            const quickDefBtn = document.getElementById('combat-action-defensive-quick');
+            if (quickSpecialBtn) quickSpecialBtn.addEventListener('click', () => {
+                if (!currentCombat.active || !currentCombat.playerTurn) return;
+                // choose highest damage attack skill affordable
+                const availableAttacks = player.skills.filter(s => s.type === 'attack' && player.level >= (s.levelReq||0));
+                availableAttacks.sort((a,b)=> (b.damageMultiplier||0)-(a.damageMultiplier||0));
+                const choice = availableAttacks.find(s => Math.max(0, Math.floor(s.mpCost*(1-player.tempMpCostReduction))) <= player.mp);
+                if (choice) usePlayerSkill(choice.id);
+                else addCombatLog('No tienes MP para usar una habilidad especial.', 'system-message');
+            });
+            if (quickDefBtn) quickDefBtn.addEventListener('click', () => {
+                if (!currentCombat.active || !currentCombat.playerTurn) return;
+                const defs = player.skills.filter(s => s.type === 'defensive' && player.level >= (s.levelReq||0));
+                if (defs.length>0) usePlayerSkill(defs[0].id);
+                else addCombatLog('No tienes una habilidad defensiva equipada.', 'system-message');
+            });
 
             loadGame(); 
             loadWikiContent();
@@ -2562,15 +2858,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Control del Botón de Música (sin sonidos por ahora)
-    const musicToggleButton = document.getElementById('music-toggle-btn');
-    if (musicToggleButton) {
-        musicToggleButton.addEventListener('click', () => {
-            console.log('¡Música togleada!');
-            // Tu lógica para la música aquí
-        });
-    }
-
     // 4. Función para las Partículas
     // NO redeclares headerElement aquí, ya lo declaraste arriba
      let particlesContainer;
@@ -2615,21 +2902,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     */
 );
-
-
-
-    // Para el botón de música, si quieres un sonido al hacer click
-    const musicToggleButton = document.getElementById('music-toggle-btn');
-    if (musicToggleButton) {
-        musicToggleButton.addEventListener('click', () => {
-            // Aquí puedes añadir tu lógica de toggle de música
-            console.log("¡Música toggleada!");
-
-            // Opcional: Sonido al click (necesitas un archivo de sonido)
-            // const clickSound = new Audio('path/to/your/sao-click-sound.mp3');
-            // clickSound.play();
-        });
-    }
 
     // Asegúrate de que setActiveLink esté definida si la usas
     // function setActiveLink(clickedLink) {
@@ -2700,9 +2972,11 @@ function showMobSelectionModal(isBossFight) {
             <div class="mob-card-info"><i class="fas fa-shield-alt"></i>DEF: ${mob.defense}</div>
             <div class="mob-card-info">EXP: ${mob.exp} | Col: ${mob.col}</div>
         `;
-        // Cuando se hace clic en la tarjeta del mob, inicia el combate con ese mob específico
-        // Reemplaza playerActions.combat con startSpecificCombat, que definiremos a continuación
-        mobCard.onclick = () => startSpecificCombat(mob.id, isBoss);
+    // Wiring por dataset: usa evento click y soporte keyboard (Enter/Space)
+    mobCard.tabIndex = 0;
+    mobCard.setAttribute('role', 'button');
+    mobCard.addEventListener('click', () => startSpecificCombat(mob.id, isBoss));
+    mobCard.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startSpecificCombat(mob.id, isBoss); } });
 
         mobListContainer.appendChild(mobCard);
     });
@@ -2714,3 +2988,58 @@ function showMobSelectionModal(isBossFight) {
 // para la barra de HP del enemigo sea 'combat-enemy-hp-bar-fill' como en el ejemplo HTML.
 // Ya usa `classList.remove` y `classList.add` para los estados 'low' y 'critical'.
 // No hay cambios aquí a menos que tu HTML use un ID diferente.
+
+// --- Wiring genérico para data-action / data-close / data-admin-action ---
+document.addEventListener('DOMContentLoaded', () => {
+    // data-action handlers
+    document.querySelectorAll('[data-action]').forEach(el => {
+        const action = el.dataset.action;
+        el.setAttribute('role', 'button');
+        if (!el.hasAttribute('tabindex')) el.tabIndex = 0;
+        el.addEventListener('click', (e) => {
+            if (action === 'save') return saveGame();
+            if (action === 'load') return loadGame();
+            if (action === 'reset') return confirmResetProgress();
+            if (action === 'nav') {
+                const target = el.dataset.target;
+                if (target) {
+                    const targetEl = document.querySelector(target);
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth' });
+                        // setActiveLink if exists
+                        if (typeof setActiveLink === 'function') setActiveLink(el);
+                    }
+                }
+            }
+        });
+        el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } });
+    });
+
+    // data-close handlers (modal close buttons)
+    document.querySelectorAll('[data-close]').forEach(el => {
+        const modalId = el.dataset.close;
+        if (!el.hasAttribute('tabindex')) el.tabIndex = 0;
+        el.addEventListener('click', () => closeModal(modalId));
+        el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeModal(modalId); } });
+    });
+
+    // data-admin-action handlers
+    document.querySelectorAll('[data-admin-action]').forEach(el => {
+        const act = el.dataset.adminAction;
+        el.setAttribute('role', 'button');
+        if (!el.hasAttribute('tabindex')) el.tabIndex = 0;
+        el.addEventListener('click', () => {
+            if (typeof adminActions === 'object') {
+                if (act === 'setStat') return adminActions.setStat(el.dataset.stat, el.dataset.inputid);
+                if (typeof adminActions[act] === 'function') return adminActions[act]();
+            }
+        });
+        el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } });
+    });
+
+    // Ensure modal content close by ESC still works (already present) and add ARIA roles to modals
+    document.querySelectorAll('.modal').forEach(m => {
+        m.setAttribute('role', 'dialog');
+        m.setAttribute('aria-hidden', m.style.display === 'block' ? 'false' : 'true');
+    });
+});
