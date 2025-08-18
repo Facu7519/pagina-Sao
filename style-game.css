@@ -369,14 +369,20 @@
     max-height: 480px;
     overflow-y: auto; /* Habilita el scroll */
     background: rgba(10,10,18,0.3);
+    align-content: start;
 }
 
-/* Estilos de cada ítem dentro de las grillas */
+/* Layouts más flexibles (comportamiento parecido al CSS "viejo") */
+.inventory-grid { grid-auto-rows: 1fr; justify-content: center; }
+.shop-grid { grid-auto-rows: 1fr; justify-content: center; }
+.blacksmith-grid { grid-auto-rows: 1fr; justify-content: center; }
+
+/* Estilos de cada ítem dentro de las grillas (comportamiento y centrado estilo viejo) */
 .inventory-item, .shop-item, .blacksmith-item, .training-option {
     background: rgba(45, 50, 75, 0.6);
-    border: 1px solid rgba(70, 130, 180, 0.4);
+    border: 2px solid rgba(70, 130, 180, 0.4);
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
     font-size: 0.85em;
     cursor: pointer;
@@ -386,14 +392,32 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    min-height: 140px;
+    justify-content: flex-start;
+    min-height: 250px; /* aumentado a 250px para inventario */
 }
+
+/* Etiqueta de rareza */
+.inventory-item::after,
+.shop-item::after,
+.blacksmith-item::after {
+    content: attr(data-rarity);
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.4);
+    color: inherit;
+    opacity: 0.95;
+}
+
+/* Hide any overly-specific conflicting selectors by overriding with this rule */
+div.shop-item.rarity-common.common::after { display: none !important; }
 /* Efectos al pasar el mouse sobre un ítem */
 .inventory-item:hover, .shop-item:hover, .blacksmith-item:hover, .training-option:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 18px rgba(135, 206, 235, 0.25);
-    background: rgba(55, 60, 85, 0.7);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 14px 34px rgba(135, 206, 235, 0.22);
     border-color: #87CEEB;
 }
 .item-icon {
@@ -401,34 +425,99 @@
     display: block;
     margin-bottom: 8px;
     color: #e0e0e0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
 }
 .item-name {
-    font-weight: bold;
-    color: #a1d8ff;
-    margin-bottom: 4px;
-    font-size: 0.9em;
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 12.24px; /* tamaño exacto de la versión vieja */
+    color: #b0c4de; /* color más claro como en la imagen */
+    white-space: normal; /* permitir varias líneas */
+    overflow-wrap: anywhere; /* permitir quiebres en palabras largas */
+    word-break: break-word;
+    text-overflow: clip;
+    overflow: visible;
+    width: 100%;
+    line-height: 1.2; /* mejor espaciado entre líneas */
 }
-.item-details, .item-price, .item-level-req, .item-materials, .item-chance, .training-stats-gain {
+/* Mantener comportamiento adaptable pero con min-width para consistencia antigua */
+.inventory-item, .shop-item, .blacksmith-item { width: auto; height: auto; min-width: 110px; }
+
+/* Ajustes visuales para modales de herrería */
+.modal-content.large.blacksmith-forge, .modal-content.large.blacksmith-upgrade {
+    border: 1px solid rgba(60,180,220,0.45);
+    box-shadow: 0 18px 60px rgba(20,120,160,0.18), inset 0 0 40px rgba(10,30,40,0.2);
+    background: linear-gradient(160deg, rgba(15,22,32,0.98), rgba(25,36,52,0.98));
+}
+
+.blacksmith-item .item-materials { font-size: 0.78em; color: #bcdff6; }
+.blacksmith-item:hover { background: linear-gradient(180deg, rgba(30,45,60,0.95), rgba(20,30,45,0.96)); border-color: rgba(80,200,240,0.6); box-shadow: 0 18px 50px rgba(40,160,220,0.16); transform: translateY(-8px) scale(1.03); }
+.item-details, .item-price, .item-materials, .item-chance, .training-stats-gain {
     font-size: 0.75em;
     color: #b0c4de;
     margin-top: 3px;
 }
-.item-price { color: #FFD700; font-weight: bold; } /* Color dorado para precios */
-.item-level-req { color: #ff8a8a; } /* Rojo claro para requisitos de nivel */
+
+.item-stats {
+    color: #87ceeb;
+    font-size: 11px;
+    margin-top: 4px;
+    text-align: center;
+}
+.item-price { 
+    color: #FFD700; 
+    font-weight: bold;
+    margin-top: auto;
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+}
+.item-level-req { 
+    color: #ff6b6b;
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    margin-top: auto;
+    margin-bottom: 4px;
+    opacity: 0.9;
+}
 .item-materials { font-size: 0.7em; color: #9FB6D7; margin-top: 5px; }
 .item-chance { color: #66CDAA; font-weight: bold; } /* Verde para porcentajes de éxito */
 
 
 .item-count { /* Cantidad de ítems en el inventario */
     position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background: rgba(0,0,0,0.7);
+    bottom: 10px;
+    right: 10px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.7), rgba(10,10,18,0.9));
     border-radius: 50%;
-    padding: 3px 7px;
-    font-size: 0.75em;
+    padding: 6px 10px;
+    font-size: 0.85em;
     color: #e0e0e0;
+    border: 1px solid rgba(255,255,255,0.04);
+    min-width: 34px;
+    text-align: center;
 }
+
+/* Mostrar el span.item-rarity dentro de items para inventario y herrería */
+.inventory-item .item-rarity,
+.blacksmith-item .item-rarity {
+    display: inline-block;
+    margin-top: 6px;
+    font-weight: 700;
+}
+
+/* Ajustes específicos para la tienda: +5px de altura y borde de 3px */
+.shop-item { min-height: 180px; }
+.shop-item { border-width: 3px; }
 
 /* Contenedores de Equipo del Jugador */
 .player-equipment h3, .shop-info h3, .blacksmith-info h3, .training-info h3 {
@@ -627,18 +716,81 @@
     max-height: 400px;
     overflow-y: auto;
 }
-.floor-select-grid button {
-    background: linear-gradient(180deg, #4a80c0 0%, #3a6a9a 100%);
-    border-bottom: 3px solid #2a507a;
+/* Estilos mejorados para la selección de pisos en herrería */
+.blacksmith-floor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    background: rgba(30, 35, 45, 0.4);
+    border-radius: 10px;
+    margin: 15px 0;
 }
-.floor-select-grid button:hover {
-    background: linear-gradient(180deg, #5a9bd8 0%, #4a80c0 100%);
+
+.floor-button {
+    background: linear-gradient(180deg, #4a5464 0%, #363c47 100%);
+    border: 1px solid rgba(135, 206, 235, 0.3);
+    border-radius: 8px;
+    color: #e0e0e0;
+    padding: 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
-.floor-select-grid button:disabled {
-    background: #333;
-    border-bottom: 3px solid #222;
-    color: #888;
+
+.floor-button:hover {
+    background: linear-gradient(180deg, #5a6474 0%, #464c57 100%);
+    border-color: rgba(135, 206, 235, 0.5);
+    transform: translateY(-2px);
+}
+
+.floor-button:disabled {
+    background: #2a2e35;
+    border-color: rgba(80, 80, 80, 0.3);
+    color: #666;
     cursor: not-allowed;
+    transform: none;
+}
+
+.floor-button .floor-name {
+    font-weight: bold;
+    color: #87ceeb;
+}
+
+.floor-button .floor-description {
+    font-size: 0.8em;
+    color: #b0c4de;
+    opacity: 0.8;
+}
+
+/* Botón de mejora de equipo */
+.upgrade-button {
+    background: linear-gradient(180deg, #6a4c93 0%, #563c78 100%);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    border-bottom: 3px solid #422c5d;
+}
+
+.upgrade-button:hover {
+    background: linear-gradient(180deg, #7a5ca3 0%, #664c88 100%);
+    transform: translateY(-2px);
+}
+
+.upgrade-button:disabled {
+    background: #444;
+    border-bottom-color: #333;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* --- Tooltip (para habilidades/pociones/ítems con descripciones) --- */
@@ -937,8 +1089,8 @@
 
     /* Grillas de ítems */
     .inventory-grid, .shop-grid, .blacksmith-grid, .training-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Ítems más pequeños en grilla */
-        gap: 8px;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Ítems reducidos para pantallas medianas */
+        gap: 10px;
     }
 }
 
@@ -951,8 +1103,8 @@
     .modal-content h2 { font-size: 1.8rem; }
     .modal-icon { font-size: 4rem; }
     .close-modal-btn { font-size: 2rem; right: 0.8rem; top: 0.8rem; }
-    .inventory-grid, .shop-grid, .blacksmith-grid, .training-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
-    .item-icon { font-size: 2.5rem; }
+    .inventory-grid, .shop-grid, .blacksmith-grid, .training-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+    .item-icon { font-size: 2.8rem; width:56px; height:56px; }
 
     /* Combate */
     .combatant-display { width: 95%; }
@@ -978,13 +1130,108 @@
 }
 
 /* Borders and glow by rarity for items and equipment */
-.inventory-item.rarity-common, .shop-item.rarity-common, .blacksmith-item.rarity-common, .equipment-slot.rarity-common { border-color: rgba(204,204,204,0.35); }
-.inventory-item.rarity-rare, .shop-item.rarity-rare, .blacksmith-item.rarity-rare, .equipment-slot.rarity-rare { border-color: var(--rarity-rare-color); box-shadow: 0 6px 18px rgba(135,206,235,0.14); }
-.inventory-item.rarity-epic, .shop-item.rarity-epic, .blacksmith-item.rarity-epic, .equipment-slot.rarity-epic { border-color: var(--rarity-epic-color); box-shadow: 0 6px 22px rgba(177,156,217,0.12); }
-.inventory-item.rarity-mythic, .shop-item.rarity-mythic, .blacksmith-item.rarity-mythic, .equipment-slot.rarity-mythic { border-color: var(--rarity-mythic-color); box-shadow: 0 8px 28px rgba(255,77,77,0.18), inset 0 0 8px rgba(255,77,77,0.06); }
+/* Estilos de rareza - versión mejorada */
+.inventory-item[data-rarity="Common"], 
+.shop-item[data-rarity="Common"], 
+.blacksmith-item[data-rarity="Common"],
+.inventory-item.common,
+.shop-item.common,
+.blacksmith-item.common { 
+    border-color: rgba(204,204,204,0.6);
+    background: rgba(35, 40, 60, 0.7);
+    color: rgba(204,204,204,0.9);
+}
+
+.inventory-item[data-rarity="Rare"],
+.shop-item[data-rarity="Rare"],
+.blacksmith-item[data-rarity="Rare"],
+.inventory-item.rare,
+.shop-item.rare,
+.blacksmith-item.rare { 
+    border-color: var(--rarity-rare-color);
+    box-shadow: 0 0 15px rgba(135,206,235,0.2);
+    color: var(--rarity-rare-color);
+}
+
+.inventory-item[data-rarity="Epic"],
+.shop-item[data-rarity="Epic"],
+.blacksmith-item[data-rarity="Epic"],
+.inventory-item.epic,
+.shop-item.epic,
+.blacksmith-item.epic { 
+    border-color: var(--rarity-epic-color);
+    box-shadow: 0 0 15px rgba(177,156,217,0.2);
+    color: var(--rarity-epic-color);
+}
+
+.inventory-item[data-rarity="Mythic"],
+.shop-item[data-rarity="Mythic"],
+.blacksmith-item[data-rarity="Mythic"],
+.inventory-item.mythic,
+.shop-item.mythic,
+.blacksmith-item.mythic { 
+    border-color: #ff4d4d;
+    box-shadow: 0 0 15px rgba(255,77,77,0.3);
+    background: rgba(60, 35, 35, 0.7);
+    color: #ff4d4d;
+}
+
+/* Asegurar que los slots de equipo reflejen correctamente los estilos de rareza en el nombre del item */
+.equipment-slot[data-rarity="Common"] .item-name,
+.equipment-slot.common .item-name,
+.item-name.common { color: #b0c4de; }
+
+.equipment-slot[data-rarity="Rare"] .item-name,
+.equipment-slot.rare .item-name,
+.item-name.rare { color: var(--rarity-rare-color); text-shadow: 0 0 8px rgba(135,206,235,0.4); }
+
+.equipment-slot[data-rarity="Epic"] .item-name,
+.equipment-slot.epic .item-name,
+.item-name.epic { color: var(--rarity-epic-color); text-shadow: 0 0 8px rgba(177,156,217,0.4); }
+
+.equipment-slot[data-rarity="Mythic"] .item-name,
+.equipment-slot.mythic .item-name,
+.item-name.mythic { color: var(--rarity-mythic-color); text-shadow: 0 0 8px rgba(255,77,77,0.7); }
+
+/* Selectores alternativos más simples para compatibilidad con templates/JS que usan clases como .rare, .epic, etc. */
+.inventory-item.common, .shop-item.common, .blacksmith-item.common, .equipment-slot.common { border-color: rgba(160,160,160,0.5); }
+.inventory-item.rare, .shop-item.rare, .blacksmith-item.rare, .equipment-slot.rare { border-color: var(--rarity-rare-color); box-shadow: 0 6px 18px rgba(135,206,235,0.14); }
+.inventory-item.epic, .shop-item.epic, .blacksmith-item.epic, .equipment-slot.epic { border-color: var(--rarity-epic-color); box-shadow: 0 6px 22px rgba(177,156,217,0.12); }
+.inventory-item.legendary, .shop-item.legendary, .blacksmith-item.legendary, .equipment-slot.legendary,
+.inventory-item.mythic, .shop-item.mythic, .blacksmith-item.mythic, .equipment-slot.mythic { border-color: var(--rarity-mythic-color); box-shadow: 0 8px 28px rgba(255,77,77,0.18), inset 0 0 8px rgba(255,77,77,0.06); }
 
 /* Item name color for mythic only (fácil de añadir otras rarezas) */
-.item-name.mythic { color: var(--rarity-mythic-color); text-shadow: 0 0 8px rgba(255,77,77,0.7); }
+/* Colores de texto por rareza */
+.inventory-item[data-rarity="Common"] .item-name,
+.shop-item[data-rarity="Common"] .item-name,
+.blacksmith-item[data-rarity="Common"] .item-name,
+.item-name.common {
+    color: #b0c4de;
+}
+
+.inventory-item[data-rarity="Rare"] .item-name,
+.shop-item[data-rarity="Rare"] .item-name,
+.blacksmith-item[data-rarity="Rare"] .item-name,
+.item-name.rare {
+    color: var(--rarity-rare-color);
+    text-shadow: 0 0 8px rgba(135,206,235,0.4);
+}
+
+.inventory-item[data-rarity="Epic"] .item-name,
+.shop-item[data-rarity="Epic"] .item-name,
+.blacksmith-item[data-rarity="Epic"] .item-name,
+.item-name.epic {
+    color: var(--rarity-epic-color);
+    text-shadow: 0 0 8px rgba(177,156,217,0.4);
+}
+
+.inventory-item[data-rarity="Mythic"] .item-name,
+.shop-item[data-rarity="Mythic"] .item-name,
+.blacksmith-item[data-rarity="Mythic"] .item-name,
+.item-name.mythic {
+    color: var(--rarity-mythic-color);
+    text-shadow: 0 0 8px rgba(255,77,77,0.7);
+}
 
 /* Floating combat text improved */
 .floating-text {

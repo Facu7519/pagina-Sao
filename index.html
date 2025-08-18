@@ -11,6 +11,8 @@
     <!-- Enlace a archivos CSS del juego y la wiki -->
     <link rel="stylesheet" href="style-wiki.css">
     <link rel="stylesheet" href="style-game.css">
+    <!-- Estilos de scrollbar personalizados -->
+    <link rel="stylesheet" href="custom-scroll.css">
 </head>
 
 <body>
@@ -20,7 +22,7 @@
     <audio id="background-music" loop src="sao_theme.mp3"></audio>
 
     <div class="floating-particles" id="particles"></div>
-    <div class="floating-particles" id="particles"></div>
+    <div class="floating-particles" id="particles-2"></div>
     <div id="notification-area"></div>
 
     <header>
@@ -181,6 +183,58 @@
             </div>
         </div>
     </div>
+
+                <!-- Nuevo: Interfaz Rework Herrería -->
+                <!-- Modal Selector Principal de Herrería -->
+                <div id="blacksmithMainModal" class="modal">
+                    <div class="modal-content large blacksmith-main">
+                        <span class="close-modal-btn" onclick="openModal('adminPanelModal')?closeModal('blacksmithMainModal'):closeModal('blacksmithMainModal')">&times;</span>
+                        <h2 style="text-align:center;">🛠️ Herrería - Selecciona una opción</h2>
+                        <div class="blacksmith-main-grid">
+                            <button class="bs-option" data-target="blacksmithForgeModal">🔨 Forjar</button>
+                            <button class="bs-option" data-target="blacksmithUpgradeModal">⬆️ Mejorar Equipamiento</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal: Forjar (nuevo) -->
+                <div id="blacksmithForgeModal" class="modal">
+                    <div class="modal-content large blacksmith-forge">
+                        <span class="close-modal-btn" onclick="closeModal('blacksmithForgeModal')">&times;</span>
+                        <h2>🔨 Forjar</h2>
+                        <p style="text-align:center;">Selecciona una receta para forjar un ítem.</p>
+                        <div id="forge-recipes-grid" class="blacksmith-actions-grid">
+                            <!-- Recipes rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal: Mejorar Equipamiento -->
+                <div id="blacksmithUpgradeModal" class="modal">
+                    <div class="modal-content large blacksmith-upgrade">
+                        <span class="close-modal-btn" onclick="closeModal('blacksmithUpgradeModal')">&times;</span>
+                        <h2>⚒️ Mejorar Equipamiento</h2>
+                        <div style="display:flex; gap:1rem;">
+                            <div style="flex:1;">
+                                <h3>Tus Equipos</h3>
+                                <div id="upgrade-equipment-list" class="inventory-grid">
+                                    <!-- Lista de equipo desde JS -->
+                                </div>
+                            </div>
+                            <div style="flex:1;">
+                                <h3>Previsualización</h3>
+                                <div id="upgrade-preview" style="padding:1rem; background:#07101a; border-radius:8px; min-height:160px;">
+                                    Selecciona un equipo para ver detalles y coste.
+                                </div>
+                                <div style="margin-top:1rem; text-align:center;">
+                                    <button id="confirm-upgrade-btn" class="action-btn" disabled>Mejorar (Col: <span id="upgrade-cost">0</span>)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reforjar y Reforzar Gemas eliminados (funcionalidad removida) -->
 
     <!-- Modal de Tienda -->
     <div id="shopModal" class="modal">
@@ -467,5 +521,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <!-- Cargando los archivos JavaScript de tu juego (¡el orden es importante!) -->
-    <script src="script.js"></script>     
+    <script src="script.js"></script>
+    <script src="scrollbar.js"></script>
 </body>

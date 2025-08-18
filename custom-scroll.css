@@ -1,0 +1,178 @@
+/* 🌌 Scrollbar*/
+/* ================================
+   Scrollbar inmersivo: CSS + variables
+   - Delgada, elegante, con aura dinámica
+   - Soporta WebKit y Firefox
+   - Reactiva a velocidad e interacción via JS
+   ================================ */
+
+:root{
+  /* Base visual */
+  --app-bg: #0b1220; /* nuevo fondo oscuro en lugar del gris */
+  --panel-bg: #0f1724;
+  --muted-bg: #0a0f18;
+
+  /* Scrollbar simple azul celeste */
+  --scroll-thumb-width: 10px;
+  --scroll-thumb-color: #7fd3f7; /* azulceleste */
+  --scroll-thumb-color-2: #4fbfe6;
+  --scroll-track-color: rgba(255,255,255,0.03);
+  --scroll-track-border: rgba(0,0,0,0.35);
+
+  /* Transition helper */
+  --scroll-transition-duration: 300ms;
+}
+
+/* ----------------------- WebKit-based browsers ----------------------- */
+*::-webkit-scrollbar{ width: var(--scroll-thumb-width); height: var(--scroll-thumb-width); }
+
+/* Track */
+*::-webkit-scrollbar-track{
+  background: var(--scroll-track-color);
+  border-radius: 10px;
+  border: 1px solid var(--scroll-track-border);
+}
+
+/* Thumb: simple, moderno */
+*::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, var(--scroll-thumb-color), var(--scroll-thumb-color-2));
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.03);
+  transition: background var(--scroll-transition-duration) ease, transform 160ms ease;
+}
+
+/* Hover / focus: resplandor y expansión suave */
+*::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:active,
+*::-webkit-scrollbar-thumb:focus{
+  transform: scale(1.04);
+  background: linear-gradient(180deg, var(--scroll-thumb-color-2), var(--scroll-thumb-color));
+}
+
+/* Cuando JS detecta scroll rápido, hacer aura más intensa */
+/* Eliminar clases dependientes de JS (no usadas) */
+
+/* Component-specific variants */
+.mob-list-grid::-webkit-scrollbar-thumb,
+.inventory-grid::-webkit-scrollbar-thumb,
+.modal .modal-content::-webkit-scrollbar-thumb,
+.shop-grid::-webkit-scrollbar-thumb,
+.blacksmith-grid::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, #7fd3f7, #4fbfe6);
+}
+
+/* Track thin visual accent for lists */
+.mob-list-grid::-webkit-scrollbar-track,
+.inventory-grid::-webkit-scrollbar-track,
+.modal .modal-content::-webkit-scrollbar-track{ background: linear-gradient(180deg,#06070a,#0b0e12); }
+
+/* Aura animation (subtle gradient shift) */
+/* transición helper: cuando exista la clase, suavizar cambios visuales */
+:root.scrollbar-color-transition { transition: all var(--scroll-transition-duration) ease; }
+
+/* ----------------------- Firefox ----------------------- */
+*{ scrollbar-width: thin; scrollbar-color: #7fd3f7 rgba(255,255,255,0.04); }
+
+/* Per-component explicit override */
+.mob-list-grid, .inventory-grid, .blacksmith-grid, .shop-grid, .modal .modal-content{
+  scrollbar-width: thin;
+  scrollbar-color: #7fd3f7 rgba(255,255,255,0.04);
+}
+
+/* Accessibility / responsive tweaks */
+@media (max-width: 480px){
+  :root{ --scroll-thumb-width: 6px; }
+  *::-webkit-scrollbar{ width: var(--scroll-thumb-width); height: var(--scroll-thumb-width); }
+}
+
+*:focus{ outline: none; }
+*:focus::-webkit-scrollbar-thumb{ box-shadow: 0 0 8px rgba(127,211,247,0.14), inset 0 1px 0 rgba(255,255,255,0.08); }
+
+/* Utility: hidden arrows */
+::-webkit-scrollbar-button{ display: none; height: 0; }
+
+/* Slight visual track overlay for depth */
+.modal .modal-content::before, .inventory-content::before{
+  content: '';
+  position: absolute; left: 0; right: 0; top: 0; bottom: 0; pointer-events: none;
+  box-shadow: inset 0 20px 60px rgba(0,0,0,0.45);
+  border-radius: inherit;
+}
+
+/* Aplicar nuevo fondo base a la app */
+body{ background: var(--app-bg); color: #d7eaf6; }
+
+/* ================== Herrería - estilos ================== */
+.blacksmith-main .blacksmith-main-grid{
+  display:flex; gap:1rem; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:1rem;
+}
+.blacksmith-main .bs-option{
+  /* Botón selector grande y centrado */
+  background: linear-gradient(180deg, #0f9bdc, #0aa3e0);
+  color: #02121a;
+  border: none;
+  padding: 1.1rem 1.6rem;
+  font-size:1.15rem;
+  border-radius: 12px;
+  cursor:pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 160px;
+  min-height: 56px;
+  box-shadow: 0 12px 28px rgba(10,140,200,0.14), inset 0 -2px 0 rgba(255,255,255,0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 160ms ease;
+}
+.blacksmith-main .bs-option:hover{ transform: translateY(-4px) scale(1.01); box-shadow: 0 18px 36px rgba(10,140,200,0.18); }
+
+/* Clase utilitaria para botones de herrería más específicos */
+.blacksmith-selector-btn { /* puede aplicarse a botones dentro de modales/herrería para consistencia */
+  background: linear-gradient(180deg, #6bc1e8 0%, #2d9ecf 100%);
+  color: #02121a;
+  padding: 0.9rem 1.4rem;
+  font-size: 1.05rem;
+  border-radius: 12px;
+  min-width: 140px;
+  min-height: 52px;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  border: none; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(30,120,160,0.12), inset 0 -2px 0 rgba(255,255,255,0.04);
+  transition: all 0.18s ease;
+}
+.blacksmith-selector-btn:hover{ transform: translateY(-3px); box-shadow: 0 14px 30px rgba(30,120,160,0.16); }
+
+.blacksmith-actions-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:16px; margin-top:1rem; }
+.blacksmith-forge .blacksmith-actions-grid .recipe-card{
+  background: linear-gradient(180deg, #07101a, #0b1720);
+  padding:18px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.04);
+  min-height: 160px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.blacksmith-upgrade #upgrade-equipment-list{ display:grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap:12px; max-height:520px; overflow:auto; padding:10px; }
+.blacksmith-upgrade .inventory-grid .item-card{ background:#07121b; padding:10px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid rgba(255,255,255,0.04); min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; }
+.blacksmith-upgrade .inventory-grid .item-card.selected{ outline: 3px solid rgba(127,211,247,0.65); transform: translateY(-6px); box-shadow: 0 10px 30px rgba(31,158,210,0.12); }
+
+/* Modal tweaks to ensure adequate spacing */
+.modal .modal-content.large.blacksmith-main, .modal .modal-content.large.blacksmith-forge, .modal .modal-content.large.blacksmith-upgrade{
+  max-width: 1100px; width: 94%; padding: 1.6rem 1.8rem;
+  /* Aumenta altura vertical del modal para herrería y permite scroll interno */
+  min-height: 640px;
+  max-height: 86vh;
+  overflow-y: auto;
+  margin: 2% auto; /* menos margen superior para mayor presencia vertical */
+}
+
+/* Small helpers */
+.recipe-card .card-title{ font-weight:700; color:#dff6ff; }
+.action-btn[disabled]{ opacity:0.45; cursor:not-allowed; }
+
+
+
+/* End of custom-scroll.css */

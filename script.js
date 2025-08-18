@@ -82,7 +82,7 @@
             ],
             equipment: {
                 weapon: null,
-                shield: null, 
+                shield: null,
                 armor: null,
                 accessory: null
             },
@@ -106,19 +106,22 @@
         
         // Datos de Items Base (sin cambios)
     const baseItems = {
-            'healing_potion_s': { name: 'Poción Vida (P)', icon: '🧪', type: 'consumable', effect: { hp: 50 }, description: "Restaura 50 HP." },
+            'healing_potion_s': { name: 'Poción Vida (P)', icon: '🧪', type: 'consumable', effect: { hp: 50 }, description: "Restaura 50 HP."},
             'healing_potion_m': { name: 'Poción Vida (M)', icon: '🧪', type: 'consumable', effect: { hp: 120 }, description: "Restaura 120 HP." },
             'healing_potion_l': { name: 'Poción Vida (G)', icon: '🧪', type: 'consumable', effect: { hp: 300 }, description: "Restaura 300 HP." },
             'mana_potion_s': { name: 'Poción Maná (P)', icon: '💧', type: 'consumable', effect: { mp: 30 }, description: "Restaura 30 MP." },
             'mana_potion_m': { name: 'Poción Maná (M)', icon: '💧', type: 'consumable', effect: { mp: 75 }, description: "Restaura 75 MP." },
+            
             'antidote_herb': { name: 'Hierba Antídoto', icon: '🌿', type: 'consumable', effect: { cure: 'poison' }, description: "Cura el veneno." },
+            
             'basic_sword': { name: 'Espada Básica', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 5 }, levelReq: 1, description: "Una espada simple.", rarity: 'Common', sockets: 0 },
             'short_sword': { name: 'Espada Corta', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 8 }, levelReq: 2, description: "Un poco mejor que la básica." },
             'iron_sword': { name: 'Espada de Hierro', icon: '🗡️', type: 'weapon', slot: 'weapon', stats: { attack: 15 }, levelReq: 5, description: "Hoja de hierro confiable.", rarity: 'Common', sockets: 0 },
             'steel_longsword': { name: 'Mandoble de Acero', icon: '⚔️', type: 'weapon', slot: 'weapon', stats: { attack: 25, defense: 2 }, levelReq: 10, description: "Una espada larga y robusta.", rarity: 'Rare', sockets: 1 },
             'knight_sword': { name: 'Espada de Caballero', icon: '⚔️', type: 'weapon', slot: 'weapon', stats: { attack: 35, defense: 5 }, levelReq: 15, description: "Arma estándar de caballero." },
-            'elucidator_prototype': { name: 'Prototipo Elucidator', icon: '⚫', type: 'weapon', slot: 'weapon', stats: { attack: 50, hp: 20 }, levelReq: 25, description: "Un intento de replicar una leyenda." },
-            'lambent_light_replica': { name: 'Réplica Luz Lambent', icon: '✨', type: 'weapon', slot: 'weapon', stats: { attack: 45, mp: 15 }, levelReq: 25, description: "Imita la velocidad de la famosa estoque." },
+            
+            'elucidator_prototype': { name: 'Prototipo Elucidator', icon: '⚫', type: 'weapon', slot: 'weapon', stats: { attack: 50, hp: 20 }, levelReq: 25, description: "Un intento de replicar una leyenda.", rarity: 'Rare', sockets: 1 },
+            'lambent_light_replica': { name: 'Réplica Luz Lambent', icon: '✨', type: 'weapon', slot: 'weapon', stats: { attack: 45, mp: 15 }, levelReq: 25, description: "Imita la velocidad de la famosa estoque.", rarity: 'Rare', sockets: 1 },
             'wooden_buckler': { name: 'Broquel de Madera', icon: '🛡️', type: 'shield', slot: 'shield', stats: { defense: 3 }, levelReq: 1, description: "Un escudo pequeño y ligero." },
             'iron_kite_shield': { name: 'Escudo Cometa Hierro', icon: '🛡️', type: 'shield', slot: 'shield', stats: { defense: 8, hp: 15 }, levelReq: 6, description: "Defensa de hierro sólida." },
             'steel_tower_shield': { name: 'Escudo Torre Acero', icon: '🛡️', type: 'shield', slot: 'shield', stats: { defense: 15, hp: 30 }, levelReq: 12, description: "Gran protección, algo pesado." },
@@ -128,19 +131,22 @@
             'knight_armor': { name: 'Armadura de Caballero', icon: '鎧', type: 'armor', slot: 'armor', stats: { defense: 28, hp: 70 }, levelReq: 16, description: "Armadura completa de caballero." },
             'ring_of_strength': { name: 'Anillo de Fuerza', icon: '💍', type: 'accessory', slot: 'accessory', stats: { attack: 3 }, levelReq: 3, description: "Aumenta ligeramente el ataque." },
             'amulet_of_vitality': { name: 'Amuleto Vitalidad', icon: '💠', type: 'accessory', slot: 'accessory', stats: { hp: 25 }, levelReq: 5, description: "Incrementa los puntos de vida." },
+            
             'mage_pendant': { name: 'Colgante de Mago', icon: '🔮', type: 'accessory', slot: 'accessory', stats: { mp: 20 }, levelReq: 8, description: "Aumenta la reserva de maná." },
             'raw_hide': { name: 'Cuero Crudo', icon: '🟤', type: 'material', description: "Material de forja básico."},
             'iron_ore': { name: 'Mena de Hierro', icon: '🔩', type: 'material', description: "Material de forja común."},
+            
             'kobold_fang': { name: 'Colmillo de Kóbold', icon: '🦷', type: 'material', description: "Material de monstruo."},
             'silver_ingot': { name: 'Lingote de Plata', icon: '🥈', type: 'material', description: "Metal precioso para forja."},
             'blue_crystal': { name: 'Cristal Azul', icon: '💎', type: 'material', description: "Cristal imbuido de energía."},
             'obsidian_shard': { name: 'Esquirla de Obsidiana', icon: '🌑', type: 'material', description: "Fragmento de roca volcánica."},
             'dragon_scale': { name: 'Escama de Dragón', icon: '🐉', type: 'material', description: "Material raro y resistente."},
             'divine_fragment': { name: 'Fragmento Divino', icon: '🌟', type: 'material', description: "Material legendario, casi imposible de encontrar."},
+            
             'elucidator': { name: 'Elucidator', icon: '⚫', type: 'weapon', slot: 'weapon', stats: { attack: 150, hp: 100 }, levelReq: 50, description: "Espada negra legendaria, forjada de un cristal de alta densidad.", rarity: 'Mythic', sockets: 2 },
-            'dark_repulser': { name: 'Dark Repulser', icon: '🟢', type: 'weapon', slot: 'weapon', stats: { attack: 140, defense: 20 }, levelReq: 50, description: "Espada verde cristalina, forjada por Lisbeth con un lingote de Crystallite." },
+            'dark_repulser': { name: 'Dark Repulser', icon: '🟢', type: 'weapon', slot: 'weapon', stats: { attack: 140, defense: 20 }, levelReq: 50, description: "Espada verde cristalina, forjada por Lisbeth con un lingote de Crystallite.", rarity: 'Mythic', sockets: 2 },
             'lambent_light': { name: 'Lambent Light', icon: '✨', type: 'weapon', slot: 'weapon', stats: { attack: 130, mp: 50 }, levelReq: 48, description: "Estoque de Asuna, increíblemente rápido y preciso.", rarity: 'Epic', sockets: 1 },
-            'heathcliff_shield': { name: 'Escudo de Heathcliff', icon: '🛡️', type: 'shield', slot: 'shield', stats: { defense: 100, hp: 200 }, levelReq: 60, description: "El escudo inamovible del líder de los KoB." }
+            'heathcliff_shield': { name: 'Escudo de Heathcliff', icon: '🛡️', type: 'shield', slot: 'shield', stats: { defense: 100, hp: 200 }, levelReq: 60, description: "El escudo inamovible del líder de los KoB.", rarity: 'Mythic', sockets: 2 }
         };
 
         // Recetas de Herrería (sin cambios)
@@ -152,6 +158,83 @@
             'lambent_light': { itemId: 'lambent_light', materials: { 'silver_ingot': 50, 'blue_crystal': 15, 'divine_fragment': 1 }, cost: 45000, levelReq: 42, chance: 0.20 },
             'heathcliff_shield': { itemId: 'heathcliff_shield', materials: { 'iron_ore': 100, 'obsidian_shard': 20, 'dragon_scale': 5, 'divine_fragment': 2 }, cost: 75000, levelReq: 55, chance: 0.10 }
         };
+
+    // Añadir recetas adicionales más accesibles para pisos bajos/medios
+    blacksmithRecipes['wooden_buckler'] = { itemId: 'wooden_buckler', materials: { 'raw_hide': 4, 'iron_ore': 2 }, cost: 80, levelReq: 1, chance: 0.95 };
+    blacksmithRecipes['iron_kite_shield'] = { itemId: 'iron_kite_shield', materials: { 'iron_ore': 12, 'raw_hide': 2 }, cost: 420, levelReq: 6, chance: 0.90 };
+    blacksmithRecipes['leather_jerkin'] = { itemId: 'leather_jerkin', materials: { 'raw_hide': 8 }, cost: 60, levelReq: 1, chance: 0.97 };
+    blacksmithRecipes['chainmail_vest'] = { itemId: 'chainmail_vest', materials: { 'iron_ore': 18, 'raw_hide': 4 }, cost: 300, levelReq: 4, chance: 0.85 };
+    blacksmithRecipes['iron_plate_armor'] = { itemId: 'iron_plate_armor', materials: { 'iron_ore': 40, 'silver_ingot': 4 }, cost: 1200, levelReq: 9, chance: 0.6 };
+    blacksmithRecipes['ring_of_strength'] = { itemId: 'ring_of_strength', materials: { 'silver_ingot': 2 }, cost: 150, levelReq: 3, chance: 0.92 };
+    blacksmithRecipes['amulet_of_vitality'] = { itemId: 'amulet_of_vitality', materials: { 'blue_crystal': 1, 'silver_ingot': 3 }, cost: 300, levelReq: 5, chance: 0.7 };
+
+
+        // Helper: generar UID único por instancia de item
+        function genUid() {
+            return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,9);
+        }
+
+        // Normalizar inventario y equipo tras load/initialize: asegurar instancias únicas con uid, stats y level
+        function normalizePlayerItems() {
+            // Normalize inventory
+            const newInventory = [];
+            for (const entry of player.inventory) {
+                const base = baseItems[entry.id] || {};
+                const type = base.type || entry.type;
+                // Consumibles/materiales: keep as single stacked entry
+                if (type === 'consumable' || type === 'material') {
+                    const merged = Object.assign({}, base, entry);
+                    merged.id = entry.id;
+                    merged.count = entry.count || merged.count || 1;
+                    newInventory.push(merged);
+                } else {
+                    // equipment-type: create one instance per count (or single)
+                    const count = entry.count && entry.count > 1 ? entry.count : 1;
+                    // if entry already seems like a full instance (has uid), keep as-is
+                    if (entry.uid) {
+                        // ensure stats/baseStats exist
+                        entry.baseStats = entry.baseStats || (base.stats ? JSON.parse(JSON.stringify(base.stats)) : {});
+                        entry.stats = entry.stats || JSON.parse(JSON.stringify(entry.baseStats));
+                        entry.level = entry.level || 1;
+                        newInventory.push(entry);
+                    } else {
+                        for (let i=0;i<count;i++) {
+                            const inst = JSON.parse(JSON.stringify(base));
+                            inst.id = entry.id;
+                            inst.uid = genUid();
+                            inst.count = 1;
+                            inst.baseStats = inst.baseStats || (inst.stats ? JSON.parse(JSON.stringify(inst.stats)) : {});
+                            inst.stats = inst.stats || JSON.parse(JSON.stringify(inst.baseStats));
+                            inst.level = entry.level || 1;
+                            newInventory.push(inst);
+                        }
+                    }
+                }
+            }
+            player.inventory = newInventory;
+
+            // Normalize equipment slots
+            for (const slot in player.equipment) {
+                const it = player.equipment[slot];
+                if (it) {
+                    const base = baseItems[it.id] || {};
+                    // if it's a simple reference (no uid), ensure instance fields
+                    if (!it.uid) {
+                        const inst = Object.assign({}, base, it);
+                        inst.id = it.id;
+                        inst.uid = genUid();
+                        inst.baseStats = inst.baseStats || (inst.stats ? JSON.parse(JSON.stringify(inst.stats)) : {});
+                        inst.stats = inst.stats || JSON.parse(JSON.stringify(inst.baseStats));
+                        inst.level = inst.level || 1;
+                        player.equipment[slot] = inst;
+                    } else {
+                        it.baseStats = it.baseStats || (base.stats ? JSON.parse(JSON.stringify(base.stats)) : {});
+                        it.stats = it.stats || JSON.parse(JSON.stringify(it.baseStats));
+                        it.level = it.level || 1;
+                    }
+                }
+            }
+        }
         
         // Habilidades del Jugador (Actualizado con nuevas habilidades)
         const skillData = {
@@ -221,7 +304,7 @@
                     { id: 'leather_jerkin', price: 60 },
                     { id: 'wooden_buckler', price: 50 }
                 ],
-                blacksmithRecipes: [],
+                blacksmithRecipes: ['leather_jerkin','wooden_buckler'],
                 unlocked: true
             },
             2: {
@@ -253,7 +336,7 @@
                     { id: 'iron_kite_shield', price: 150 },
                     { id: 'ring_of_strength', price: 120 }
                 ],
-                blacksmithRecipes: [],
+                blacksmithRecipes: ['leather_jerkin','chainmail_vest','iron_kite_shield'],
                 unlocked: false
             },
             3: {
@@ -284,7 +367,7 @@
                     { id: 'iron_plate_armor', price: 400 },
                     { id: 'amulet_of_vitality', price: 250 }
                 ],
-                blacksmithRecipes: [],
+                blacksmithRecipes: ['chainmail_vest','iron_plate_armor','ring_of_strength'],
                 unlocked: false
             },
             4: {
@@ -313,7 +396,7 @@
                     { id: 'steel_tower_shield', price: 380 },
                     { id: 'mage_pendant', price: 300 }
                 ],
-                blacksmithRecipes: [],
+                blacksmithRecipes: ['iron_plate_armor','amulet_of_vitality'],
                 unlocked: false
             },
             5: {
@@ -341,7 +424,7 @@
                     { id: 'knight_sword', price: 800 },
                     { id: 'knight_armor', price: 750 }
                 ],
-                blacksmithRecipes: [],
+                blacksmithRecipes: ['iron_plate_armor','knight_armor','ring_of_strength'],
                 unlocked: false
             },
             6: {
@@ -370,7 +453,7 @@
                     { id: 'obsidian_shard', price: 1500, type: 'material' },
                     { id: 'blue_crystal', price: 2500, type: 'material' }
                 ],
-                blacksmithRecipes: [],
+                blacksmithRecipes: ['elucidator_prototype','lambent_light_replica','iron_plate_armor'],
                 unlocked: false
             },
             7: {
@@ -394,7 +477,7 @@
                     ]
                 },
                 shopItems: [],
-                blacksmithRecipes: [],
+                blacksmithRecipes: ['elucidator','dark_repulser','lambent_light','heathcliff_shield','elucidator_prototype'],
                 unlocked: false
             }
             // ... hasta el piso 100 (seguir la misma estructura para añadir mas pisos)
@@ -419,6 +502,8 @@
         const expBarFillElement = document.getElementById('exp-bar-fill');
         const playerColElement = document.getElementById('player-col');
         const currentFloorElement = document.getElementById('current-floor');
+
+    // ...existing code...
         const floorNameElement = document.getElementById('floor-name');
         const trainCostDisplay = document.getElementById('train-cost-display'); 
 
@@ -488,6 +573,217 @@
         const combatEnemyAtkElement = document.getElementById('combat-enemy-atk');
         const combatEnemyDefElement = document.getElementById('combat-enemy-def');
         const combatEnemyStatusEffectsDisplay = document.getElementById('combat-enemy-status-effects-display'); 
+
+        // ------------------ Nuevo: lógica Herrería Rework ------------------
+        const blacksmithMainModal = document.getElementById('blacksmithMainModal');
+        const blacksmithForgeModal = document.getElementById('blacksmithForgeModal');
+        const blacksmithUpgradeModal = document.getElementById('blacksmithUpgradeModal');
+        const blacksmithReforgeModal = document.getElementById('blacksmithReforgeModal');
+        const blacksmithGemsModal = document.getElementById('blacksmithGemsModal');
+
+
+        function openBlacksmithMain(){
+            openModal('blacksmithMainModal');
+        }
+
+        // abrir ventana objetivo desde selector
+        document.addEventListener('click', (e)=>{
+            const el = e.target.closest && e.target.closest('.bs-option');
+            if (!el) return;
+            const target = el.dataset.target;
+            if (!target) return;
+            // cerrar selector y abrir modal objetivo
+            closeModal('blacksmithMainModal');
+            openModal(target);
+        });
+
+    // el listener se asigna en DOMContentLoaded para mantener la inicialización centralizada
+
+        // Mejorar Equipamiento: sistema de niveles 1-10 con vista previa y coste
+        const upgradeListDiv = document.getElementById('upgrade-equipment-list');
+        const upgradePreviewDiv = document.getElementById('upgrade-preview');
+        const confirmUpgradeBtn = document.getElementById('confirm-upgrade-btn');
+        const upgradeCostSpan = document.getElementById('upgrade-cost');
+
+        let selectedUpgradeItemId = null;
+
+        // Por nivel -> porcentaje de incremento aplicado SOBRE el stat base al subir al siguiente nivel
+        const UPGRADE_PERCENT_STEPS = [0, 10, 15, 18, 22, 26, 30, 35, 40, 50]; // índice 1 = 1->2
+        const MAX_ITEM_LEVEL = 10;
+
+        function getNextUpgradePercent(currentLevel){
+            if (!currentLevel || currentLevel < 1) currentLevel = 1;
+            if (currentLevel >= MAX_ITEM_LEVEL) return 0;
+            return UPGRADE_PERCENT_STEPS[Math.min(currentLevel, UPGRADE_PERCENT_STEPS.length-1)];
+        }
+
+        function ensureItemHasBaseStats(item){
+            if (!item) return {};
+            if (!item.baseStats) {
+                const base = baseItems[item.id] && baseItems[item.id].stats ? JSON.parse(JSON.stringify(baseItems[item.id].stats)) : (item.stats ? JSON.parse(JSON.stringify(item.stats)) : {});
+                item.baseStats = base;
+                // Ensure current stats exist
+                item.stats = item.stats || JSON.parse(JSON.stringify(base));
+                // default level
+                if (!item.level) item.level = 1;
+            }
+            return item.baseStats;
+        }
+
+        function calcUpgradeCostForItem(item){
+            // Coste escalado por nivel y rareza (si existe)
+            const level = item.level || 1;
+            const rarity = (baseItems[item.id] && baseItems[item.id].rarity) || (item.rarity || 'Common');
+            const rarityMult = rarity === 'Rare' ? 1.1 : (rarity === 'Epic' ? 1.3 : (rarity === 'Mythic' ? 1.6 : 1));
+            const baseValue = Math.max(1, (item.baseStats && ((item.baseStats.attack||0) + (item.baseStats.defense||0))) || 5);
+            const cost = Math.round(150 * level * (1 + level*0.08) * rarityMult + baseValue * 10);
+            return Math.max(50, cost);
+        }
+
+        function renderUpgradeEquipmentList(){
+            if (!upgradeListDiv) return;
+            upgradeListDiv.innerHTML = '';
+            const addCardFor = (it, source) => {
+                if (!it) return;
+                ensureItemHasBaseStats(it);
+                // ensure instance has uid
+                if (!it.uid) {
+                    it.uid = genUid();
+                    // persist back to inventory/equipment depending on source
+                    if (source === 'inv') {
+                        const idx = player.inventory.findIndex(x => x === it || x.id === it.id && !x.uid);
+                        if (idx !== -1) player.inventory[idx].uid = it.uid;
+                    } else if (source === 'equip') {
+                        for (const s in player.equipment) {
+                            if (player.equipment[s] && player.equipment[s].id === it.id && !player.equipment[s].uid) player.equipment[s].uid = it.uid;
+                        }
+                    }
+                }
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.dataset.uid = it.uid || '';
+                card.dataset.itemId = it.id || '';
+                card.innerHTML = `
+                    <div class="item-card-top" style="display:flex;gap:8px;align-items:center;justify-content:center;flex-direction:column;">
+                        <div class="item-icon">${(baseItems[it.id]||it).icon||''}</div>
+                        <div style="font-size:0.95rem;font-weight:700;">${it.name||it.id||'Item'}</div>
+                    </div>
+                    <div style="font-size:0.8rem;color:#cfeeff;margin-top:6px;">LV ${it.level||1}</div>
+                `;
+                card.addEventListener('click', ()=> selectUpgradeItemByUid(it.uid));
+                upgradeListDiv.appendChild(card);
+            };
+
+            // equipo equipado (mostrar primero)
+            for (const slot of ['weapon','shield','armor','accessory']){
+                const it = player.equipment[slot];
+                if (it) addCardFor(it, 'equip');
+            }
+            // items en inventario: cada instancia
+            for (const inv of player.inventory){
+                const base = baseItems[inv.id] || inv;
+                if (['weapon','armor','shield','accessory'].includes(base.type)){
+                    addCardFor(inv, 'inv');
+                }
+            }
+        }
+
+        function selectUpgradeItemByUid(uid){
+            if (!uid) return;
+            selectedUpgradeItemId = uid; // ahora guarda uid
+            const cards = upgradeListDiv.querySelectorAll('.item-card');
+            cards.forEach(c=> c.classList.toggle('selected', c.dataset.uid === String(selectedUpgradeItemId)));
+            let item = player.inventory.find(it => it.uid === uid) || Object.values(player.equipment).find(it => it && it.uid === uid);
+            // fallback: si no encontró por uid, intentar buscar por itemId en la card seleccionada
+            if (!item) {
+                const selCard = upgradeListDiv.querySelector(`.item-card.selected`);
+                if (selCard && selCard.dataset && selCard.dataset.itemId) {
+                    const iid = selCard.dataset.itemId;
+                    // buscar primer item en inventario con ese id
+                    item = player.inventory.find(it => it.id === iid) || Object.values(player.equipment).find(it => it && it.id === iid);
+                    // si encontramos y no tiene uid, asignar uid persistente
+                    if (item && !item.uid) { item.uid = uid; }
+                }
+            }
+            if (!item) return;
+            ensureItemHasBaseStats(item);
+            const level = item.level || 1;
+            if (level >= MAX_ITEM_LEVEL){
+                upgradePreviewDiv.innerHTML = `<strong>${item.name || item.id}</strong><p>Nivel máximo alcanzado (${level}).</p>`;
+                upgradeCostSpan.textContent = '—';
+                confirmUpgradeBtn.disabled = true;
+                return;
+            }
+            const percent = getNextUpgradePercent(level);
+            // mostrar preview por stat
+            const base = item.baseStats || {};
+            const curr = item.stats || {};
+            let previewHtml = `<strong>${item.name || item.id}</strong><p style="margin-top:6px;">${level} → ${level+1}  (+${percent}%)</p><ul style="text-align:left;margin-top:8px;">`;
+            ['attack','defense','hp','mp'].forEach(stat => {
+                const b = base[stat] || 0;
+                const c = curr[stat] || 0;
+                const delta = Math.round(b * (percent/100));
+                const projected = c + delta;
+                if (b || c || delta) previewHtml += `<li>${stat.toUpperCase()}: ${c} → ${projected} <span style="color:#9fd8ff;">(+${delta})</span></li>`;
+            });
+            previewHtml += `</ul>`;
+            const cost = calcUpgradeCostForItem(item);
+            upgradeCostSpan.textContent = cost;
+            confirmUpgradeBtn.disabled = player.col < cost;
+            upgradePreviewDiv.innerHTML = previewHtml + `<p style="margin-top:8px;">Coste: ${cost} Col</p>`;
+        }
+
+        function confirmUpgrade(){
+            if (!selectedUpgradeItemId) return;
+            // localizar item por uid en equipo o inventario
+            let item = player.inventory.find(it => it.uid === selectedUpgradeItemId) || Object.values(player.equipment).find(it => it && it.uid === selectedUpgradeItemId);
+            if (!item) { showNotification('Item no encontrado.', 'error'); return; }
+            ensureItemHasBaseStats(item);
+            const level = item.level || 1;
+            if (level >= MAX_ITEM_LEVEL){ showNotification('Item ya está en nivel máximo.', 'default'); return; }
+            const cost = calcUpgradeCostForItem(item);
+            if (player.col < cost){ showNotification('No tienes suficiente Col', 'error'); return; }
+            const percent = getNextUpgradePercent(level);
+            // aplicar incremento sobre baseStats
+            ['attack','defense','hp','mp'].forEach(stat => {
+                const b = item.baseStats[stat] || 0;
+                const delta = Math.round(b * (percent/100));
+                item.stats[stat] = (item.stats[stat] || 0) + delta;
+            });
+            item.level = (item.level || 1) + 1;
+            player.col -= cost;
+            updatePlayerHUD(); renderInventory(); renderEquipment(); renderUpgradeEquipmentList();
+            confirmUpgradeBtn.disabled = true; selectedUpgradeItemId = null; upgradePreviewDiv.innerHTML = 'Selecciona un equipo para ver detalles y coste.';
+            showNotification('Equipo mejorado al siguiente nivel.', 'success');
+            saveGame();
+        }
+
+        if (confirmUpgradeBtn) confirmUpgradeBtn.addEventListener('click', confirmUpgrade);
+
+        // Inicializar vista
+        renderUpgradeEquipmentList();
+
+        // Eliminar/ocultar funcionalidades de Reforjar y Reforzar Gemas (se piden borrar)
+        (function disableReforgeAndGems(){
+            const reforgeBtn = document.querySelector('.bs-option[data-target="blacksmithReforgeModal"]');
+            const gemsBtn = document.querySelector('.bs-option[data-target="blacksmithGemsModal"]');
+            if (reforgeBtn) reforgeBtn.remove();
+            if (gemsBtn) gemsBtn.remove();
+            const reforgeModal = document.getElementById('blacksmithReforgeModal'); if (reforgeModal) reforgeModal.remove();
+            const gemsModal = document.getElementById('blacksmithGemsModal'); if (gemsModal) gemsModal.remove();
+        })();
+
+        // Añadir emojis y pequeño ajuste visual a botones del selector si faltan
+        (function decorateBlacksmithSelectorButtons(){
+            const map = { 'blacksmithForgeModal': '🔨', 'blacksmithUpgradeModal': '⬆️', 'blacksmithMainModal': '🛠️' };
+            document.querySelectorAll('.bs-option').forEach(btn => {
+                const target = btn.dataset.target;
+                const emoji = map[target];
+                if (emoji && !btn.textContent.trim().startsWith(emoji)) btn.textContent = `${emoji} ${btn.textContent.trim()}`;
+            });
+        })();
+
+        // ------------------ FIN Herrería ------------------
 
         const combatLogDisplayElement = document.getElementById('combat-log-display');
         const combatActionAttackBtn = document.getElementById('combat-action-attack');
@@ -1605,39 +1901,82 @@
         // ===============================================
         //           INVENTARIO Y EQUIPO 
         // ===============================================
-        function renderInventory() { 
+        function renderInventory() {
             inventoryGridDisplay.innerHTML = '';
+            // Mostrar consumibles/materiales agrupados y cada instancia de equip por separado
+            // Agrupar stackables
+            const stackables = {};
+            const nonStack = [];
             player.inventory.forEach((item, index) => {
-                const itemData = baseItems[item.id] || item; 
+                const base = baseItems[item.id] || item;
+                if (base.type === 'consumable' || base.type === 'material') {
+                    if (!stackables[item.id]) stackables[item.id] = { item: item, count: 0 };
+                    stackables[item.id].count += item.count || 1;
+                } else {
+                    nonStack.push({ item, index });
+                }
+            });
+
+            // Render stackables
+            Object.values(stackables).forEach(s => {
+                const item = s.item;
+                const itemData = baseItems[item.id] || item;
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'inventory-item';
-                // apply rarity class for border/glow
                 const rarityLabel = itemData.rarity || 'Common';
-                const rarityClass = rarityLabel.toLowerCase();
-                itemDiv.classList.add(`rarity-${rarityClass}`);
-                let detailsHtml = itemData.description ? `<span class="item-details">${itemData.description}</span>` : '';
-                if (itemData.stats) {
-                    detailsHtml += `<span class="item-details">ATK:${itemData.stats.attack || 0} DEF:${itemData.stats.defense || 0} HP:${itemData.stats.hp || 0} MP:${itemData.stats.mp || 0}</span>`;
-                }
-                if (itemData.effect) { // Asegurarse que itemData.effect existe
-                     detailsHtml += `<span class="item-details">Efecto: ${Object.entries(itemData.effect).map(([key, val]) => `${key.toUpperCase()}: ${val}`).join(', ')}</span>`;
-                }
+                itemDiv.classList.add(`rarity-${rarityLabel.toLowerCase()}`);
+                itemDiv.classList.add(rarityLabel.toLowerCase()); // compat class (rare, epic, mythic)
+                itemDiv.setAttribute('data-rarity', rarityLabel);
                 const rarityColor = rarityLabel === 'Epic' ? '#b19cd9' : (rarityLabel === 'Rare' ? '#87ceeb' : (rarityLabel === 'Mythic' ? '#ff4d4d' : '#cccccc'));
+                const detailsHtml = itemData.description ? `<span class="item-details">${itemData.description}</span>` : '';
                 const socketHtml = itemData.sockets ? `<span class="item-sockets">🔵×${itemData.sockets}</span>` : '';
                 itemDiv.innerHTML = `
                     <span class="item-icon">${itemData.icon}</span>
-                    <span class="item-name ${rarityLabel === 'Mythic' ? 'mythic' : ''}">${itemData.name}</span>
-                    <span class="item-rarity" style="color:${rarityColor}; font-weight:700; margin-left:0.4rem;">${rarityLabel}</span>
+                    <span class="item-name ${(itemData.rarity||'Common').toLowerCase()}">${itemData.name}</span>
+                    <span class="item-rarity" style="color:${rarityColor}; font-weight:700; margin-top:6px;">${rarityLabel}</span>
+                    ${itemData.levelReq ? `<span class="item-level-req">Req. LV: ${itemData.levelReq}</span>` : ''}
+                    <span class="item-count">x${s.count}</span>
                     ${detailsHtml}
                     ${socketHtml}
-                    ${itemData.levelReq ? `<span class="item-level-req">Req. LV: ${itemData.levelReq}</span>` : ''}
-                    ${item.count > 1 ? `<span class="item-count">x${item.count}</span>` : ''}
                 `;
-                itemDiv.onclick = () => handleItemClick(index);
+                itemDiv.onclick = () => handleItemClickById(item.id);
+                inventoryGridDisplay.appendChild(itemDiv);
+            });
+
+            // Render non-stackables (each instance)
+            nonStack.forEach(({ item, index }) => {
+                const itemData = baseItems[item.id] || item;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'inventory-item';
+                const rarityLabel = itemData.rarity || 'Common';
+                itemDiv.classList.add(`rarity-${rarityLabel.toLowerCase()}`);
+                itemDiv.classList.add(rarityLabel.toLowerCase());
+                itemDiv.setAttribute('data-rarity', rarityLabel);
+                const rarityColor = rarityLabel === 'Epic' ? '#b19cd9' : (rarityLabel === 'Rare' ? '#87ceeb' : (rarityLabel === 'Mythic' ? '#ff4d4d' : '#cccccc'));
+                let detailsHtml = itemData.description ? `<span class="item-details">${itemData.description}</span>` : '';
+                if (item.stats) detailsHtml += `<span class="item-details">ATK:${item.stats.attack||0} DEF:${item.stats.defense||0} HP:${item.stats.hp||0} MP:${item.stats.mp||0}</span>`;
+                const socketHtml = item.sockets ? `<span class="item-sockets">🔵×${item.sockets}</span>` : '';
+                itemDiv.innerHTML = `
+                    <span class="item-icon">${itemData.icon}</span>
+                    <span class="item-name ${(itemData.rarity||'Common').toLowerCase()}">${itemData.name}</span>
+                    <span class="item-rarity" style="color:${rarityColor}; font-weight:700; margin-top:6px;">${rarityLabel}</span>
+                    ${item.level ? `<div style="font-size:0.85rem;color:#cfeeff">LV ${item.level}</div>` : ''}
+                    ${itemData.levelReq ? `<span class="item-level-req">Req. LV: ${itemData.levelReq}</span>` : ''}
+                    ${detailsHtml}
+                    ${socketHtml}
+                `;
+                // ensure item has a uid so clicks map to the correct instance
+                if (!item.uid) {
+                    const newUid = genUid();
+                    item.uid = newUid;
+                    // persist back to player inventory
+                    player.inventory[index].uid = newUid;
+                }
+                itemDiv.onclick = () => handleItemClickByUid(item.uid);
                 inventoryGridDisplay.appendChild(itemDiv);
             });
         }
-        function renderEquipment() { 
+        function renderEquipment() {
             const slots = { weapon: equipWeaponSlot, shield: equipShieldSlot, armor: equipArmorSlot, accessory: equipAccessorySlot };
             for (const slotName in slots) {
                 const slotElement = slots[slotName];
@@ -1648,12 +1987,17 @@
                     const rarity = itemData.rarity || 'Common';
                     const rarityColor = rarity === 'Epic' ? '#b19cd9' : (rarity === 'Rare' ? '#87ceeb' : (rarity === 'Mythic' ? '#ff4d4d' : '#cccccc'));
                     // clear previous rarity classes then add rarity class to slot for border/glow
-                    slotElement.classList.remove('rarity-common','rarity-rare','rarity-epic','rarity-mythic');
+                    slotElement.classList.remove('rarity-common','rarity-rare','rarity-epic','rarity-mythic','common','rare','epic','mythic');
                     slotElement.classList.add(`rarity-${(rarity||'Common').toLowerCase()}`);
+                    slotElement.classList.add((rarity||'Common').toLowerCase());
+                    slotElement.setAttribute('data-rarity', rarity || 'Common');
                     const socketHtml = itemData.sockets ? `<span class="item-sockets">🔵×${itemData.sockets}</span>` : '';
+                    const rarityClass = (rarity||'Common').toLowerCase();
                     slotElement.innerHTML += `
                         <span class="item-icon">${itemData.icon}</span>
-                        <span class="item-name ${rarity === 'Mythic' ? 'mythic' : ''}">${itemData.name}</span>
+                        <span class="item-name ${rarityClass}">${itemData.name}</span>
+                        <span class="item-level" style="font-size:0.85rem;color:#cfeeff;margin-left:0.4rem;">LV ${itemData.level || 1}</span>
+                        ${itemData.levelReq ? `<span class="item-level-req">Req. LV: ${itemData.levelReq}</span>` : ''}
                         <span class="item-rarity" style="color:${rarityColor}; margin-left:0.4rem; font-weight:700;">${rarity}</span>
                         ${socketHtml}
                     `;
@@ -1668,20 +2012,28 @@
             calculateEffectiveStats();
             updatePlayerHUD();
         }
-        function handleItemClick(itemIndexInInventory) { 
-            const item = player.inventory[itemIndexInInventory];
-            if (!item) return;
-            const itemBaseData = baseItems[item.id] || item;
+        function handleItemClickById(itemId) {
+            // usado para consumibles/materiales agrupados
+            const itemBaseData = baseItems[itemId];
+            if (!itemBaseData) return;
             if (itemBaseData.type === 'consumable') {
-                useConsumable(item, itemIndexInInventory);
-            } else if (['weapon', 'shield', 'armor', 'accessory'].includes(itemBaseData.type)) {
-                if (player.level >= (itemBaseData.levelReq || 0)) {
-                    equipItem(item, itemIndexInInventory);
-                } else {
-                    showNotification(`Necesitas ser Nivel ${itemBaseData.levelReq} para equipar ${itemBaseData.name}.`, "error");
-                }
+                const idx = player.inventory.findIndex(it => it.id === itemId && (baseItems[it.id] && baseItems[it.id].type === 'consumable'));
+                if (idx !== -1) useConsumable(player.inventory[idx], idx);
             } else if (itemBaseData.type === 'material') {
-                showNotification(`${itemBaseData.name}: Material de forja. Tienes ${player.materials[item.id] || item.count}.`, "default");
+                showNotification(`${itemBaseData.name}: Material de forja. Tienes ${player.materials[itemId] || 0}.`, "default");
+            }
+        }
+
+        function handleItemClickByUid(uid) {
+            const idx = player.inventory.findIndex(it => it.uid === uid);
+            if (idx === -1) return;
+            const item = player.inventory[idx];
+            const itemBaseData = baseItems[item.id] || item;
+            if (itemBaseData.type === 'consumable') return useConsumable(item, idx);
+            if (['weapon','shield','armor','accessory'].includes(itemBaseData.type)) {
+                if (player.level >= (itemBaseData.levelReq || 0)) {
+                    equipItemByUid(item.uid);
+                } else showNotification(`Necesitas ser Nivel ${itemBaseData.levelReq} para equipar ${itemBaseData.name}.`, 'error');
             }
         }
         function useConsumable(itemInstance, index) { 
@@ -1694,55 +2046,59 @@
             }
             showNotification(`Has usado ${itemBase.name}.`, "success");
             itemInstance.count = (itemInstance.count || 1) - 1;
-            if (itemInstance.count <= 0) {
-                player.inventory.splice(index, 1);
-            }
+            if (itemInstance.count <= 0) player.inventory.splice(index, 1);
             renderInventory();
             saveGame();
         }
-        function equipItem(itemToEquipInstance, itemIndexInInventory) { 
+        function equipItemByUid(uid) {
+            const idx = player.inventory.findIndex(it => it.uid === uid);
+            if (idx === -1) return;
+            const itemToEquipInstance = player.inventory[idx];
             const itemBase = baseItems[itemToEquipInstance.id] || itemToEquipInstance;
             const slot = itemBase.slot;
             if (!slot) return;
+            // move currently equipped back to inventory as an instance
             if (player.equipment[slot]) {
-                addItemToInventory(player.equipment[slot]); 
+                const old = player.equipment[slot];
+                addItemToInventory({ id: old.id, uid: old.uid, level: old.level, stats: old.stats }, 1);
             }
-            player.equipment[slot] = JSON.parse(JSON.stringify(itemToEquipInstance)); 
-            itemToEquipInstance.count = (itemToEquipInstance.count || 1) -1;
-            if(itemToEquipInstance.count <= 0) {
-                player.inventory.splice(itemIndexInInventory, 1);
-            }
+            // equip the instance (preserve uid/stats)
+            player.equipment[slot] = player.inventory.splice(idx,1)[0];
             showNotification(`${itemBase.name} equipado.`, "success");
-            renderInventory();
-            renderEquipment();
-            saveGame();
+            renderInventory(); renderEquipment(); saveGame();
         }
-        function unequipItem(slotName) { 
+        function equipItem(itemToEquipInstance, itemIndexInInventory) { // backward compatibility
+            if (itemToEquipInstance.uid) return equipItemByUid(itemToEquipInstance.uid);
+            return equipItemByUid(null);
+        }
+        function unequipItem(slotName) {
             const itemToUnequipInstance = player.equipment[slotName];
             if (!itemToUnequipInstance) return;
             const itemBase = baseItems[itemToUnequipInstance.id] || itemToUnequipInstance;
-            addItemToInventory(itemToUnequipInstance); 
+            addItemToInventory({ id: itemToUnequipInstance.id, uid: itemToUnequipInstance.uid, level: itemToUnequipInstance.level, stats: itemToUnequipInstance.stats }, 1);
             player.equipment[slotName] = null;
             showNotification(`${itemBase.name} desequipado.`, "default");
-            renderInventory();
-            renderEquipment();
-            saveGame();
+            renderInventory(); renderEquipment(); saveGame();
         }
-        function addItemToInventory(itemData, quantity = 1) { // Modificado para aceptar cantidad
+        function addItemToInventory(itemData, quantity = 1) {
             const itemBase = baseItems[itemData.id] || itemData;
-            // Los items de equipo no se apilan, los consumibles y materiales sí.
             const stackable = itemBase.type === 'consumable' || itemBase.type === 'material';
-            const existingItem = player.inventory.find(invItem => invItem.id === itemData.id && stackable); 
-            
-            if (existingItem && stackable) {
-                existingItem.count = (existingItem.count || 0) + quantity;
-            } else {
-                const newItemInstance = JSON.parse(JSON.stringify(itemBase)); 
-                newItemInstance.id = itemData.id; 
-                newItemInstance.count = quantity; // Usar la cantidad pasada
-                delete newItemInstance.price; 
-                delete newItemInstance.stock;
-                player.inventory.push(newItemInstance);
+            if (stackable) {
+                const existing = player.inventory.find(inv => inv.id === itemData.id && (baseItems[inv.id] && (baseItems[inv.id].type === 'consumable' || baseItems[inv.id].type === 'material')) );
+                if (existing) { existing.count = (existing.count||0) + quantity; return; }
+                const newItem = JSON.parse(JSON.stringify(itemBase)); newItem.id = itemData.id; newItem.count = quantity; delete newItem.price; delete newItem.stock; player.inventory.push(newItem); return;
+            }
+            // Non-stackable: create `quantity` instances each with uid
+            for (let i=0;i<quantity;i++) {
+                const inst = JSON.parse(JSON.stringify(itemBase));
+                inst.id = itemData.id;
+                inst.uid = itemData.uid || genUid();
+                inst.count = 1;
+                inst.baseStats = inst.baseStats || (inst.stats ? JSON.parse(JSON.stringify(inst.stats)) : {});
+                inst.stats = inst.stats || JSON.parse(JSON.stringify(inst.baseStats));
+                inst.level = itemData.level || inst.level || 1;
+                delete inst.price; delete inst.stock;
+                player.inventory.push(inst);
             }
         }
 
@@ -1767,6 +2123,8 @@
                 // rarity class + mythic name color
                 const shopRarity = (itemToDisplay.rarity || 'Common').toLowerCase();
                 itemDiv.classList.add(`rarity-${shopRarity}`);
+                itemDiv.classList.add(shopRarity);
+                itemDiv.setAttribute('data-rarity', itemToDisplay.rarity || 'Common');
                 let detailsHtml = itemToDisplay.description ? `<span class="item-details">${itemToDisplay.description}</span>` : '';
                  if (itemToDisplay.stats) {
                     detailsHtml += `<span class="item-details">ATK:${itemToDisplay.stats.attack || 0} DEF:${itemToDisplay.stats.defense || 0} HP:${itemToDisplay.stats.hp || 0} MP:${itemToDisplay.stats.mp || 0}</span>`;
@@ -1776,7 +2134,7 @@
                 const socketHtml = itemToDisplay.sockets ? `<span class="item-sockets">🔵×${itemToDisplay.sockets}</span>` : '';
                 itemDiv.innerHTML = `
                     <span class="item-icon">${itemToDisplay.icon}</span>
-                    <span class="item-name ${itemToDisplay.rarity === 'Mythic' ? 'mythic' : ''}">${itemToDisplay.name}</span>
+                    <span class="item-name ${(itemToDisplay.rarity||'Common').toLowerCase()}">${itemToDisplay.name}</span>
                     <span class="item-rarity" style="color:${rarityColor}; font-weight:700; margin-left:0.4rem;">${rarity}</span>
                     ${detailsHtml}
                     ${socketHtml}
@@ -1843,13 +2201,19 @@
         function renderBlacksmithRecipes() { 
             const currentFloorRecipes = floorData[player.currentFloor]?.blacksmithRecipes || [];
             blacksmithGridDisplay.innerHTML = '';
+            // clear forge modal grid as well to avoid duplicates
+            const forgeGridClear = document.getElementById('forge-recipes-grid');
+            if (forgeGridClear) forgeGridClear.innerHTML = '';
             blacksmithFloorNumberElement.textContent = player.currentFloor;
             blacksmithPlayerColElement.textContent = player.col;
             renderPlayerMaterials();
-            const availableRecipes = Object.values(blacksmithRecipes).filter(recipeDef => 
-                currentFloorRecipes.includes(recipeDef.itemId) || 
-                (recipeDef.levelReq && player.level >= recipeDef.levelReq && !currentFloorRecipes.includes(recipeDef.itemId)) 
-            );
+            // Mostrar recetas listadas explícitamente en el piso (por clave de receta)
+            // o recetas desbloqueadas por nivel del jugador.
+            const availableRecipes = Object.entries(blacksmithRecipes).filter(([key, recipeDef]) => {
+                if (currentFloorRecipes && currentFloorRecipes.includes(key)) return true;
+                if (recipeDef.levelReq && player.level >= recipeDef.levelReq) return true;
+                return false;
+            }).map(([key, recipeDef]) => ({ key, ...recipeDef }));
             if (availableRecipes.length === 0) {
                 blacksmithGridDisplay.innerHTML = "<p>No hay recetas de forja disponibles o que cumplas los requisitos en este piso.</p>";
                 return;
@@ -1861,6 +2225,8 @@
                 itemDiv.className = 'blacksmith-item';
                 const craftRarity = (itemToCraftBase.rarity || 'Common').toLowerCase();
                 itemDiv.classList.add(`rarity-${craftRarity}`);
+                itemDiv.classList.add(craftRarity);
+                itemDiv.setAttribute('data-rarity', itemToCraftBase.rarity || 'Common');
                 let materialsHtml = "Materiales: ";
                 let canCraft = true;
                 for (const matId in recipe.materials) {
@@ -1877,9 +2243,12 @@
                  if (itemToCraftBase.stats) {
                     detailsHtml += `<span class="item-details">ATK:${itemToCraftBase.stats.attack || 0} DEF:${itemToCraftBase.stats.defense || 0} HP:${itemToCraftBase.stats.hp || 0}</span>`;
                 }
+                const rarityLabel = itemToCraftBase.rarity || 'Common';
+                const rarityColor = rarityLabel === 'Epic' ? '#b19cd9' : (rarityLabel === 'Rare' ? '#87ceeb' : (rarityLabel === 'Mythic' ? '#ff4d4d' : '#cccccc'));
                 itemDiv.innerHTML = `
                     <span class="item-icon">${itemToCraftBase.icon}</span>
-                    <span class="item-name ${itemToCraftBase.rarity === 'Mythic' ? 'mythic' : ''}">${itemToCraftBase.name}</span>
+                    <span class="item-name ${(itemToCraftBase.rarity||'Common').toLowerCase()}">${itemToCraftBase.name}</span>
+                    <span class="item-rarity" style="color:${rarityColor}; font-weight:700; margin-top:6px;">${rarityLabel}</span>
                     ${detailsHtml}
                     ${itemToCraftBase.levelReq ? `<span class="item-level-req">Req. LV: ${itemToCraftBase.levelReq}</span>` : ''}
                     <span class="item-materials">${materialsHtml}</span>
@@ -1889,11 +2258,21 @@
                 if (!canCraft) {
                     itemDiv.style.opacity = "0.6";
                     itemDiv.style.pointerEvents = "none"; 
-                     itemDiv.title = "No cumples los requisitos o no tienes suficientes materiales/Col.";
+                    itemDiv.title = "No cumples los requisitos o no tienes suficientes materiales/Col.";
                 } else {
-                    itemDiv.onclick = () => attemptForge(recipe.itemId);
+                    // use recipe.key to identify which recipe to attempt (key = blacksmithRecipes key)
+                    itemDiv.onclick = () => attemptForge(recipe.key);
                 }
+                // append to main blacksmith grid
                 blacksmithGridDisplay.appendChild(itemDiv);
+                // if the Forge modal grid exists, also append a clone so recipes show in the Forge modal
+                const forgeGrid = document.getElementById('forge-recipes-grid');
+                if (forgeGrid) {
+                    const clone = itemDiv.cloneNode(true);
+                    // ensure onclick uses recipe.key as well on the clone
+                    clone.onclick = itemDiv.onclick;
+                    forgeGrid.appendChild(clone);
+                }
             });
         }
         function attemptForge(recipeIdToForge) { 
@@ -1998,6 +2377,10 @@
             if (modalId === 'inventoryModal') { renderInventory(); renderEquipment(); }
             if (modalId === 'shopModal') renderShop();
             if (modalId === 'blacksmithModal') renderBlacksmithRecipes();
+            // Cuando abrimos el modal de Forjar en la interfaz rework, asegurarnos de renderizar recetas
+            if (modalId === 'blacksmithForgeModal') renderBlacksmithRecipes();
+            // Cuando abrimos el modal de Mejorar, normalizar instancias y renderizar la lista
+            if (modalId === 'blacksmithUpgradeModal') { normalizePlayerItems(); renderUpgradeEquipmentList(); upgradePreviewDiv.innerHTML = 'Selecciona un equipo para ver detalles y coste.'; selectedUpgradeItemId = null; }
             if (modalId === 'playerStatsModal') renderPlayerStats();
             if (modalId === 'nameEntryModal') { 
                 playerNameInputElement.focus();
@@ -2303,6 +2686,8 @@
                     player.equipment = loadedData.equipment || { weapon: null, shield: null, armor: null, accessory: null };
                     player.materials = loadedData.materials || {};
                     player.isAdmin = loadedData.isAdmin || false; // Cargar estado de admin
+                    // Normalizar instancias (uids, stats, niveles)
+                    normalizePlayerItems();
                     
                     player.skills = []; 
                     if (loadedData.skills && Array.isArray(loadedData.skills)) {
@@ -2388,7 +2773,9 @@
 
             if (promptName) {
                 promptForPlayerName();
-            } else { 
+            } else {
+                // Normalize created inventory instances
+                normalizePlayerItems();
                 calculateEffectiveStats();
                 updatePlayerHUD();
                 renderEquipment();
@@ -2409,10 +2796,9 @@
                 showNotification(`¡Nombre establecido como ${player.name}!`, "success");
                 
                 if (!player.equipment.weapon) {
-                    const basicSwordIndex = player.inventory.findIndex(i => i.id === 'basic_sword');
-                    if (basicSwordIndex !== -1) {
-                        const swordToEquip = JSON.parse(JSON.stringify(player.inventory[basicSwordIndex]));
-                        equipItem(swordToEquip, basicSwordIndex);
+                    const basicInstance = player.inventory.find(i => i.id === 'basic_sword');
+                    if (basicInstance) {
+                        equipItemByUid(basicInstance.uid);
                     }
                 }
                 
@@ -2757,7 +3143,7 @@
             trainSkillBtn.onclick = () => openTrainingModal(); 
             inventoryBtn.onclick = () => openModal('inventoryModal');
             shopBtn.onclick = () => openModal('shopModal');
-            blacksmithBtn.onclick = () => openModal('blacksmithModal');
+            blacksmithBtn.onclick = () => openBlacksmithMain();
             playerStatsBtn.onclick = () => openModal('playerStatsModal');
             adminAccessBtn.onclick = openAdminLoginModal; // Listener para el botón de admin
             submitAdminKeyBtn.onclick = checkAdminKey; // Listener para el botón de enviar clave admin
